@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Beniah.games</title>
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    :root { --accent:#ffcc00; --bg:#111; --panel:#1c1c1c; --muted:#bbb; }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:#eee}
+    header{padding:5rem 1rem;text-align:center;background:linear-gradient(135deg,#171717,#262626)}
+    h1{margin:0;font-size:3rem;color:var(--accent)} p{color:var(--muted)}
+    main{max-width:960px;margin:0 auto;padding:2rem 1rem}
+    section{margin:3rem 0}
+    .grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    .card{background:var(--panel);border-radius:12px;padding:1.25rem}
+    .card h3{margin:.25rem 0;color:var(--accent)}
+    a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+    footer{padding:2rem 1rem;text-align:center;color:#888;border-top:1px solid #222}
+    .btn{display:inline-block;margin-top:1rem;padding:.75rem 1.1rem;border:1px solid var(--accent);border-radius:10px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Beniah.games</h1>
+    <p>Indie Game Developer • Quirky • Funny • Endless</p>
+    <a class="btn" href="#games">See My Games</a>
+  </header>
+
+  <main>
+    <section id="about">
+      <h2>About</h2>
+      <p>Hi, I’m <strong>Beniah Gepts</strong>. I make playful incremental/idle and retro-sci-fi games.</p>
+    </section>
+
+    <section id="games">
+      <h2>Games</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Is This My Floor?</h3>
+          <p>A clever idle elevator game about going nowhere—and calling it progress.</p>
+          <p><em>Store page coming soon</em></p>
+        </div>
+        <div class="card">
+          <h3>Desktop Defender</h3>
+          <p>Antivirus-themed incremental tower defense at the bottom of your desktop.</p>
+          <p><em>In development</em></p>
+        </div>
+        <div class="card">
+          <h3>Project QB</h3>
+          <p>Retro-sci-fi roguelike with cartridge battles starring QB.</p>
+          <p><em>In development</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Email: <a href="mailto:contact@beniah.games">contact@beniah.games</a></p>
+    </section>
+  </main>
+
+  <footer>© 2025
