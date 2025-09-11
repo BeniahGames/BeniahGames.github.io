@@ -166,14 +166,14 @@
     </section>
   </main>
 
-  <footer>© 2025 Beniah Gepts • Making games that put fun first.</footer>
+  <footer>© 2025 Beniah Gepts</footer>
   <button id="back-to-top" aria-label="Back to top">↑</button>
 
   <script>
     // Reveal on scroll
     (()=>{const els=document.querySelectorAll('.reveal');const obs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('revealed');obs.unobserve(e.target)}})},{threshold:.15});els.forEach(el=>obs.observe(el));})();
 
-    // Collapsible cards (all of them)
+    // Collapsible cards
     (() => {
       const cards = document.querySelectorAll('#games .card');
       cards.forEach(card => {
