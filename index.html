@@ -402,7 +402,7 @@
         // Contact section
         'contact.title': 'Contact',
         'contact.lead': 'Say hi, ask a question, or talk shop.',
-        'contact.email': 'Email:',
+        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Join the server',
         
@@ -445,7 +445,7 @@
         // Contact section
         'contact.title': 'Contact',
         'contact.lead': 'Zeg hoi, stel een vraag, of praat shop.',
-        'contact.email': 'Email:',
+        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Deelnemen aan de server',
         
@@ -488,7 +488,7 @@
         // Contact section
         'contact.title': 'Kontakt',
         'contact.lead': 'Sag hallo, stell eine Frage oder rede Fachsimpelei.',
-        'contact.email': 'Email:',
+        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Server beitreten',
         
@@ -531,7 +531,7 @@
         // Contact section
         'contact.title': 'Contatti',
         'contact.lead': 'Saluta, fai una domanda, o parla di lavoro.',
-        'contact.email': 'Email:',
+        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Unisciti al server',
         
@@ -574,7 +574,7 @@
         // Contact section
         'contact.title': 'Contacto',
         'contact.lead': 'Saluda, haz una pregunta, o habla de trabajo.',
-        'contact.email': 'Email:',
+        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Únete al servidor',
         
@@ -617,7 +617,7 @@
         // Contact section
         'contact.title': 'お問い合わせ',
         'contact.lead': '挨拶、質問、または仕事の話をしましょう。',
-        'contact.email': 'メール：',
+        'contact.email': 'メール：<a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord：',
         'contact.discord_link': 'サーバーに参加',
         
@@ -816,7 +816,7 @@
         elements.forEach(element => {
           const key = element.getAttribute('data-translate');
           if (translations[lang] && translations[lang][key]) {
-            element.textContent = translations[lang][key];
+            element.innerHTML = translations[lang][key];
           }
         });
       };
