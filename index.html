@@ -32,23 +32,17 @@
       background:url('/assets/parallax-back.png') repeat;
       background-size:128px 128px;
       opacity:.3;
-      animation: twinkle 6s ease-in-out infinite;
     }
     .layer-mid{
       background:url('/assets/parallax-mid.png') repeat;
       background-size:96px 96px;
       opacity:.5;
-      animation: twinkle 5s ease-in-out infinite;
-      animation-delay: 2s;
     }
     .layer-front{
       background:url('/assets/parallax-front.png') repeat;
       background-size:64px 64px;
       opacity:.8;
-      animation: twinkle 4s ease-in-out infinite;
-      animation-delay: 1.5s;
     }
-    @keyframes twinkle{0%,100%{opacity:.6}50%{opacity:1}}
 
     /* Hero title glow (sync-ish with front twinkle at 4s) */
     h1.glow {
@@ -297,19 +291,58 @@
   <button id="back-to-top" aria-label="Back to top">↑</button>
 
   <script>
-    // Scroll-based parallax (movement only on scroll)
+    // Scroll-based parallax (movement only on scroll) - optimized for mobile
     (() => {
       const back = document.querySelector('.layer-back');
       const mid = document.querySelector('.layer-mid');
       const front = document.querySelector('.layer-front');
+      
+      let ticking = false;
+      
       const apply = () => {
         const y = window.scrollY || window.pageYOffset || 0;
-        back.style.transform = `translateY(${y * 0.1}px)`;   // far
-        mid.style.transform = `translateY(${y * 0.3}px)`;    // mid
-        front.style.transform = `translateY(${y * 0.5}px)`;  // near
+        
+        // Use transform3d for better mobile performance
+        back.style.transform = `translate3d(0, ${y * 0.1}px, 0)`;   // far
+        mid.style.transform = `translate3d(0, ${y * 0.3}px, 0)`;    // mid
+        front.style.transform = `translate3d(0, ${y * 0.5}px, 0)`;  // near
+        
+        ticking = false;
       };
+      
+      const requestTick = () => {
+        if (!ticking) {
+          requestAnimationFrame(apply);
+          ticking = true;
+        }
+      };
+      
+      // Initial application
       apply();
-      window.addEventListener('scroll', apply, { passive: true });
+      
+      // Handle scroll events with throttling for better performance
+      window.addEventListener('scroll', requestTick, { passive: true });
+      
+      // Handle touch events for mobile devices
+      let touchStartY = 0;
+      let isScrolling = false;
+      
+      window.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        isScrolling = false;
+      }, { passive: true });
+      
+      window.addEventListener('touchmove', (e) => {
+        if (!isScrolling) {
+          isScrolling = true;
+          requestTick();
+        }
+      }, { passive: true });
+      
+      // Handle orientation changes on mobile
+      window.addEventListener('orientationchange', () => {
+        setTimeout(apply, 100);
+      });
     })();
 
     // Reveal on scroll (with fallback so cards never stay hidden)
@@ -359,4 +392,71 @@
             body.getBoundingClientRect();
             body.style.maxHeight = full + 'px';
           } else {
-            body.style.maxHeigh
+            body.style.maxHeight = '0px';
+          }
+        }
+
+        card.addEventListener('click', () => {
+          const isExpanded = card.getAttribute('aria-expanded') === 'true';
+          setExpanded(!isExpanded);
+        });
+
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const isExpanded = card.getAttribute('aria-expanded') === 'true';
+            setExpanded(!isExpanded);
+          }
+        });
+      });
+    })();
+
+    // Hamburger menu
+    (() => {
+      const hamburger = document.getElementById('hamburger');
+      const panel = document.getElementById('menu-panel');
+      
+      hamburger.addEventListener('click', () => {
+        const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+        hamburger.setAttribute('aria-expanded', !isOpen);
+        panel.classList.toggle('open', !isOpen);
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!hamburger.contains(e.target) && !panel.contains(e.target)) {
+          hamburger.setAttribute('aria-expanded', 'false');
+          panel.classList.remove('open');
+        }
+      });
+
+      // Close menu when pressing escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          hamburger.setAttribute('aria-expanded', 'false');
+          panel.classList.remove('open');
+        }
+      });
+    })();
+
+    // Back to top button
+    (() => {
+      const backToTop = document.getElementById('back-to-top');
+      
+      const toggleVisibility = () => {
+        if (window.scrollY > 300) {
+          backToTop.classList.add('show');
+        } else {
+          backToTop.classList.remove('show');
+        }
+      };
+
+      window.addEventListener('scroll', toggleVisibility, { passive: true });
+      
+      backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    })();
+  </script>
+</body>
+</html>
