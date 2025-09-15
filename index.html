@@ -86,6 +86,35 @@
     .nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s}
     .nav-links a:hover::after{transform:scaleX(1)}
 
+    /* Language Dropdown */
+    .language-selector{position:relative;display:inline-block}
+    .language-btn{
+      display:flex;align-items:center;gap:.4rem;padding:.5rem .7rem;
+      border:1px solid var(--border);border-radius:8px;background:transparent;
+      color:var(--text);cursor:pointer;font-size:.85rem;transition:.2s;
+    }
+    .language-btn:hover{border-color:var(--accent);background:rgba(255,204,0,.05)}
+    .language-dropdown{
+      position:absolute;top:100%;right:0;margin-top:.25rem;
+      background:var(--panel);border:1px solid var(--border);border-radius:10px;
+      box-shadow:var(--shadow);min-width:140px;opacity:0;visibility:hidden;
+      transform:translateY(-8px);transition:all .25s ease;z-index:100;
+    }
+    .language-selector.open .language-dropdown{opacity:1;visibility:visible;transform:translateY(0)}
+    .language-option{
+      display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;
+      color:var(--text);text-decoration:none;font-size:.85rem;
+      border-bottom:1px solid var(--border);transition:.2s;
+    }
+    .language-option:last-child{border-bottom:none}
+    .language-option:hover{background:rgba(255,204,0,.08);color:var(--accent)}
+    .language-option.active{background:rgba(255,204,0,.12);color:var(--accent)}
+    .flag{font-size:1.1em}
+    @media(max-width:820px){
+      .language-selector{order:-1;margin-right:auto}
+      .language-dropdown{right:auto;left:0}
+    }
+
     /* Hamburger + Mobile Panel (slide + shadow + stagger) */
     .hamburger{display:none;flex-direction:column;gap:.45rem;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--accent);border-radius:10px;cursor:pointer;background:transparent}
     .hamburger span{width:20px;height:2px;background:var(--accent);transition:.25s}
@@ -176,9 +205,45 @@
 
       <!-- Desktop -->
       <div class="nav-links">
-        <a href="#about">About</a>
-        <a href="#games">Games</a>
-        <a href="#contact">Contact</a>
+        <a href="#about" data-translate="nav.about">About</a>
+        <a href="#games" data-translate="nav.games">Games</a>
+        <a href="#contact" data-translate="nav.contact">Contact</a>
+        
+        <!-- Language Selector -->
+        <div class="language-selector" id="language-selector">
+          <button class="language-btn" id="language-btn" aria-label="Select language">
+            <span class="flag" id="current-flag">🇺🇸</span>
+            <span id="current-lang">EN</span>
+            <span style="font-size:.7em">▼</span>
+          </button>
+          <div class="language-dropdown" id="language-dropdown">
+            <a href="#" class="language-option active" data-lang="en">
+              <span class="flag">🇺🇸</span>
+              <span>English</span>
+            </a>
+            <a href="#" class="language-option" data-lang="nl">
+              <span class="flag">🇳🇱</span>
+              <span>Nederlands</span>
+            </a>
+            <a href="#" class="language-option" data-lang="de">
+              <span class="flag">🇩🇪</span>
+              <span>Deutsch</span>
+            </a>
+            <a href="#" class="language-option" data-lang="it">
+              <span class="flag">🇮🇹</span>
+              <span>Italiano</span>
+            </a>
+            <a href="#" class="language-option" data-lang="es">
+              <span class="flag">🇪🇸</span>
+              <span>Español</span>
+            </a>
+            <a href="#" class="language-option" data-lang="ja">
+              <span class="flag">🇯🇵</span>
+              <span>日本語</span>
+            </a>
+          </div>
+        </div>
+        
         <a class="btn-discord" href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener" aria-label="Join Discord">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.865-.608 1.249a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.077.077 0 00.084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.104c-.652-.247-1.27-.55-1.845-.899a.077.077 0 01-.007-.127c.124-.093.248-.19.366-.287a.074.074 0 01.077-.01c3.869 1.776 8.065 1.776 11.896 0a.075.075 0 01.078.009c.118.098.242.195.366.288a.077.077 0 01-.006.127 12.298 12.298 0 01-1.846.898.077.077 0 00-.04.105c.36.698.772 1.364 1.225 1.994a.076.076 0 00.084.027 19.876 19.876 0 005.994-3.03.077.077 0 00.031-.056c.5-5.177-.838-9.673-3.548-13.66a.06.06 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.947 2.419-2.157 2.419z"/></svg>
           Join Discord
@@ -191,10 +256,10 @@
       <!-- Mobile panel -->
       <div class="menu-panel" id="menu-panel">
         <div class="menu-panel-inner">
-          <a href="#about">About</a>
-          <a href="#games">Games</a>
-          <a href="#contact">Contact</a>
-          <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Join Discord</a>
+          <a href="#about" data-translate="nav.about">About</a>
+          <a href="#games" data-translate="nav.games">Games</a>
+          <a href="#contact" data-translate="nav.contact">Contact</a>
+          <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener" data-translate="nav.discord">Join Discord</a>
         </div>
       </div>
     </div>
@@ -204,16 +269,16 @@
   <header class="hero scanlines">
     <div class="hero-inner">
       <div>
-        <div class="kicker">Indie Game Developer — Belgium</div>
-        <h1 class="glow">Quirky, funny, and <span style="color:var(--accent-2)">endlessly fun</span> games.</h1>
-        <p class="tag">I’m <strong>Beniah Gepts</strong>. New(ish) to gamedev, but I’ve loved games for over 30 years.
-          My goal is simple: make great-quality games that put <em>fun first</em>.</p>
+        <div class="kicker" data-translate="hero.kicker">Indie Game Developer — Belgium</div>
+        <h1 class="glow"><span data-translate="hero.title1">Quirky, funny, and </span><span style="color:var(--accent-2)" data-translate="hero.title2">endlessly fun</span><span data-translate="hero.title3"> games.</span></h1>
+        <p class="tag"><span data-translate="hero.intro1">I'm </span><strong>Beniah Gepts</strong><span data-translate="hero.intro2">. New(ish) to gamedev, but I've loved games for over 30 years.
+          My goal is simple: make great-quality games that put </span><em data-translate="hero.intro3">fun first</em><span data-translate="hero.intro4">.</span></p>
         <div class="cta-row">
-          <a class="cta" href="#games">See the games</a>
-          <a class="cta secondary" href="#about">Learn more</a>
+          <a class="cta" href="#games" data-translate="hero.cta1">See the games</a>
+          <a class="cta secondary" href="#about" data-translate="hero.cta2">Learn more</a>
           <a class="btn-discord" href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515..."/></svg>
-            Join the Discord
+            <span data-translate="hero.discord">Join the Discord</span>
           </a>
         </div>
       </div>
@@ -222,16 +287,16 @@
 
   <main>
     <!-- About -->
-    <section id="about"><h2>About</h2>
-      <p class="lead">Hi, I’m <strong>Beniah Gepts</strong>, an indie developer from Belgium.  
-      I’m relatively new to the game development scene, but I’ve been passionate about games for over 30 years.  
-      I grew up playing and studying them, and now I’m dedicated to creating my own worlds.</p>
-      <p class="lead">My goal is simple: to make games of great quality that focus on one thing above all else — being fun.  
-      Whether it’s quirky idle projects or retro-inspired adventures, I want to craft experiences that bring players joy and a smile.</p>
+    <section id="about"><h2 data-translate="about.title">About</h2>
+      <p class="lead"><span data-translate="about.p1_1">Hi, I'm </span><strong>Beniah Gepts</strong><span data-translate="about.p1_2">, an indie developer from Belgium.  
+      I'm relatively new to the game development scene, but I've been passionate about games for over 30 years.  
+      I grew up playing and studying them, and now I'm dedicated to creating my own worlds.</span></p>
+      <p class="lead" data-translate="about.p2">My goal is simple: to make games of great quality that focus on one thing above all else — being fun.  
+      Whether it's quirky idle projects or retro-inspired adventures, I want to craft experiences that bring players joy and a smile.</p>
     </section>
 
     <!-- Games -->
-    <section id="games"><h2>Games</h2>
+    <section id="games"><h2 data-translate="games.title">Games</h2>
       <div class="grid">
 
         <!-- Is This My Floor? -->
@@ -241,12 +306,12 @@
             <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="collapsible">
-            <p>An idle elevator adventure about going nowhere—while somehow calling it progress. Strange passengers, lost-and-found upgrades, and prestige rides that push your elevator higher each run.</p>
+            <p data-translate="games.floor.desc">An idle elevator adventure about going nowhere—while somehow calling it progress. Strange passengers, lost-and-found upgrades, and prestige rides that push your elevator higher each run.</p>
             <div class="preview" style="margin-top:.75rem"><figure><img src="/assets/is-this-my-floor-preview.gif" alt="Is This My Floor? preview"></figure></div>
             <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.75rem">
-              <a class="btn no-toggle" href="#contact">Contact</a><a class="btn no-toggle" href="#">Steam (soon)</a>
+              <a class="btn no-toggle" href="#contact" data-translate="games.contact">Contact</a><a class="btn no-toggle" href="#" data-translate="games.steam_soon">Steam (soon)</a>
             </div>
-            <p class="muted"><em>Store page coming soon</em></p>
+            <p class="muted"><em data-translate="games.store_soon">Store page coming soon</em></p>
           </div>
         </article>
 
@@ -257,8 +322,8 @@
             <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="collapsible">
-            <p><strong>C.A.R.T.R.I.D.G.E</strong> is a retro sci-fi roguelike card battler where you don’t play cards — you load cartridges. Each run takes you deeper into a corrupted facility as QB, a cube-bot fighting glitches, viruses, and rogue machines. Discover synergies between modules, manage heat and power, and survive long enough to rewrite your firmware.</p>
-            <p class="muted"><em>Currently in early development.</em></p>
+            <p><strong>C.A.R.T.R.I.D.G.E</strong><span data-translate="games.cartridge.desc"> is a retro sci-fi roguelike card battler where you don't play cards — you load cartridges. Each run takes you deeper into a corrupted facility as QB, a cube-bot fighting glitches, viruses, and rogue machines. Discover synergies between modules, manage heat and power, and survive long enough to rewrite your firmware.</span></p>
+            <p class="muted"><em data-translate="games.early_dev">Currently in early development.</em></p>
           </div>
         </article>
 
@@ -269,8 +334,8 @@
             <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="collapsible">
-            <p><strong>My Guildies!</strong> is a whimsical yet deep guild management sim. Recruit and train heroes, send squads on quests, and watch them grow. Expand halls, unlock facilities like alchemy labs and dojos, craft gear, and balance risk vs. reward to build the most renowned guild in the realm.</p>
-            <p class="muted"><em>Currently in early development.</em></p>
+            <p><strong>My Guildies!</strong><span data-translate="games.guildies.desc"> is a whimsical yet deep guild management sim. Recruit and train heroes, send squads on quests, and watch them grow. Expand halls, unlock facilities like alchemy labs and dojos, craft gear, and balance risk vs. reward to build the most renowned guild in the realm.</span></p>
+            <p class="muted"><em data-translate="games.early_dev">Currently in early development.</em></p>
           </div>
         </article>
 
@@ -278,19 +343,280 @@
     </section>
 
     <!-- Contact -->
-    <section id="contact"><h2>Contact</h2>
-      <p class="lead">Say hi, ask a question, or talk shop.</p>
-      <p>Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a></p>
-      <p>Discord: <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Join the server</a></p>
+    <section id="contact"><h2 data-translate="contact.title">Contact</h2>
+      <p class="lead" data-translate="contact.lead">Say hi, ask a question, or talk shop.</p>
+      <p data-translate="contact.email">Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a></p>
+      <p><span data-translate="contact.discord_label">Discord:</span> <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener" data-translate="contact.discord_link">Join the server</a></p>
     </section>
   </main>
 
-  <footer>© 2025 Beniah Gepts.</footer>
+  <footer data-translate="footer.copyright">© 2025 Beniah Gepts.</footer>
 
   <!-- Back to top -->
-  <button id="back-to-top" aria-label="Back to top">↑</button>
+  <button id="back-to-top" aria-label="Back to top" data-translate="ui.back_to_top">↑</button>
 
   <script>
+    // Translation data
+    const translations = {
+      en: {
+        // Navigation
+        'nav.about': 'About',
+        'nav.games': 'Games',
+        'nav.contact': 'Contact',
+        'nav.discord': 'Join Discord',
+        
+        // Hero section
+        'hero.kicker': 'Indie Game Developer',
+        'hero.title1': 'Building games that',
+        'hero.title2': 'spark curiosity',
+        'hero.description': 'I create thoughtful indie games that blend creativity with engaging mechanics. From idle adventures to strategic card battlers, each project explores unique ideas and invites players to discover something new.',
+        'hero.cta_games': 'Explore Games',
+        'hero.cta_contact': 'Get in Touch',
+        
+        // About section
+        'about.title': 'About',
+        'about.p1_1': 'Hi, I\'m',
+        'about.p1_2': ', an indie game developer passionate about creating experiences that surprise and delight. I believe the best games are those that make you think differently about familiar concepts.',
+        'about.p2': 'My approach combines thoughtful design with engaging mechanics, whether it\'s an idle game that questions the nature of progress or a card battler that reimagines traditional gameplay. Each project is an opportunity to explore new ideas and connect with players who appreciate creativity and depth.',
+        
+        // Games section
+        'games.title': 'Games',
+        'games.floor.desc': 'An idle elevator adventure about going nowhere—while somehow calling it progress. Strange passengers, lost-and-found upgrades, and prestige rides that push your elevator higher each run.',
+        'games.cartridge.desc': ' is a retro sci-fi roguelike card battler where you don\'t play cards — you load cartridges. Each run takes you deeper into a corrupted facility as QB, a cube-bot fighting glitches, viruses, and rogue machines. Discover synergies between modules, manage heat and power, and survive long enough to rewrite your firmware.',
+        'games.guildies.desc': ' is a whimsical yet deep guild management sim. Recruit and train heroes, send squads on quests, and watch them grow. Expand halls, unlock facilities like alchemy labs and dojos, craft gear, and balance risk vs. reward to build the most renowned guild in the realm.',
+        'games.contact': 'Contact',
+        'games.steam_soon': 'Steam (soon)',
+        'games.store_soon': 'Store page coming soon',
+        'games.early_dev': 'Currently in early development.',
+        
+        // Contact section
+        'contact.title': 'Contact',
+        'contact.lead': 'Say hi, ask a question, or talk shop.',
+        'contact.email': 'Email:',
+        'contact.discord_label': 'Discord:',
+        'contact.discord_link': 'Join the server',
+        
+        // Footer and UI
+        'footer.copyright': '© 2025 Beniah Gepts.',
+        'ui.back_to_top': '↑'
+      },
+      
+      nl: {
+        // Navigation
+        'nav.about': 'Over',
+        'nav.games': 'Spellen',
+        'nav.contact': 'Contact',
+        'nav.discord': 'Discord Deelnemen',
+        
+        // Hero section
+        'hero.kicker': 'Indie Game Ontwikkelaar',
+        'hero.title1': 'Spellen bouwen die',
+        'hero.title2': 'nieuwsgierigheid wekken',
+        'hero.description': 'Ik creëer doordachte indie games die creativiteit combineren met boeiende mechanica. Van idle avonturen tot strategische kaartgevechten, elk project verkent unieke ideeën en nodigt spelers uit om iets nieuws te ontdekken.',
+        'hero.cta_games': 'Verken Spellen',
+        'hero.cta_contact': 'Neem Contact Op',
+        
+        // About section
+        'about.title': 'Over',
+        'about.p1_1': 'Hoi, ik ben',
+        'about.p1_2': ', een indie game ontwikkelaar gepassioneerd over het creëren van ervaringen die verrassen en bekoren. Ik geloof dat de beste spellen degene zijn die je anders laten denken over bekende concepten.',
+        'about.p2': 'Mijn aanpak combineert doordacht ontwerp met boeiende mechanica, of het nu een idle game is die de aard van vooruitgang in vraag stelt of een kaartgevecht dat traditionele gameplay heruitvindt. Elk project is een kans om nieuwe ideeën te verkennen en contact te maken met spelers die creativiteit en diepte waarderen.',
+        
+        // Games section
+        'games.title': 'Spellen',
+        'games.floor.desc': 'Een idle lift avontuur over nergens naartoe gaan—terwijl je het op de een of andere manier vooruitgang noemt. Vreemde passagiers, verloren-en-gevonden upgrades, en prestige ritten die je lift hoger duwen elke run.',
+        'games.cartridge.desc': ' is een retro sci-fi roguelike kaartgevecht waar je geen kaarten speelt — je laadt cartridges. Elke run brengt je dieper in een gecorrumpeerde faciliteit als QB, een kubus-bot die glitches, virussen en malafide machines bevecht. Ontdek synergieën tussen modules, beheer warmte en kracht, en overleef lang genoeg om je firmware te herschrijven.',
+        'games.guildies.desc': ' is een grillige maar diepe gilde management sim. Rekruteer en train helden, stuur teams op quests, en zie ze groeien. Breid hallen uit, ontgrendel faciliteiten zoals alchemie labs en dojo\'s, maak uitrusting, en balanceer risico vs. beloning om de meest gerenommeerde gilde in het rijk te bouwen.',
+        'games.contact': 'Contact',
+        'games.steam_soon': 'Steam (binnenkort)',
+        'games.store_soon': 'Winkelpagina komt binnenkort',
+        'games.early_dev': 'Momenteel in vroege ontwikkeling.',
+        
+        // Contact section
+        'contact.title': 'Contact',
+        'contact.lead': 'Zeg hoi, stel een vraag, of praat shop.',
+        'contact.email': 'Email:',
+        'contact.discord_label': 'Discord:',
+        'contact.discord_link': 'Deelnemen aan de server',
+        
+        // Footer and UI
+        'footer.copyright': '© 2025 Beniah Gepts.',
+        'ui.back_to_top': '↑'
+      },
+      
+      de: {
+        // Navigation
+        'nav.about': 'Über',
+        'nav.games': 'Spiele',
+        'nav.contact': 'Kontakt',
+        'nav.discord': 'Discord Beitreten',
+        
+        // Hero section
+        'hero.kicker': 'Indie-Spieleentwickler',
+        'hero.title1': 'Spiele entwickeln, die',
+        'hero.title2': 'Neugier wecken',
+        'hero.description': 'Ich erschaffe durchdachte Indie-Spiele, die Kreativität mit fesselnden Mechaniken verbinden. Von Idle-Abenteuern bis zu strategischen Kartenkämpfen erkundet jedes Projekt einzigartige Ideen und lädt Spieler ein, etwas Neues zu entdecken.',
+        'hero.cta_games': 'Spiele Erkunden',
+        'hero.cta_contact': 'Kontakt Aufnehmen',
+        
+        // About section
+        'about.title': 'Über',
+        'about.p1_1': 'Hallo, ich bin',
+        'about.p1_2': ', ein Indie-Spieleentwickler mit Leidenschaft für das Erschaffen von Erfahrungen, die überraschen und erfreuen. Ich glaube, die besten Spiele sind die, die einen anders über vertraute Konzepte denken lassen.',
+        'about.p2': 'Mein Ansatz kombiniert durchdachtes Design mit fesselnden Mechaniken, sei es ein Idle-Spiel, das die Natur des Fortschritts hinterfragt, oder ein Kartenkampf, der traditionelles Gameplay neu erfindet. Jedes Projekt ist eine Gelegenheit, neue Ideen zu erkunden und mit Spielern in Kontakt zu treten, die Kreativität und Tiefe schätzen.',
+        
+        // Games section
+        'games.title': 'Spiele',
+        'games.floor.desc': 'Ein Idle-Fahrstuhl-Abenteuer über das Nirgendwo-Hingehen—während man es irgendwie Fortschritt nennt. Seltsame Passagiere, verloren-und-gefundene Upgrades und Prestige-Fahrten, die deinen Fahrstuhl bei jedem Lauf höher treiben.',
+        'games.cartridge.desc': ' ist ein Retro-Sci-Fi-Roguelike-Kartenkampf, bei dem du keine Karten spielst — du lädst Cartridges. Jeder Lauf führt dich tiefer in eine korrumpierte Einrichtung als QB, ein Würfel-Bot, der Glitches, Viren und Schurken-Maschinen bekämpft. Entdecke Synergien zwischen Modulen, verwalte Hitze und Energie und überlebe lange genug, um deine Firmware neu zu schreiben.',
+        'games.guildies.desc': ' ist eine skurrile, aber tiefe Gildenverwaltungssimulation. Rekrutiere und trainiere Helden, schicke Trupps auf Quests und sieh sie wachsen. Erweitere Hallen, schalte Einrichtungen wie Alchemielabore und Dojos frei, fertige Ausrüstung und balanciere Risiko vs. Belohnung, um die renommierteste Gilde im Reich aufzubauen.',
+        'games.contact': 'Kontakt',
+        'games.steam_soon': 'Steam (bald)',
+        'games.store_soon': 'Shop-Seite kommt bald',
+        'games.early_dev': 'Derzeit in früher Entwicklung.',
+        
+        // Contact section
+        'contact.title': 'Kontakt',
+        'contact.lead': 'Sag hallo, stell eine Frage oder rede Fachsimpelei.',
+        'contact.email': 'Email:',
+        'contact.discord_label': 'Discord:',
+        'contact.discord_link': 'Server beitreten',
+        
+        // Footer and UI
+        'footer.copyright': '© 2025 Beniah Gepts.',
+        'ui.back_to_top': '↑'
+      },
+      
+      it: {
+        // Navigation
+        'nav.about': 'Chi Sono',
+        'nav.games': 'Giochi',
+        'nav.contact': 'Contatti',
+        'nav.discord': 'Unisciti a Discord',
+        
+        // Hero section
+        'hero.kicker': 'Sviluppatore di Giochi Indie',
+        'hero.title1': 'Costruendo giochi che',
+        'hero.title2': 'accendono la curiosità',
+        'hero.description': 'Creo giochi indie riflessivi che uniscono creatività con meccaniche coinvolgenti. Dalle avventure idle ai combattimenti strategici con carte, ogni progetto esplora idee uniche e invita i giocatori a scoprire qualcosa di nuovo.',
+        'hero.cta_games': 'Esplora Giochi',
+        'hero.cta_contact': 'Mettiti in Contatto',
+        
+        // About section
+        'about.title': 'Chi Sono',
+        'about.p1_1': 'Ciao, sono',
+        'about.p1_2': ', uno sviluppatore di giochi indie appassionato nel creare esperienze che sorprendono e deliziano. Credo che i migliori giochi siano quelli che ti fanno pensare diversamente ai concetti familiari.',
+        'about.p2': 'Il mio approccio combina design riflessivo con meccaniche coinvolgenti, che si tratti di un gioco idle che mette in discussione la natura del progresso o di un combattimento con carte che reinventa il gameplay tradizionale. Ogni progetto è un\'opportunità per esplorare nuove idee e connettersi con giocatori che apprezzano creatività e profondità.',
+        
+        // Games section
+        'games.title': 'Giochi',
+        'games.floor.desc': 'Un\'avventura idle in ascensore sul non andare da nessuna parte—pur chiamandolo in qualche modo progresso. Passeggeri strani, upgrade persi-e-trovati, e corse di prestigio che spingono il tuo ascensore più in alto ad ogni corsa.',
+        'games.cartridge.desc': ' è un combattimento roguelike retro sci-fi con carte dove non giochi carte — carichi cartucce. Ogni corsa ti porta più in profondità in una struttura corrotta come QB, un cubo-bot che combatte glitch, virus e macchine canaglia. Scopri sinergie tra moduli, gestisci calore e potenza, e sopravvivi abbastanza a lungo per riscrivere il tuo firmware.',
+        'games.guildies.desc': ' è una simulazione di gestione gilda stravagante ma profonda. Recluta e addestra eroi, manda squadre in missioni, e guardali crescere. Espandi sale, sblocca strutture come laboratori di alchimia e dojo, crea equipaggiamento, e bilancia rischio vs. ricompensa per costruire la gilda più rinomata del regno.',
+        'games.contact': 'Contatti',
+        'games.steam_soon': 'Steam (presto)',
+        'games.store_soon': 'Pagina del negozio in arrivo presto',
+        'games.early_dev': 'Attualmente in sviluppo iniziale.',
+        
+        // Contact section
+        'contact.title': 'Contatti',
+        'contact.lead': 'Saluta, fai una domanda, o parla di lavoro.',
+        'contact.email': 'Email:',
+        'contact.discord_label': 'Discord:',
+        'contact.discord_link': 'Unisciti al server',
+        
+        // Footer and UI
+        'footer.copyright': '© 2025 Beniah Gepts.',
+        'ui.back_to_top': '↑'
+      },
+      
+      es: {
+        // Navigation
+        'nav.about': 'Acerca de',
+        'nav.games': 'Juegos',
+        'nav.contact': 'Contacto',
+        'nav.discord': 'Únete a Discord',
+        
+        // Hero section
+        'hero.kicker': 'Desarrollador de Juegos Indie',
+        'hero.title1': 'Construyendo juegos que',
+        'hero.title2': 'despiertan curiosidad',
+        'hero.description': 'Creo juegos indie reflexivos que combinan creatividad con mecánicas atractivas. Desde aventuras idle hasta batallas estratégicas de cartas, cada proyecto explora ideas únicas e invita a los jugadores a descubrir algo nuevo.',
+        'hero.cta_games': 'Explorar Juegos',
+        'hero.cta_contact': 'Ponerse en Contacto',
+        
+        // About section
+        'about.title': 'Acerca de',
+        'about.p1_1': 'Hola, soy',
+        'about.p1_2': ', un desarrollador de juegos indie apasionado por crear experiencias que sorprenden y deleitan. Creo que los mejores juegos son aquellos que te hacen pensar diferente sobre conceptos familiares.',
+        'about.p2': 'Mi enfoque combina diseño reflexivo con mecánicas atractivas, ya sea un juego idle que cuestiona la naturaleza del progreso o una batalla de cartas que reinventa el gameplay tradicional. Cada proyecto es una oportunidad para explorar nuevas ideas y conectar con jugadores que aprecian la creatividad y profundidad.',
+        
+        // Games section
+        'games.title': 'Juegos',
+        'games.floor.desc': 'Una aventura idle de ascensor sobre no ir a ninguna parte—mientras de alguna manera lo llamas progreso. Pasajeros extraños, mejoras perdidas-y-encontradas, y viajes de prestigio que empujan tu ascensor más alto en cada carrera.',
+        'games.cartridge.desc': ' es un juego de cartas roguelike retro sci-fi donde no juegas cartas — cargas cartuchos. Cada carrera te lleva más profundo en una instalación corrupta como QB, un cubo-bot luchando contra glitches, virus y máquinas rebeldes. Descubre sinergias entre módulos, gestiona calor y energía, y sobrevive lo suficiente para reescribir tu firmware.',
+        'games.guildies.desc': ' es una simulación de gestión de gremio caprichosa pero profunda. Recluta y entrena héroes, envía escuadrones en misiones, y míralos crecer. Expande salas, desbloquea instalaciones como laboratorios de alquimia y dojos, crea equipo, y equilibra riesgo vs. recompensa para construir el gremio más renombrado del reino.',
+        'games.contact': 'Contacto',
+        'games.steam_soon': 'Steam (pronto)',
+        'games.store_soon': 'Página de la tienda próximamente',
+        'games.early_dev': 'Actualmente en desarrollo temprano.',
+        
+        // Contact section
+        'contact.title': 'Contacto',
+        'contact.lead': 'Saluda, haz una pregunta, o habla de trabajo.',
+        'contact.email': 'Email:',
+        'contact.discord_label': 'Discord:',
+        'contact.discord_link': 'Únete al servidor',
+        
+        // Footer and UI
+        'footer.copyright': '© 2025 Beniah Gepts.',
+        'ui.back_to_top': '↑'
+      },
+      
+      ja: {
+        // Navigation
+        'nav.about': 'について',
+        'nav.games': 'ゲーム',
+        'nav.contact': 'お問い合わせ',
+        'nav.discord': 'Discordに参加',
+        
+        // Hero section
+        'hero.kicker': 'インディーゲーム開発者',
+        'hero.title1': '好奇心を',
+        'hero.title2': '刺激するゲームを制作',
+        'hero.description': '創造性と魅力的なメカニクスを組み合わせた思慮深いインディーゲームを作成しています。アイドルアドベンチャーから戦略的カードバトラーまで、各プロジェクトはユニークなアイデアを探求し、プレイヤーに新しい発見を招待します。',
+        'hero.cta_games': 'ゲームを探索',
+        'hero.cta_contact': 'お問い合わせ',
+        
+        // About section
+        'about.title': 'について',
+        'about.p1_1': 'こんにちは、私は',
+        'about.p1_2': 'です。驚きと喜びを与える体験を作ることに情熱を注ぐインディーゲーム開発者です。最高のゲームは、馴染みのある概念について異なる考え方をさせるものだと信じています。',
+        'about.p2': '私のアプローチは、思慮深いデザインと魅力的なメカニクスを組み合わせます。進歩の本質に疑問を投げかけるアイドルゲームでも、従来のゲームプレイを再構築するカードバトラーでも。各プロジェクトは新しいアイデアを探求し、創造性と深さを評価するプレイヤーとつながる機会です。',
+        
+        // Games section
+        'games.title': 'ゲーム',
+        'games.floor.desc': 'どこにも行かないことについてのアイドルエレベーターアドベンチャー—それをなぜか進歩と呼んでいます。奇妙な乗客、紛失・発見されたアップグレード、そして各ランでエレベーターをより高く押し上げるプレステージライド。',
+        'games.cartridge.desc': 'は、カードをプレイしないレトロSFローグライクカードバトラーです—カートリッジをロードします。各ランでは、グリッチ、ウイルス、不正なマシンと戦うキューブボットQBとして、破損した施設の奥深くへ進みます。モジュール間のシナジーを発見し、熱と電力を管理し、ファームウェアを書き換えるのに十分長く生き残ってください。',
+        'games.guildies.desc': 'は、風変わりでありながら深いギルド管理シムです。ヒーローを募集・訓練し、チームをクエストに送り、彼らの成長を見守ります。ホールを拡張し、錬金術ラボや道場などの施設をアンロックし、装備を作成し、リスクと報酬のバランスを取って、王国で最も有名なギルドを築きます。',
+        'games.contact': 'お問い合わせ',
+        'games.steam_soon': 'Steam（近日公開）',
+        'games.store_soon': 'ストアページ近日公開',
+        'games.early_dev': '現在初期開発中。',
+        
+        // Contact section
+        'contact.title': 'お問い合わせ',
+        'contact.lead': '挨拶、質問、または仕事の話をしましょう。',
+        'contact.email': 'メール：',
+        'contact.discord_label': 'Discord：',
+        'contact.discord_link': 'サーバーに参加',
+        
+        // Footer and UI
+        'footer.copyright': '© 2025 Beniah Gepts.',
+        'ui.back_to_top': '↑'
+      }
+    };
+
     // Scroll-based parallax (movement only on scroll) - optimized for mobile
     (() => {
       const back = document.querySelector('.layer-back');
@@ -455,6 +781,133 @@
       
       backToTop.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    })();
+
+    // Language switching functionality
+    (() => {
+      const languageSelector = document.querySelector('.language-selector');
+      const languageButton = document.querySelector('.language-btn');
+      const languageOptions = document.querySelector('.language-options');
+      const languageItems = document.querySelectorAll('.language-option');
+      
+      // Get current language from localStorage or default to 'en'
+      let currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+      
+      // Function to update all translatable elements
+      const updateTranslations = (lang) => {
+        const elements = document.querySelectorAll('[data-translate]');
+        elements.forEach(element => {
+          const key = element.getAttribute('data-translate');
+          if (translations[lang] && translations[lang][key]) {
+            element.textContent = translations[lang][key];
+          }
+        });
+      };
+      
+      // Function to update the language button display
+      const updateLanguageButton = (lang) => {
+        const flagMap = {
+          'en': '🇺🇸',
+          'nl': '🇳🇱', 
+          'de': '🇩🇪',
+          'it': '🇮🇹',
+          'es': '🇪🇸',
+          'ja': '🇯🇵'
+        };
+        
+        const langMap = {
+          'en': 'EN',
+          'nl': 'NL',
+          'de': 'DE', 
+          'it': 'IT',
+          'es': 'ES',
+          'ja': 'JA'
+        };
+        
+        languageButton.innerHTML = `${flagMap[lang]} ${langMap[lang]} <span class="dropdown-arrow">▼</span>`;
+        
+        // Update active state in dropdown
+        languageItems.forEach(item => {
+          item.classList.toggle('active', item.dataset.lang === lang);
+        });
+      };
+      
+      // Function to change language
+      const changeLanguage = (lang) => {
+        if (translations[lang]) {
+          currentLanguage = lang;
+          localStorage.setItem('selectedLanguage', lang);
+          updateTranslations(lang);
+          updateLanguageButton(lang);
+          
+          // Close dropdown
+          languageOptions.classList.remove('show');
+          languageButton.setAttribute('aria-expanded', 'false');
+        }
+      };
+      
+      // Initialize with current language
+      updateTranslations(currentLanguage);
+      updateLanguageButton(currentLanguage);
+      
+      // Toggle dropdown
+      languageButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isOpen = languageOptions.classList.contains('show');
+        languageOptions.classList.toggle('show');
+        languageButton.setAttribute('aria-expanded', !isOpen);
+      });
+      
+      // Handle language selection
+      languageItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          const selectedLang = item.dataset.lang;
+          changeLanguage(selectedLang);
+        });
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!languageSelector.contains(e.target)) {
+          languageOptions.classList.remove('show');
+          languageButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+      
+      // Close dropdown on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && languageOptions.classList.contains('show')) {
+          languageOptions.classList.remove('show');
+          languageButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+      
+      // Handle keyboard navigation in dropdown
+      languageButton.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          languageButton.click();
+        }
+      });
+      
+      languageItems.forEach((item, index) => {
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            item.click();
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const nextItem = languageItems[index + 1] || languageItems[0];
+            nextItem.focus();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prevItem = languageItems[index - 1] || languageItems[languageItems.length - 1];
+            prevItem.focus();
+          }
+        });
       });
     })();
   </script>
