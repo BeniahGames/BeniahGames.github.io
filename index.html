@@ -20,7 +20,7 @@
       position:relative; z-index:0; /* for parallax layering */
     }
 
-    /* --- PARALLAX BACKGROUND --- */
+    /* --- PARALLAX BACKGROUND (scroll-driven + twinkle) --- */
     .parallax{
       position:fixed; inset:0; overflow:hidden; z-index:-1;
     }
@@ -32,26 +32,41 @@
       background:url('/assets/parallax-back.png') repeat;
       background-size:128px 128px;
       opacity:.3;
-      animation:float-back 120s linear infinite, twinkle 6s ease-in-out infinite;
+      animation: twinkle 6s ease-in-out infinite;
     }
     .layer-mid{
       background:url('/assets/parallax-mid.png') repeat;
       background-size:96px 96px;
       opacity:.5;
-      animation:float-mid 60s linear infinite, twinkle 4s ease-in-out infinite;
-      animation-delay:0s, 2s;
+      animation: twinkle 5s ease-in-out infinite;
+      animation-delay: 2s;
     }
     .layer-front{
       background:url('/assets/parallax-front.png') repeat;
       background-size:64px 64px;
       opacity:.8;
-      animation:float-front 30s linear infinite, twinkle 3s ease-in-out infinite;
-      animation-delay:0s, 1.5s;
+      animation: twinkle 4s ease-in-out infinite;
+      animation-delay: 1.5s;
     }
-    @keyframes float-back{from{transform:translateY(0)}to{transform:translateY(-200px)}}
-    @keyframes float-mid{from{transform:translateY(0)}to{transform:translateY(-400px)}}
-    @keyframes float-front{from{transform:translateY(0)}to{transform:translateY(-600px)}}
     @keyframes twinkle{0%,100%{opacity:.6}50%{opacity:1}}
+
+    /* Hero title glow (sync-ish with front twinkle at 4s) */
+    h1.glow {
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% {
+        text-shadow: 0 0 8px rgba(255, 204, 0, 0.2),
+                     0 0 16px rgba(255, 204, 0, 0.1);
+        color: var(--text);
+      }
+      50% {
+        text-shadow: 0 0 12px rgba(255, 204, 0, 0.8),
+                     0 0 24px rgba(255, 204, 0, 0.5),
+                     0 0 36px rgba(255, 220, 100, 0.3);
+        color: var(--accent-2);
+      }
+    }
 
     /* Buttons */
     .btn{display:inline-block;padding:.6rem .9rem;border:1px solid var(--accent);border-radius:10px;color:var(--text);text-decoration:none}
@@ -196,14 +211,14 @@
     <div class="hero-inner">
       <div>
         <div class="kicker">Indie Game Developer — Belgium</div>
-        <h1>Quirky, funny, and <span style="color:var(--accent-2)">endlessly fun</span> games.</h1>
+        <h1 class="glow">Quirky, funny, and <span style="color:var(--accent-2)">endlessly fun</span> games.</h1>
         <p class="tag">I’m <strong>Beniah Gepts</strong>. New(ish) to gamedev, but I’ve loved games for over 30 years.
           My goal is simple: make great-quality games that put <em>fun first</em>.</p>
         <div class="cta-row">
           <a class="cta" href="#games">See the games</a>
           <a class="cta secondary" href="#about">Learn more</a>
           <a class="btn-discord" href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.865-.608 1.249a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.077.077 0 00.084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.104c-.652-.247-1.27-.55-1.845-.899a.077.077 0 01-.007-.127c.124-.093.248-.19.366-.287a.074.074 0 01.077-.01c3.869 1.776 8.065 1.776 11.896 0a.075.075 0 01.078.009c.118.098.242.195.366.288a.077.077 0 01-.006.127 12.298 12.298 0 01-1.846.898.077.077 0 00-.04.105c.36.698.772 1.364 1.225 1.994a.076.076 0 00.084.027 19.876 19.876 0 005.994-3.03.077.077 0 00.031-.056c.5-5.177-.838-9.673-3.548-13.66a.06.06 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.947 2.419-2.157 2.419z"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515..."/></svg>
             Join the Discord
           </a>
         </div>
@@ -282,8 +297,48 @@
   <button id="back-to-top" aria-label="Back to top">↑</button>
 
   <script>
-    // Reveal on scroll
-    (()=>{const els=document.querySelectorAll('.reveal');const obs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('revealed');obs.unobserve(e.target)}})},{threshold:.15});els.forEach(el=>obs.observe(el));})();
+    // Scroll-based parallax (movement only on scroll)
+    (() => {
+      const back = document.querySelector('.layer-back');
+      const mid = document.querySelector('.layer-mid');
+      const front = document.querySelector('.layer-front');
+      const apply = () => {
+        const y = window.scrollY || window.pageYOffset || 0;
+        back.style.transform = `translateY(${y * 0.1}px)`;   // far
+        mid.style.transform = `translateY(${y * 0.3}px)`;    // mid
+        front.style.transform = `translateY(${y * 0.5}px)`;  // near
+      };
+      apply();
+      window.addEventListener('scroll', apply, { passive: true });
+    })();
+
+    // Reveal on scroll (with fallback so cards never stay hidden)
+    document.addEventListener('DOMContentLoaded', () => {
+      const els = document.querySelectorAll('#games .card');
+
+      if (!('IntersectionObserver' in window)) {
+        els.forEach(el => el.classList.add('revealed'));
+        return;
+      }
+
+      let anyRevealed = false;
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('revealed');
+            obs.unobserve(e.target);
+            anyRevealed = true;
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+      els.forEach(el => obs.observe(el));
+
+      // Safety: if nothing reveals quickly, just show them (prevents "empty grid")
+      setTimeout(() => {
+        if (!anyRevealed) els.forEach(el => el.classList.add('revealed'));
+      }, 600);
+    });
 
     // Collapsible cards (all)
     (() => {
@@ -291,14 +346,17 @@
       cards.forEach(card => {
         const body = card.querySelector('.collapsible');
         if (!body) return;
-        card.querySelectorAll('.no-toggle, .no-toggle *').forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+
+        // prevent toggling when clicking links/buttons inside
+        card.querySelectorAll('.no-toggle, .no-toggle *')
+            .forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+
         function setExpanded(expand){
           card.setAttribute('aria-expanded', expand);
-          if(expand){body.style.maxHeight='0px';const full=body.scrollHeight;body.getBoundingClientRect();body.style.maxHeight=full+'px';}
-          else{body.style.maxHeight=body.scrollHeight+'px';body.getBoundingClientRect();body.style.maxHeight='0px';}
-        }
-        body.addEventListener('transitionend', (e)=>{if(e.propertyName!=='max-height')return;const expanded=card.getAttribute('aria-expanded')==='true';body.style.maxHeight=expanded?'9999px':'0px';});
-        function toggle(){setExpanded(card.getAttribute('aria-expanded')!=='true');}
-        card.addEventListener('click', toggle);
-        card.addEventListener('keydown', e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
-        body.style.maxHeight='0px'; if(!card.hasAttribute('aria-expanded')) card.setAttribute(
+          if (expand) {
+            body.style.maxHeight = '0px';
+            const full = body.scrollHeight;
+            body.getBoundingClientRect();
+            body.style.maxHeight = full + 'px';
+          } else {
+            body.style.maxHeigh
