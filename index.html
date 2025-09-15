@@ -197,6 +197,24 @@
     #back-to-top:hover{background:#191d25}
     #back-to-top::after{content:"Back to top";position:absolute;right:110%;top:50%;transform:translateY(-50%) scale(.9);background:#191d25;color:var(--text);font-size:.75rem;padding:.25rem .5rem;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;border:1px solid var(--border)}
     #back-to-top:hover::after,#back-to-top:focus::after{opacity:1;transform:translateY(-50%) scale(1)}
+
+    /* FAQ */
+    .faq{display:grid;gap:.6rem;margin-top:1rem}
+    .faq details{
+      background:linear-gradient(180deg,var(--panel),var(--panel-2));
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:.2rem .8rem;
+      box-shadow:var(--shadow);
+    }
+    .faq summary{
+      cursor:pointer;list-style:none;padding:.8rem 0;font-weight:700;color:var(--text);
+      display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+    }
+    .faq summary::-webkit-details-marker{display:none}
+    .faq details > div{color:var(--muted);padding:0 0 .9rem;}
+    .faq details[open]{border-color:var(--accent);}
+    .faq details[open] summary{color:var(--accent);}
   </style>
 </head>
 <body>
@@ -349,6 +367,62 @@
       </div>
     </section>
 
+    <!-- FAQ -->
+    <section id="faq">
+      <h2 data-translate="faq.title">FAQ</h2>
+      <p class="lead" data-translate="faq.lead">Questions you might be thinking. If you don't see yours, ping me!</p>
+
+      <div class="faq">
+        <details>
+          <summary data-translate="faq.q1">What tools do you use?</summary>
+          <div data-translate="faq.a1">
+            I build with <strong>Godot</strong> for the engine. Art & pixels with <strong>Krita</strong>, <strong>Aseprite</strong>,
+            <strong>PixelOver</strong>, and <strong>SpriteMancer</strong>. 3D and renders in <strong>Blender</strong>.
+          </div>
+        </details>
+
+        <details>
+          <summary data-translate="faq.q2">Will you release games on console?</summary>
+          <div data-translate="faq.a2">
+            <strong>PC first</strong> (Windows). I'll definitely look into console possibilities in the future once the games are stable and the porting path makes sense.
+          </div>
+        </details>
+
+        <details>
+          <summary data-translate="faq.q3">Where are save files stored?</summary>
+          <div data-translate="faq.a3">
+            Saves are stored locally on your PC. By default, they're in the user data folder created by Godot:
+            <code>%APPDATA%\Godot\app_userdata\YourGameName</code> on Windows.
+            I may add Steam Cloud support so your progress follows you between devices.
+          </div>
+        </details>
+
+        <details>
+          <summary data-translate="faq.q4">Can I stream or make videos of your games?</summary>
+          <div data-translate="faq.a4">
+            Absolutely! You're welcome to record, stream, or monetize content featuring my games.
+            If you do, feel free to share it in the Discord — I'd love to check it out!
+          </div>
+        </details>
+
+        <details>
+          <summary data-translate="faq.q5">I'm having an issue with a game — how can I get help?</summary>
+          <div data-translate="faq.a5">
+            Please reach out at <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>
+            or post in the Discord server.
+            To help me fix it faster, include:
+            <ul>
+              <li>Your OS + version (e.g., Windows 11 23H2)</li>
+              <li>Game version/build date</li>
+              <li>Steps to reproduce (what you did right before it happened)</li>
+              <li>Screenshots or a short clip if possible</li>
+              <li>Any error text or logs</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
     <!-- Contact -->
     <section id="contact"><h2 data-translate="contact.title">Contact</h2>
       <p class="lead" data-translate="contact.lead">Say hi, ask a question, or talk shop.</p>
@@ -395,6 +469,20 @@
         'games.store_soon': 'Store page coming soon',
         'games.early_dev': 'Currently in early development.',
         
+        // FAQ section
+        'faq.title': 'FAQ',
+        'faq.lead': 'Questions you might be thinking. If you don\'t see yours, ping me!',
+        'faq.q1': 'What tools do you use?',
+        'faq.a1': 'I build with <strong>Godot</strong> for the engine. Art & pixels with <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong>, and <strong>SpriteMancer</strong>. 3D and renders in <strong>Blender</strong>.',
+        'faq.q2': 'Will you release games on console?',
+        'faq.a2': '<strong>PC first</strong> (Windows). I\'ll definitely look into console possibilities in the future once the games are stable and the porting path makes sense.',
+        'faq.q3': 'Where are save files stored?',
+        'faq.a3': 'Saves are stored locally on your PC. By default, they\'re in the user data folder created by Godot: <code>%APPDATA%\\Godot\\app_userdata\\YourGameName</code> on Windows. I may add Steam Cloud support so your progress follows you between devices.',
+        'faq.q4': 'Can I stream or make videos of your games?',
+        'faq.a4': 'Absolutely! You\'re welcome to record, stream, or monetize content featuring my games. If you do, feel free to share it in the Discord — I\'d love to check it out!',
+        'faq.q5': 'I\'m having an issue with a game — how can I get help?',
+        'faq.a5': 'Please reach out at <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a> or post in the Discord server. To help me fix it faster, include: <ul><li>Your OS + version (e.g., Windows 11 23H2)</li><li>Game version/build date</li><li>Steps to reproduce (what you did right before it happened)</li><li>Screenshots or a short clip if possible</li><li>Any error text or logs</li></ul>',
+        
         // Contact section
         'contact.title': 'Contact',
         'contact.lead': 'Say hi, ask a question, or talk shop.',
@@ -436,6 +524,20 @@
         'games.steam_soon': 'Steam (binnenkort)',
         'games.store_soon': 'Winkelpagina komt binnenkort',
         'games.early_dev': 'Momenteel in vroege ontwikkeling.',
+        
+        // FAQ section
+        'faq.title': 'FAQ',
+        'faq.lead': 'Vragen die je misschien denkt. Als je de jouwe niet ziet, ping me!',
+        'faq.q1': 'Welke tools gebruik je?',
+        'faq.a1': 'Ik bouw met <strong>Godot</strong> voor de engine. Kunst & pixels met <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong>, en <strong>SpriteMancer</strong>. 3D en renders in <strong>Blender</strong>.',
+        'faq.q2': 'Ga je spellen uitbrengen op console?',
+        'faq.a2': '<strong>PC eerst</strong> (Windows). Ik ga zeker kijken naar console mogelijkheden in de toekomst zodra de spellen stabiel zijn en het porting pad logisch is.',
+        'faq.q3': 'Waar worden save bestanden opgeslagen?',
+        'faq.a3': 'Saves worden lokaal op je PC opgeslagen. Standaard staan ze in de gebruikersdata map gemaakt door Godot: <code>%APPDATA%\\Godot\\app_userdata\\YourGameName</code> op Windows. Ik overweeg Steam Cloud ondersteuning toe te voegen zodat je voortgang je volgt tussen apparaten.',
+        'faq.q4': 'Kan ik streamen of video\'s maken van je spellen?',
+        'faq.a4': 'Absoluut! Je bent welkom om content op te nemen, te streamen, of te monetiseren met mijn spellen. Als je dat doet, deel het gerust in de Discord — ik zou het graag bekijken!',
+        'faq.q5': 'Ik heb een probleem met een spel — hoe kan ik hulp krijgen?',
+        'faq.a5': 'Neem contact op via <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a> of post in de Discord server. Om me te helpen het sneller op te lossen, voeg toe: <ul><li>Je OS + versie (bijv. Windows 11 23H2)</li><li>Spel versie/build datum</li><li>Stappen om te reproduceren (wat je deed vlak voordat het gebeurde)</li><li>Screenshots of een korte clip indien mogelijk</li><li>Eventuele error tekst of logs</li></ul>',
         
         // Contact section
         'contact.title': 'Contact',
@@ -479,6 +581,20 @@
         'games.store_soon': 'Shop-Seite kommt bald',
         'games.early_dev': 'Derzeit in früher Entwicklung.',
         
+        // FAQ section
+        'faq.title': 'FAQ',
+        'faq.lead': 'Fragen, die du vielleicht denkst. Wenn du deine nicht siehst, ping mich!',
+        'faq.q1': 'Welche Tools verwendest du?',
+        'faq.a1': 'Ich baue mit <strong>Godot</strong> für die Engine. Kunst & Pixel mit <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong> und <strong>SpriteMancer</strong>. 3D und Renders in <strong>Blender</strong>.',
+        'faq.q2': 'Wirst du Spiele auf Konsolen veröffentlichen?',
+        'faq.a2': '<strong>PC zuerst</strong> (Windows). Ich werde definitiv Konsolen-Möglichkeiten in der Zukunft betrachten, sobald die Spiele stabil sind und der Portierungspfad Sinn macht.',
+        'faq.q3': 'Wo werden Speicherdateien gespeichert?',
+        'faq.a3': 'Speicherstände werden lokal auf deinem PC gespeichert. Standardmäßig befinden sie sich im Benutzerdatenordner, der von Godot erstellt wurde: <code>%APPDATA%\\Godot\\app_userdata\\YourGameName</code> unter Windows. Ich könnte Steam Cloud-Unterstützung hinzufügen, damit dein Fortschritt dir zwischen Geräten folgt.',
+        'faq.q4': 'Kann ich deine Spiele streamen oder Videos davon machen?',
+        'faq.a4': 'Absolut! Du bist willkommen, Inhalte mit meinen Spielen aufzunehmen, zu streamen oder zu monetarisieren. Wenn du das tust, teile es gerne im Discord — ich würde es gerne anschauen!',
+        'faq.q5': 'Ich habe ein Problem mit einem Spiel — wie kann ich Hilfe bekommen?',
+        'faq.a5': 'Bitte wende dich an <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a> oder poste im Discord-Server. Um mir zu helfen, es schneller zu beheben, füge hinzu: <ul><li>Dein OS + Version (z.B. Windows 11 23H2)</li><li>Spielversion/Build-Datum</li><li>Schritte zur Reproduktion (was du getan hast, bevor es passierte)</li><li>Screenshots oder ein kurzer Clip, wenn möglich</li><li>Jeglicher Fehlertext oder Logs</li></ul>',
+        
         // Contact section
         'contact.title': 'Kontakt',
         'contact.lead': 'Sag hallo, stell eine Frage oder rede Fachsimpelei.',
@@ -520,6 +636,20 @@
         'games.steam_soon': 'Steam (presto)',
         'games.store_soon': 'Pagina del negozio in arrivo presto',
         'games.early_dev': 'Attualmente in sviluppo iniziale.',
+        
+        // FAQ section
+        'faq.title': 'FAQ',
+        'faq.lead': 'Domande che potresti pensare. Se non vedi la tua, scrivimi!',
+        'faq.q1': 'Che strumenti usi?',
+        'faq.a1': 'Costruisco con <strong>Godot</strong> per il motore. Arte & pixel con <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong> e <strong>SpriteMancer</strong>. 3D e render in <strong>Blender</strong>.',
+        'faq.q2': 'Rilascerai giochi su console?',
+        'faq.a2': '<strong>PC prima</strong> (Windows). Guarderò sicuramente alle possibilità console in futuro una volta che i giochi sono stabili e il percorso di porting ha senso.',
+        'faq.q3': 'Dove sono memorizzati i file di salvataggio?',
+        'faq.a3': 'I salvataggi sono memorizzati localmente sul tuo PC. Di default, sono nella cartella dati utente creata da Godot: <code>%APPDATA%\\Godot\\app_userdata\\YourGameName</code> su Windows. Potrei aggiungere il supporto Steam Cloud così i tuoi progressi ti seguono tra dispositivi.',
+        'faq.q4': 'Posso fare streaming o video dei tuoi giochi?',
+        'faq.a4': 'Assolutamente! Sei il benvenuto a registrare, fare streaming o monetizzare contenuti con i miei giochi. Se lo fai, sentiti libero di condividerlo nel Discord — mi piacerebbe vederlo!',
+        'faq.q5': 'Ho un problema con un gioco — come posso ottenere aiuto?',
+        'faq.a5': 'Per favore contatta <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a> o posta nel server Discord. Per aiutarmi a risolverlo più velocemente, includi: <ul><li>Il tuo OS + versione (es. Windows 11 23H2)</li><li>Versione del gioco/data di build</li><li>Passi per riprodurre (cosa hai fatto proprio prima che succedesse)</li><li>Screenshot o un breve clip se possibile</li><li>Qualsiasi testo di errore o log</li></ul>',
         
         // Contact section
         'contact.title': 'Contatti',
@@ -563,6 +693,20 @@
         'games.store_soon': 'Página de la tienda próximamente',
         'games.early_dev': 'Actualmente en desarrollo temprano.',
         
+        // FAQ section
+        'faq.title': 'FAQ',
+        'faq.lead': 'Preguntas que podrías estar pensando. Si no ves la tuya, ¡escríbeme!',
+        'faq.q1': '¿Qué herramientas usas?',
+        'faq.a1': 'Construyo con <strong>Godot</strong> para el motor. Arte y píxeles con <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong> y <strong>SpriteMancer</strong>. 3D y renders en <strong>Blender</strong>.',
+        'faq.q2': '¿Lanzarás juegos en consola?',
+        'faq.a2': '<strong>PC primero</strong> (Windows). Definitivamente consideraré posibilidades de consola en el futuro una vez que los juegos sean estables y el camino de porteo tenga sentido.',
+        'faq.q3': '¿Dónde se almacenan los archivos de guardado?',
+        'faq.a3': 'Los guardados se almacenan localmente en tu PC. Por defecto, están en la carpeta de datos de usuario creada por Godot: <code>%APPDATA%\\Godot\\app_userdata\\YourGameName</code> en Windows. Podría agregar soporte de Steam Cloud para que tu progreso te siga entre dispositivos.',
+        'faq.q4': '¿Puedo hacer streaming o videos de tus juegos?',
+        'faq.a4': '¡Absolutamente! Eres bienvenido a grabar, hacer streaming o monetizar contenido con mis juegos. Si lo haces, siéntete libre de compartirlo en Discord — ¡me encantaría verlo!',
+        'faq.q5': 'Tengo un problema con un juego — ¿cómo puedo obtener ayuda?',
+        'faq.a5': 'Por favor contacta a <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a> o publica en el servidor de Discord. Para ayudarme a solucionarlo más rápido, incluye: <ul><li>Tu OS + versión (ej. Windows 11 23H2)</li><li>Versión del juego/fecha de compilación</li><li>Pasos para reproducir (qué hiciste justo antes de que pasara)</li><li>Capturas de pantalla o un clip corto si es posible</li><li>Cualquier texto de error o logs</li></ul>',
+        
         // Contact section
         'contact.title': 'Contacto',
         'contact.lead': 'Saluda, haz una pregunta, o habla de trabajo.',
@@ -604,6 +748,20 @@
         'games.steam_soon': 'Steam（近日公開）',
         'games.store_soon': 'ストアページ近日公開',
         'games.early_dev': '現在初期開発中。',
+        
+        // FAQ section
+        'faq.title': 'FAQ',
+        'faq.lead': 'あなたが考えているかもしれない質問。見つからない場合は、連絡してください！',
+        'faq.q1': 'どのようなツールを使用していますか？',
+        'faq.a1': 'エンジンには<strong>Godot</strong>を使用しています。アートとピクセルには<strong>Krita</strong>、<strong>Aseprite</strong>、<strong>PixelOver</strong>、<strong>SpriteMancer</strong>を使用。3Dとレンダリングには<strong>Blender</strong>を使用しています。',
+        'faq.q2': 'コンソールでゲームをリリースしますか？',
+        'faq.a2': '<strong>PCファースト</strong>（Windows）です。ゲームが安定し、移植パスが理にかなったら、将来的にコンソールの可能性を確実に検討します。',
+        'faq.q3': 'セーブファイルはどこに保存されますか？',
+        'faq.a3': 'セーブはPCにローカルに保存されます。デフォルトでは、Godotによって作成されたユーザーデータフォルダにあります：Windowsでは<code>%APPDATA%\\Godot\\app_userdata\\YourGameName</code>。Steam Cloudサポートを追加して、進行状況がデバイス間で同期されるようにするかもしれません。',
+        'faq.q4': 'あなたのゲームをストリーミングしたり動画を作ったりできますか？',
+        'faq.a4': 'もちろんです！私のゲームを録画、ストリーミング、または収益化することを歓迎します。もしそうするなら、Discordで共有してください — ぜひ見てみたいです！',
+        'faq.q5': 'ゲームで問題が発生しました — どうすれば助けを得られますか？',
+        'faq.a5': '<a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>に連絡するか、Discordサーバーに投稿してください。より早く修正するために、以下を含めてください：<ul><li>あなたのOS +バージョン（例：Windows 11 23H2）</li><li>ゲームバージョン/ビルド日</li><li>再現手順（それが起こる直前に何をしたか）</li><li>可能であればスクリーンショットまたは短いクリップ</li><li>エラーテキストまたはログ</li></ul>',
         
         // Contact section
         'contact.title': 'お問い合わせ',
