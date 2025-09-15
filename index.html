@@ -98,9 +98,14 @@
       position:absolute;top:100%;right:0;margin-top:.25rem;
       background:var(--panel);border:1px solid var(--border);border-radius:10px;
       box-shadow:var(--shadow);min-width:140px;opacity:0;visibility:hidden;
-      transform:translateY(-8px);transition:all .25s ease;z-index:100;
+      transform:translateY(-8px);transition:all .25s ease;z-index:1000;
     }
-    .language-dropdown.show{opacity:1;visibility:visible;transform:translateY(0)}
+    .language-dropdown.show{
+      opacity:1 !important;
+      visibility:visible !important;
+      transform:translateY(0) !important;
+      display:block !important;
+    }
     .language-option{
       display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;
       color:var(--text);text-decoration:none;font-size:.85rem;
@@ -791,10 +796,16 @@
 
     // Language switching functionality
     (() => {
-      const languageSelector = document.querySelector('.language-selector');
-      const languageButton = document.querySelector('.language-btn');
-      const languageOptions = document.querySelector('.language-options');
+      const languageSelector = document.querySelector('#language-selector');
+      const languageButton = document.querySelector('#language-btn');
+      const languageOptions = document.querySelector('#language-dropdown');
       const languageItems = document.querySelectorAll('.language-option');
+      
+      // Check if all elements exist
+      if (!languageSelector || !languageButton || !languageOptions) {
+        console.error('Language selector elements not found');
+        return;
+      }
       
       // Get current language from localStorage or default to 'en'
       let currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
@@ -860,8 +871,18 @@
       languageButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        console.log('Language button clicked');
+        
+        // Visual test - change button background temporarily
+        languageButton.style.backgroundColor = 'red';
+        setTimeout(() => {
+          languageButton.style.backgroundColor = '';
+        }, 500);
+        
         const isOpen = languageOptions.classList.contains('show');
+        console.log('Dropdown is currently open:', isOpen);
         languageOptions.classList.toggle('show');
+        console.log('Dropdown classes after toggle:', languageOptions.className);
         languageButton.setAttribute('aria-expanded', !isOpen);
       });
       
