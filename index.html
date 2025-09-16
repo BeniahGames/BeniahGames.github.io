@@ -25,8 +25,10 @@
       position:fixed; inset:0; overflow:hidden; z-index:-1;
     }
     .layer{
-      position:absolute; inset:0; background-repeat:repeat;
+      position:absolute; background-repeat:repeat;
       will-change:transform, opacity;
+      /* Make layers larger to account for parallax movement */
+      top:-20%; left:-10%; right:-10%; bottom:-20%;
     }
     .layer-back{
       background:url('/assets/parallax-back.png') no-repeat center center;
@@ -807,9 +809,10 @@
         const y = window.scrollY || window.pageYOffset || 0;
         
         // Use transform3d for better mobile performance
-        back.style.transform = `translate3d(0, ${y * 0.1}px, 0)`;   // far
-        mid.style.transform = `translate3d(0, ${y * 0.3}px, 0)`;    // mid
-        front.style.transform = `translate3d(0, ${y * 0.5}px, 0)`;  // near
+        // Adjusted values to work with larger layer sizes and prevent gaps
+        back.style.transform = `translate3d(0, ${y * 0.05}px, 0)`;   // far (slower)
+        mid.style.transform = `translate3d(0, ${y * 0.15}px, 0)`;    // mid 
+        front.style.transform = `translate3d(0, ${y * 0.25}px, 0)`;  // near
         
         ticking = false;
       };
