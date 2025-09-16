@@ -22,7 +22,20 @@
 
     /* --- PARALLAX BACKGROUND (scroll-driven + twinkle) --- */
     .parallax{
-      position:fixed; inset:0; overflow:hidden; z-index:-1;
+      position:fixed; 
+      top:0; left:0; right:0; 
+      height:100vh; /* Use initial viewport height */
+      min-height:100vh; /* Ensure minimum height */
+      overflow:hidden; 
+      z-index:-1;
+    }
+    
+    /* Prevent mobile browser bar resize issues */
+    @supports (height: 100dvh) {
+      .parallax {
+        height: 100dvh; /* Use dynamic viewport height if supported */
+        min-height: 100dvh;
+      }
     }
     .layer{
       position:absolute; background-repeat:repeat;
