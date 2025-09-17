@@ -168,6 +168,30 @@
     .menu-panel.open .menu-panel-inner a:nth-child(5){opacity:1;transform:none;transition-delay:240ms}
     @media (prefers-reduced-motion:reduce){.menu-panel,.menu-panel a{transition:none !important;transform:none !important}}
 
+    /* Spotify Now Playing */
+    .now-playing{display:flex;align-items:center;gap:.75rem;padding:.5rem;background:rgba(30,215,96,.1);border:1px solid rgba(30,215,96,.3);border-radius:8px;transition:all .3s ease}
+    .now-playing:hover{background:rgba(30,215,96,.15);border-color:rgba(30,215,96,.5)}
+    .np-art,.np-art-mobile{width:40px;height:40px;background:#333;border-radius:6px;flex-shrink:0;background-size:cover;background-position:center}
+    .np-info,.np-info-mobile{flex:1;min-width:0}
+    .np-title,.np-title-mobile{font-size:.85rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .np-artist,.np-artist-mobile{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .np-link,.np-link-mobile{font-size:.7rem;color:#1db954;text-decoration:none;margin-top:.25rem;display:inline-block}
+    .np-link:hover,.np-link-mobile:hover{text-decoration:underline}
+    
+    /* Desktop Now Playing */
+    .now-playing.desktop-only{margin-left:1rem;max-width:200px}
+    
+    /* Mobile Now Playing */
+    .now-playing.mobile-only{margin:1rem;background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.2)}
+    
+    /* Responsive visibility */
+    .desktop-only{display:flex}
+    .mobile-only{display:none}
+    @media (max-width:768px){
+      .desktop-only{display:none}
+      .mobile-only{display:flex}
+    }
+
     /* Hero */
     header.hero{position:relative;overflow:hidden;isolation:isolate;background:
       radial-gradient(80% 60% at 70% 20%, rgba(255,204,0,.12), transparent 60%),
@@ -253,6 +277,16 @@
         <a href="#games" data-translate="nav.games">Games</a>
         <a href="#contact" data-translate="nav.contact">Contact</a>
         
+        <!-- Spotify Now Playing (Desktop) -->
+        <div class="now-playing desktop-only" id="now-playing-desktop">
+          <div class="np-art" id="np-art"></div>
+          <div class="np-info">
+            <div class="np-title" id="np-title" data-translate="spotify.not_playing">Not playing</div>
+            <div class="np-artist" id="np-artist"></div>
+            <a class="np-link" id="np-link" href="#" target="_blank" rel="noopener" style="display:none;" data-translate="spotify.listen">♪ Listen</a>
+          </div>
+        </div>
+        
         <!-- Language Selector -->
         <div class="language-selector" id="language-selector">
           <button class="language-btn" id="language-btn" aria-label="Select language">
@@ -309,6 +343,16 @@
       </div>
     </div>
   </nav>
+
+  <!-- Spotify Now Playing (Mobile) -->
+  <div class="now-playing mobile-only" id="now-playing-mobile">
+    <div class="np-art-mobile" id="np-art-mobile"></div>
+    <div class="np-info-mobile">
+      <div class="np-title-mobile" id="np-title-mobile" data-translate="spotify.not_playing">Not playing</div>
+      <div class="np-artist-mobile" id="np-artist-mobile"></div>
+      <a class="np-link-mobile" id="np-link-mobile" href="#" target="_blank" rel="noopener" style="display:none;" data-translate="spotify.listen">♪ Listen</a>
+    </div>
+  </div>
 
   <!-- Hero -->
   <header class="hero scanlines">
@@ -520,7 +564,11 @@
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
-        'ui.back_to_top': '↑'
+        'ui.back_to_top': '↑',
+        
+        // Spotify Now Playing
+        'spotify.not_playing': 'Not playing',
+        'spotify.listen': '♪ Listen'
       },
       
       nl: {
@@ -579,7 +627,11 @@
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
-        'ui.back_to_top': '↑'
+        'ui.back_to_top': '↑',
+        
+        // Spotify Now Playing
+        'spotify.not_playing': 'Niet aan het spelen',
+        'spotify.listen': '♪ Luisteren'
       },
       
       de: {
@@ -638,7 +690,11 @@
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
-        'ui.back_to_top': '↑'
+        'ui.back_to_top': '↑',
+        
+        // Spotify Now Playing
+        'spotify.not_playing': 'Spielt nicht',
+        'spotify.listen': '♪ Anhören'
       },
       
       it: {
@@ -697,7 +753,11 @@
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
-        'ui.back_to_top': '↑'
+        'ui.back_to_top': '↑',
+        
+        // Spotify Now Playing
+        'spotify.not_playing': 'Non in riproduzione',
+        'spotify.listen': '♪ Ascolta'
       },
       
       es: {
@@ -756,7 +816,11 @@
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
-        'ui.back_to_top': '↑'
+        'ui.back_to_top': '↑',
+        
+        // Spotify Now Playing
+        'spotify.not_playing': 'No reproduciendo',
+        'spotify.listen': '♪ Escuchar'
       },
       
       ja: {
@@ -815,7 +879,11 @@
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
-        'ui.back_to_top': '↑'
+        'ui.back_to_top': '↑',
+        
+        // Spotify Now Playing
+        'spotify.not_playing': '再生していません',
+        'spotify.listen': '♪ 聴く'
       }
     };
 
@@ -1128,6 +1196,74 @@
           }
         });
       });
+    })();
+
+    // Spotify Now Playing
+    (() => {
+      const API = 'https://now-playing-api-one.vercel.app/api/now-playing';
+      
+      // Desktop elements
+      const art = document.getElementById('np-art');
+      const title = document.getElementById('np-title');
+      const artist = document.getElementById('np-artist');
+      const link = document.getElementById('np-link');
+      
+      // Mobile elements
+      const artMobile = document.getElementById('np-art-mobile');
+      const titleMobile = document.getElementById('np-title-mobile');
+      const artistMobile = document.getElementById('np-artist-mobile');
+      const linkMobile = document.getElementById('np-link-mobile');
+
+      async function refresh() {
+        try {
+          const r = await fetch(API, { cache: 'no-store', mode: 'cors', credentials: 'omit' });
+          const data = await r.json();
+
+          if (!data.isPlaying) {
+            // Desktop
+            title.textContent = translations[currentLanguage]['spotify.not_playing'] || "Not playing";
+            artist.textContent = "";
+            link.style.display = "none";
+            art.style.backgroundImage = "";
+            
+            // Mobile
+            titleMobile.textContent = translations[currentLanguage]['spotify.not_playing'] || "Not playing";
+            artistMobile.textContent = "";
+            linkMobile.style.display = "none";
+            artMobile.style.backgroundImage = "";
+            return;
+          }
+
+          const trackName = data.name || "Unknown track";
+          const trackArtists = data.artists || "";
+          const trackUrl = data.url || "#";
+          const albumArt = data.albumArt;
+
+          // Desktop
+          title.textContent = trackName;
+          artist.textContent = trackArtists;
+          link.href = trackUrl;
+          link.style.display = trackUrl !== "#" ? "inline-block" : "none";
+          art.style.backgroundImage = albumArt ? `url(${albumArt})` : "";
+          art.style.backgroundSize = "cover";
+          art.style.backgroundPosition = "center";
+          
+          // Mobile
+          titleMobile.textContent = trackName;
+          artistMobile.textContent = trackArtists;
+          linkMobile.href = trackUrl;
+          linkMobile.style.display = trackUrl !== "#" ? "inline-block" : "none";
+          artMobile.style.backgroundImage = albumArt ? `url(${albumArt})` : "";
+          artMobile.style.backgroundSize = "cover";
+          artMobile.style.backgroundPosition = "center";
+        } catch (e) {
+          // swallow errors; keep last state
+          console.log('Spotify API error:', e);
+        }
+      }
+
+      refresh();
+      setInterval(refresh, 30000); // Refresh every 30 seconds
     })();
   </script>
 </body>
