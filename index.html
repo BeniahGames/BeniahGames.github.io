@@ -1077,7 +1077,19 @@
         elements.forEach(element => {
           const key = element.getAttribute('data-translate');
           if (translations[lang] && translations[lang][key]) {
-            element.innerHTML = translations[lang][key];
+            // Special handling for Spotify widget - only update if showing "Not playing" text
+            if (key === 'spotify.not_playing') {
+              // Check if the element currently shows a "Not playing" translation in any language
+              const isShowingNotPlaying = Object.values(translations).some(langTranslations => 
+                langTranslations['spotify.not_playing'] === element.textContent
+              );
+              // Only update if it's currently showing "Not playing" text
+              if (isShowingNotPlaying) {
+                element.innerHTML = translations[lang][key];
+              }
+            } else {
+              element.innerHTML = translations[lang][key];
+            }
           }
         });
       };
