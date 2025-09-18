@@ -202,18 +202,13 @@
     @keyframes scroll-text {
       0% { transform: translateX(0); }
       20% { transform: translateX(0); }
-      80% { transform: translateX(calc(-100% + var(--container-width, 150px))); }
-      100% { transform: translateX(calc(-100% + var(--container-width, 150px))); }
-    }
-    
-    .np-title.scrollable, .np-title-mobile.scrollable,
-    .np-artist.scrollable, .np-artist-mobile.scrollable {
-      text-overflow: clip;
-      white-space: nowrap;
+      80% { transform: translateX(calc(var(--scroll-distance, -50px))); }
+      100% { transform: translateX(calc(var(--scroll-distance, -50px))); }
     }
     
     .np-title.scrollable:hover, .np-title-mobile.scrollable:hover,
     .np-artist.scrollable:hover, .np-artist-mobile.scrollable:hover {
+      text-overflow: clip;
       animation: scroll-text 4s ease-in-out infinite;
     }
     
@@ -1396,6 +1391,7 @@
     function checkTextOverflow(element) {
       if (!element || !element.textContent.trim()) {
         element?.classList.remove('scrollable');
+        element?.style.removeProperty('--scroll-distance');
         return;
       }
       
@@ -1406,9 +1402,12 @@
       const isOverflowing = element.scrollWidth > element.clientWidth;
       
       if (isOverflowing) {
-        // Set the container width as a CSS custom property for accurate scrolling
-        element.style.setProperty('--container-width', element.clientWidth + 'px');
+        // Calculate how far to scroll to show the hidden text
+        const scrollDistance = element.clientWidth - element.scrollWidth;
+        element.style.setProperty('--scroll-distance', scrollDistance + 'px');
         element.classList.add('scrollable');
+      } else {
+        element.style.removeProperty('--scroll-distance');
       }
     }
 
