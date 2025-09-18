@@ -1305,19 +1305,45 @@
 
       // Load and cache audio files
       async function loadSound(name, url) {
+        // Don't reload if already loaded
+        if (sounds[name]) {
+          console.log(`Sound already loaded: ${name}`);
+          return;
+        }
+        
         try {
+          console.log(`Loading sound: ${name} from ${url}`);
           const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText} for ${url}`);
+          }
           const arrayBuffer = await response.arrayBuffer();
           const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
           sounds[name] = audioBuffer;
+          console.log(`Successfully loaded sound: ${name}, duration: ${audioBuffer.duration}s`);
         } catch (error) {
-          console.warn(`Failed to load sound: ${name}`, error);
+          console.error(`Failed to load sound: ${name} from ${url}`, error);
         }
       }
 
       // Play sound with volume control
       function playSound(name, volume = 1) {
-        if (!audioContext || !sounds[name] || masterVolume === 0) return;
+        console.log(`Attempting to play sound: ${name}, volume: ${masterVolume}%, audioContext: ${!!audioContext}, soundLoaded: ${!!sounds[name]}`);
+        
+        if (!audioContext) {
+          console.warn('Audio context not initialized');
+          return;
+        }
+        
+        if (!sounds[name]) {
+          console.warn(`Sound not loaded: ${name}`);
+          return;
+        }
+        
+        if (masterVolume === 0) {
+          console.log('Volume is muted, not playing sound');
+          return;
+        }
         
         try {
           const source = audioContext.createBufferSource();
@@ -1329,8 +1355,9 @@
           
           gainNode.gain.value = (masterVolume / 100) * volume;
           source.start();
+          console.log(`Playing sound: ${name} at volume ${gainNode.gain.value}`);
         } catch (error) {
-          console.warn(`Failed to play sound: ${name}`, error);
+          console.error(`Failed to play sound: ${name}`, error);
         }
       }
 
@@ -1363,17 +1390,28 @@
         updateVolumeIcon();
       }
 
-      // Volume button click
-      volumeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        volumeSliderContainer.classList.toggle('show');
-      });
-
       // Volume slider change
-      volumeSlider.addEventListener('input', (e) => {
+      volumeSlider.addEventListener('input', async (e) => {
         masterVolume = parseInt(e.target.value);
         updateVolumeDisplay();
-        initAudioContext(); // Initialize on first interaction
+        
+        // Initialize audio context and load sounds when user first adjusts volume
+        if (!audioContext) {
+          initAudioContext();
+          await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
+        }
+      });
+
+      // Volume button click - also initialize audio
+      volumeBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        volumeSliderContainer.classList.toggle('show');
+        
+        // Initialize audio context when user opens volume control
+        if (!audioContext) {
+          initAudioContext();
+          await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
+        }
       });
 
       // Close volume slider when clicking outside
@@ -1386,11 +1424,11 @@
       // Initialize volume display
       updateVolumeDisplay();
 
-      // Load sounds on first user interaction
-      document.addEventListener('click', () => {
+      // Load sounds on first user interaction (fallback)
+      document.addEventListener('click', async () => {
         if (!audioContext) {
           initAudioContext();
-          loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
+          await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
         }
       }, { once: true });
 
@@ -1402,7 +1440,20 @@
           masterVolume = Math.max(0, Math.min(100, vol));
           updateVolumeDisplay();
         },
-        getVolume: () => masterVolume
+        getVolume: () => masterVolume,
+        testSound: async () => {
+          if (!audioContext) {
+            initAudioContext();
+            await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
+          }
+          playSound('welcomeClick');
+        },
+        getSoundStatus: () => ({
+          audioContext: !!audioContext,
+          soundLoaded: !!sounds.welcomeClick,
+          volume: masterVolume,
+          sounds: Object.keys(sounds)
+        })
       };
     })();
 
