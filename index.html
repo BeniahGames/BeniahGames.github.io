@@ -247,7 +247,9 @@
     .chev{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;transition:.35s}
     .card[aria-expanded="true"] .chev{transform:rotate(180deg);background:#191d25}
     .collapsible{overflow:hidden;max-height:0;opacity:0;transform:translateY(-4px) scale(.995);transition:max-height .55s cubic-bezier(.2,.7,.2,1),opacity .35s,transform .45s;border-top:1px dashed #2a3142;margin-top:.75rem;padding-top:.75rem}
+    .card[aria-expanded="false"] > .collapsible{max-height:0!important;opacity:0!important;transform:translateY(-4px) scale(.995)!important}
     .card[aria-expanded="true"] > .collapsible{opacity:1;transform:translateY(0) scale(1);max-height:500px}
+    .card.expanded > .collapsible{opacity:1!important;transform:translateY(0) scale(1)!important;max-height:500px!important}
     .preview figure{margin:0;background:#0e1015;border:1px solid var(--border);border-radius:10px;overflow:hidden}
     .preview img{display:block;width:100%;height:auto}
 
@@ -1074,6 +1076,13 @@
         function toggleCard(shouldExpand) {
           // Only affect this specific card - let CSS handle the animation
           card.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
+          
+          // Also add/remove a class for additional specificity
+          if (shouldExpand) {
+            card.classList.add('expanded');
+          } else {
+            card.classList.remove('expanded');
+          }
         }
 
         card.addEventListener('click', (e) => {
@@ -1126,6 +1135,11 @@
         
         gameCards.forEach(card => {
           card.setAttribute('aria-expanded', shouldExpand);
+          if (shouldExpand) {
+            card.classList.add('expanded');
+          } else {
+            card.classList.remove('expanded');
+          }
         });
         
         updateButtonText();
