@@ -202,8 +202,14 @@
     @keyframes scroll-text {
       0% { transform: translateX(0); }
       20% { transform: translateX(0); }
-      80% { transform: translateX(calc(-100% + 100px)); }
-      100% { transform: translateX(calc(-100% + 100px)); }
+      80% { transform: translateX(calc(-100% + var(--container-width, 150px))); }
+      100% { transform: translateX(calc(-100% + var(--container-width, 150px))); }
+    }
+    
+    .np-title.scrollable, .np-title-mobile.scrollable,
+    .np-artist.scrollable, .np-artist-mobile.scrollable {
+      text-overflow: clip;
+      white-space: nowrap;
     }
     
     .np-title.scrollable:hover, .np-title-mobile.scrollable:hover,
@@ -1400,6 +1406,8 @@
       const isOverflowing = element.scrollWidth > element.clientWidth;
       
       if (isOverflowing) {
+        // Set the container width as a CSS custom property for accurate scrolling
+        element.style.setProperty('--container-width', element.clientWidth + 'px');
         element.classList.add('scrollable');
       }
     }
