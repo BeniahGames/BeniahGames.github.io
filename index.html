@@ -319,9 +319,110 @@
     .faq details > div{color:var(--muted);padding:0 0 .9rem;}
     .faq details[open]{border-color:var(--accent);}
     .faq details[open] summary{color:var(--accent);}
+
+    /* Welcome Message Element */
+    .welcome-element {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      z-index: 1000;
+    }
+
+    .welcome-trigger {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .welcome-trigger:hover {
+      transform: scale(1.1);
+      box-shadow: 0 15px 40px rgba(255, 204, 0, 0.3);
+    }
+
+    .welcome-message {
+      position: absolute;
+      right: 60px;
+      top: 50%;
+      transform: translateY(-50%) translateX(20px);
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 300px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .welcome-message.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-50%) translateX(0);
+      pointer-events: auto;
+    }
+
+    .welcome-content p {
+      margin: 0 0 1rem 0;
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .welcome-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      .welcome-element {
+        right: 15px;
+      }
+      
+      .welcome-trigger {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+      }
+      
+      .welcome-message {
+        right: 55px;
+        max-width: 250px;
+        padding: 1rem;
+      }
+      
+      .welcome-content p {
+        font-size: 0.85rem;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Welcome Message Element -->
+  <div class="welcome-element" id="welcome-element">
+    <button class="welcome-trigger" id="welcome-trigger" aria-label="Welcome message">
+      <span>👋</span>
+    </button>
+    <div class="welcome-message" id="welcome-message">
+      <div class="welcome-content">
+        <p>Hey there, and welcome to my little corner of the web! Feel free to look around and enjoy your stay.</p>
+        <p>Just a heads-up: the site's still a work in progress, so some info may change and a few things might not work as expected. If you do spot any bugs, I'd love to hear about them!</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Parallax layers -->
   <div class="parallax">
     <div class="layer layer-back"></div>
@@ -1209,6 +1310,58 @@
       
       // Initial button state
       updateButtonText();
+    })();
+
+    // Welcome Message
+    (() => {
+      const welcomeTrigger = document.getElementById('welcome-trigger');
+      const welcomeMessage = document.getElementById('welcome-message');
+      let isMessageVisible = false;
+
+      function toggleWelcomeMessage() {
+        isMessageVisible = !isMessageVisible;
+        
+        if (isMessageVisible) {
+          welcomeMessage.classList.add('show');
+        } else {
+          welcomeMessage.classList.remove('show');
+        }
+      }
+
+      function hideWelcomeMessage() {
+        if (isMessageVisible) {
+          isMessageVisible = false;
+          welcomeMessage.classList.remove('show');
+        }
+      }
+
+      // Toggle message on trigger click
+      welcomeTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleWelcomeMessage();
+      });
+
+      // Hide message when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!welcomeTrigger.contains(e.target) && !welcomeMessage.contains(e.target)) {
+          hideWelcomeMessage();
+        }
+      });
+
+      // Hide message on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          hideWelcomeMessage();
+        }
+      });
+
+      // Handle keyboard navigation for accessibility
+      welcomeTrigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleWelcomeMessage();
+        }
+      });
     })();
 
     // Hamburger menu
