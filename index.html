@@ -80,6 +80,8 @@
     /* Buttons */
     .btn{display:inline-block;padding:.6rem .9rem;border:1px solid var(--accent);border-radius:10px;color:var(--text);text-decoration:none}
     .btn:hover{box-shadow:0 0 0 3px rgba(255,204,0,.15)}
+    .btn-secondary{display:inline-block;padding:.5rem .8rem;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--muted);font-size:.85rem;cursor:pointer;transition:.25s}
+    .btn-secondary:hover{background:var(--panel-2);color:var(--text);border-color:var(--accent)}
     .btn-discord{
       display:inline-flex;align-items:center;gap:.5rem;background:var(--accent);color:#111;
       font-weight:700;padding:.6rem 1rem;border-radius:12px;text-decoration:none;
@@ -87,6 +89,24 @@
     }
     .btn-discord:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(255,204,0,.4)}
     .btn-discord svg{width:20px;height:20px;fill:currentColor}
+
+    /* Contact Form */
+    .contact-form{max-width:600px;margin:2rem 0}
+    .form-group{margin-bottom:1.5rem}
+    .form-group label{display:block;margin-bottom:.5rem;color:var(--text);font-weight:500}
+    .form-group input,.form-group textarea{
+      width:100%;padding:.75rem;border:1px solid var(--border);border-radius:8px;
+      background:var(--panel);color:var(--text);font-family:inherit;font-size:.9rem;
+      transition:border-color .25s,box-shadow .25s;
+    }
+    .form-group input:focus,.form-group textarea:focus{
+      outline:none;border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(255,204,0,.1);
+    }
+    .form-group textarea{resize:vertical;min-height:120px}
+    .form-status{margin-top:1rem;padding:.75rem;border-radius:8px;font-size:.9rem}
+    .form-status.success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22c55e}
+    .form-status.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444}
 
     /* Sticky Nav */
     .nav{position:sticky;top:0;z-index:40;backdrop-filter:saturate(140%) blur(6px);
@@ -227,7 +247,7 @@
     .chev{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;transition:.35s}
     .card[aria-expanded="true"] .chev{transform:rotate(180deg);background:#191d25}
     .collapsible{overflow:hidden;max-height:0;opacity:0;transform:translateY(-4px) scale(.995);transition:max-height .55s cubic-bezier(.2,.7,.2,1),opacity .35s,transform .45s;border-top:1px dashed #2a3142;margin-top:.75rem;padding-top:.75rem}
-    .card[aria-expanded="true"] .collapsible{opacity:1;transform:translateY(0) scale(1)}
+    .card[aria-expanded="true"] > .collapsible{opacity:1;transform:translateY(0) scale(1)}
     .preview figure{margin:0;background:#0e1015;border:1px solid var(--border);border-radius:10px;overflow:hidden}
     .preview img{display:block;width:100%;height:auto}
 
@@ -383,7 +403,11 @@
     </section>
 
     <!-- Games -->
-    <section id="games"><h2 data-translate="games.title">Games</h2>
+    <section id="games">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 data-translate="games.title">Games</h2>
+        <button id="expand-all-btn" class="btn-secondary" data-translate="games.expand_all">Expand All</button>
+      </div>
       <div class="grid">
 
         <!-- Is This My Floor? -->
@@ -495,8 +519,34 @@
     <!-- Contact -->
     <section id="contact"><h2 data-translate="contact.title">Contact</h2>
       <p class="lead" data-translate="contact.lead">Say hi, ask a question, or talk shop.</p>
-      <p data-translate="contact.email">Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a></p>
-      <p><span data-translate="contact.discord_label">Discord:</span> <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener" data-translate="contact.discord_link">Join the server</a></p>
+      
+      <form id="contact-form" class="contact-form">
+        <div class="form-group">
+          <label for="contact-name" data-translate="contact.form.name">Name</label>
+          <input type="text" id="contact-name" name="name" required data-translate-placeholder="contact.form.name_placeholder">
+        </div>
+        
+        <div class="form-group">
+          <label for="contact-email" data-translate="contact.form.email">Your Email</label>
+          <input type="email" id="contact-email" name="email" required data-translate-placeholder="contact.form.email_placeholder">
+        </div>
+        
+        <div class="form-group">
+          <label for="contact-subject" data-translate="contact.form.subject">Subject</label>
+          <input type="text" id="contact-subject" name="subject" required data-translate-placeholder="contact.form.subject_placeholder">
+        </div>
+        
+        <div class="form-group">
+          <label for="contact-message" data-translate="contact.form.message">Message</label>
+          <textarea id="contact-message" name="message" rows="5" required data-translate-placeholder="contact.form.message_placeholder"></textarea>
+        </div>
+        
+        <button type="submit" class="btn" data-translate="contact.form.send">Send Message</button>
+        
+        <div id="form-status" class="form-status" style="display: none;"></div>
+      </form>
+      
+      <p style="margin-top: 2rem;"><span data-translate="contact.discord_label">Discord:</span> <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener" data-translate="contact.discord_link">Join the server</a></p>
     </section>
   </main>
 
@@ -531,6 +581,8 @@
         
         // Games section
         'games.title': 'Games',
+        'games.expand_all': 'Expand All',
+        'games.collapse_all': 'Collapse All',
         'games.floor.desc': 'An idle elevator adventure about going nowhere—while somehow calling it progress. Strange passengers, lost-and-found upgrades, and prestige rides that push your elevator higher each run.',
         'games.cartridge.desc': ' is a retro sci-fi roguelike card battler where you don\'t play cards — you load cartridges. Each run takes you deeper into a corrupted facility as QB, a cube-bot fighting glitches, viruses, and rogue machines. Discover synergies between modules, manage heat and power, and survive long enough to rewrite your firmware.',
         'games.guildies.desc': ' is a whimsical yet deep guild management sim. Recruit and train heroes, send squads on quests, and watch them grow. Expand halls, unlock facilities like alchemy labs and dojos, craft gear, and balance risk vs. reward to build the most renowned guild in the realm.',
@@ -558,9 +610,17 @@
         // Contact section
         'contact.title': 'Contact',
         'contact.lead': 'Say hi, ask a question, or talk shop.',
-        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Join the server',
+        'contact.form.name': 'Name',
+        'contact.form.name_placeholder': 'Your name',
+        'contact.form.email': 'Your Email',
+        'contact.form.email_placeholder': 'your.email@example.com',
+        'contact.form.subject': 'Subject',
+        'contact.form.subject_placeholder': 'What is this about?',
+        'contact.form.message': 'Message',
+        'contact.form.message_placeholder': 'Tell me what\'s on your mind...',
+        'contact.form.send': 'Send Message',
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
@@ -594,6 +654,8 @@
         
         // Games section
         'games.title': 'Spellen',
+        'games.expand_all': 'Alles Uitklappen',
+        'games.collapse_all': 'Alles Inklappen',
         'games.floor.desc': 'Een idle lift avontuur over nergens naartoe gaan—terwijl je het op de een of andere manier vooruitgang noemt. Vreemde passagiers, verloren-en-gevonden upgrades, en prestige ritten die je lift hoger duwen elke run.',
         'games.cartridge.desc': ' is een retro sci-fi roguelike kaartgevecht waar je geen kaarten speelt — je laadt cartridges. Elke run brengt je dieper in een gecorrumpeerde faciliteit als QB, een kubus-bot die glitches, virussen en malafide machines bevecht. Ontdek synergieën tussen modules, beheer warmte en kracht, en overleef lang genoeg om je firmware te herschrijven.',
         'games.guildies.desc': ' is een grillige maar diepe gilde management sim. Rekruteer en train helden, stuur teams op quests, en zie ze groeien. Breid hallen uit, ontgrendel faciliteiten zoals alchemie labs en dojo\'s, maak uitrusting, en balanceer risico vs. beloning om de meest gerenommeerde gilde in het rijk te bouwen.',
@@ -621,9 +683,17 @@
         // Contact section
         'contact.title': 'Contact',
         'contact.lead': 'Zeg hoi, stel een vraag, of praat shop.',
-        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Deelnemen aan de server',
+        'contact.form.name': 'Naam',
+        'contact.form.name_placeholder': 'Je naam',
+        'contact.form.email': 'Je Email',
+        'contact.form.email_placeholder': 'je.email@voorbeeld.com',
+        'contact.form.subject': 'Onderwerp',
+        'contact.form.subject_placeholder': 'Waar gaat dit over?',
+        'contact.form.message': 'Bericht',
+        'contact.form.message_placeholder': 'Vertel me wat je denkt...',
+        'contact.form.send': 'Bericht Versturen',
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
@@ -657,6 +727,8 @@
         
         // Games section
         'games.title': 'Spiele',
+        'games.expand_all': 'Alle Erweitern',
+        'games.collapse_all': 'Alle Einklappen',
         'games.floor.desc': 'Ein Idle-Fahrstuhl-Abenteuer über das Nirgendwo-Hingehen—während man es irgendwie Fortschritt nennt. Seltsame Passagiere, verloren-und-gefundene Upgrades und Prestige-Fahrten, die deinen Fahrstuhl bei jedem Lauf höher treiben.',
         'games.cartridge.desc': ' ist ein Retro-Sci-Fi-Roguelike-Kartenkampf, bei dem du keine Karten spielst — du lädst Cartridges. Jeder Lauf führt dich tiefer in eine korrumpierte Einrichtung als QB, ein Würfel-Bot, der Glitches, Viren und Schurken-Maschinen bekämpft. Entdecke Synergien zwischen Modulen, verwalte Hitze und Energie und überlebe lange genug, um deine Firmware neu zu schreiben.',
         'games.guildies.desc': ' ist eine skurrile, aber tiefe Gildenverwaltungssimulation. Rekrutiere und trainiere Helden, schicke Trupps auf Quests und sieh sie wachsen. Erweitere Hallen, schalte Einrichtungen wie Alchemielabore und Dojos frei, fertige Ausrüstung und balanciere Risiko vs. Belohnung, um die renommierteste Gilde im Reich aufzubauen.',
@@ -684,9 +756,17 @@
         // Contact section
         'contact.title': 'Kontakt',
         'contact.lead': 'Sag hallo, stell eine Frage oder rede Fachsimpelei.',
-        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Server beitreten',
+        'contact.form.name': 'Name',
+        'contact.form.name_placeholder': 'Dein Name',
+        'contact.form.email': 'Deine Email',
+        'contact.form.email_placeholder': 'deine.email@beispiel.com',
+        'contact.form.subject': 'Betreff',
+        'contact.form.subject_placeholder': 'Worum geht es?',
+        'contact.form.message': 'Nachricht',
+        'contact.form.message_placeholder': 'Erzähl mir, was du denkst...',
+        'contact.form.send': 'Nachricht Senden',
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
@@ -720,6 +800,8 @@
         
         // Games section
         'games.title': 'Giochi',
+        'games.expand_all': 'Espandi Tutto',
+        'games.collapse_all': 'Comprimi Tutto',
         'games.floor.desc': 'Un\'avventura idle in ascensore sul non andare da nessuna parte—pur chiamandolo in qualche modo progresso. Passeggeri strani, upgrade persi-e-trovati, e corse di prestigio che spingono il tuo ascensore più in alto ad ogni corsa.',
         'games.cartridge.desc': ' è un combattimento roguelike retro sci-fi con carte dove non giochi carte — carichi cartucce. Ogni corsa ti porta più in profondità in una struttura corrotta come QB, un cubo-bot che combatte glitch, virus e macchine canaglia. Scopri sinergie tra moduli, gestisci calore e potenza, e sopravvivi abbastanza a lungo per riscrivere il tuo firmware.',
         'games.guildies.desc': ' è una simulazione di gestione gilda stravagante ma profonda. Recluta e addestra eroi, manda squadre in missioni, e guardali crescere. Espandi sale, sblocca strutture come laboratori di alchimia e dojo, crea equipaggiamento, e bilancia rischio vs. ricompensa per costruire la gilda più rinomata del regno.',
@@ -747,9 +829,17 @@
         // Contact section
         'contact.title': 'Contatti',
         'contact.lead': 'Saluta, fai una domanda, o parla di lavoro.',
-        'contact.email': 'Email: <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Unisciti al server',
+        'contact.form.name': 'Nome',
+        'contact.form.name_placeholder': 'Il tuo nome',
+        'contact.form.email': 'La tua Email',
+        'contact.form.email_placeholder': 'tua.email@esempio.com',
+        'contact.form.subject': 'Oggetto',
+        'contact.form.subject_placeholder': 'Di cosa si tratta?',
+        'contact.form.message': 'Messaggio',
+        'contact.form.message_placeholder': 'Dimmi cosa pensi...',
+        'contact.form.send': 'Invia Messaggio',
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
@@ -1006,6 +1096,53 @@
           }
         });
       });
+    })();
+
+    // Expand All Button
+    (() => {
+      const expandAllBtn = document.getElementById('expand-all-btn');
+      const gameCards = document.querySelectorAll('#games .card');
+      
+      if (!expandAllBtn || !gameCards.length) return;
+      
+      let allExpanded = false;
+      
+      const updateButtonText = () => {
+        const expandedCards = document.querySelectorAll('#games .card[aria-expanded="true"]');
+        allExpanded = expandedCards.length === gameCards.length;
+        
+        // Update button text based on current state
+        if (allExpanded) {
+          expandAllBtn.setAttribute('data-translate', 'games.collapse_all');
+          expandAllBtn.textContent = 'Collapse All';
+        } else {
+          expandAllBtn.setAttribute('data-translate', 'games.expand_all');
+          expandAllBtn.textContent = 'Expand All';
+        }
+      };
+      
+      expandAllBtn.addEventListener('click', () => {
+        const shouldExpand = !allExpanded;
+        
+        gameCards.forEach(card => {
+          const collapsible = card.querySelector('.collapsible');
+          if (collapsible) {
+            card.setAttribute('aria-expanded', shouldExpand);
+            collapsible.style.maxHeight = shouldExpand ? collapsible.scrollHeight + 'px' : '0';
+          }
+        });
+        
+        updateButtonText();
+      });
+      
+      // Listen for individual card changes to update button state
+      gameCards.forEach(card => {
+        const observer = new MutationObserver(updateButtonText);
+        observer.observe(card, { attributes: true, attributeFilter: ['aria-expanded'] });
+      });
+      
+      // Initial button state
+      updateButtonText();
     })();
 
     // Hamburger menu
@@ -1276,6 +1413,60 @@
 
       refresh();
       setInterval(refresh, 30000); // Refresh every 30 seconds
+    })();
+
+    // Contact Form
+    (() => {
+      const form = document.getElementById('contact-form');
+      const statusDiv = document.getElementById('form-status');
+      
+      if (!form) return;
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = {
+          name: formData.get('name'),
+          email: formData.get('email'),
+          subject: formData.get('subject'),
+          message: formData.get('message')
+        };
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        statusDiv.style.display = 'none';
+        
+        try {
+          // Create mailto link with form data
+          const emailBody = `Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`;
+          const mailtoLink = `mailto:contact@beniah.games?subject=${encodeURIComponent(data.subject)}&body=${encodeURIComponent(emailBody)}`;
+          
+          // Open email client
+          window.location.href = mailtoLink;
+          
+          // Show success message
+          statusDiv.className = 'form-status success';
+          statusDiv.textContent = 'Email client opened! Please send the email to complete your message.';
+          statusDiv.style.display = 'block';
+          
+          // Reset form
+          form.reset();
+          
+        } catch (error) {
+          // Show error message
+          statusDiv.className = 'form-status error';
+          statusDiv.textContent = 'Sorry, there was an error. Please try again or contact us directly.';
+          statusDiv.style.display = 'block';
+        }
+        
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      });
     })();
   </script>
 </body>
