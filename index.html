@@ -207,10 +207,28 @@
       100% { transform: translateX(calc(var(--scroll-distance, -50px))); }
     }
     
+    .np-title.scrollable, .np-title-mobile.scrollable,
+    .np-artist.scrollable, .np-artist-mobile.scrollable {
+      position: relative;
+    }
+    
     .np-title.scrollable:hover, .np-title-mobile.scrollable:hover,
     .np-artist.scrollable:hover, .np-artist-mobile.scrollable:hover {
       text-overflow: clip;
       animation: scroll-text 4s ease-in-out infinite;
+    }
+    
+    /* Create a wrapper for the full text that can scroll */
+    .np-title.scrollable:hover::before, .np-title-mobile.scrollable:hover::before,
+    .np-artist.scrollable:hover::before, .np-artist-mobile.scrollable:hover::before {
+      content: attr(data-full-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      white-space: nowrap;
+      animation: scroll-text 4s ease-in-out infinite;
+      background: inherit;
+      color: inherit;
     }
     
     /* Desktop Now Playing */
@@ -1393,8 +1411,12 @@
       if (!element || !element.textContent.trim()) {
         element?.classList.remove('scrollable');
         element?.style.removeProperty('--scroll-distance');
+        element?.removeAttribute('data-full-text');
         return;
       }
+      
+      // Store the full text content
+      const fullText = element.textContent;
       
       // Temporarily remove scrollable class to get accurate measurements
       element.classList.remove('scrollable');
@@ -1403,12 +1425,28 @@
       const isOverflowing = element.scrollWidth > element.clientWidth;
       
       if (isOverflowing) {
+        // Store full text for the pseudo-element
+        element.setAttribute('data-full-text', fullText);
+        
+        // Create a temporary element to measure the full text width
+        const tempElement = document.createElement('span');
+        tempElement.style.visibility = 'hidden';
+        tempElement.style.position = 'absolute';
+        tempElement.style.whiteSpace = 'nowrap';
+        tempElement.style.font = window.getComputedStyle(element).font;
+        tempElement.textContent = fullText;
+        document.body.appendChild(tempElement);
+        
+        const fullTextWidth = tempElement.offsetWidth;
+        document.body.removeChild(tempElement);
+        
         // Calculate how far to scroll to show the hidden text
-        const scrollDistance = element.clientWidth - element.scrollWidth;
+        const scrollDistance = element.clientWidth - fullTextWidth;
         element.style.setProperty('--scroll-distance', scrollDistance + 'px');
         element.classList.add('scrollable');
       } else {
         element.style.removeProperty('--scroll-distance');
+        element.removeAttribute('data-full-text');
       }
     }
 
