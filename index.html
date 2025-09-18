@@ -197,7 +197,53 @@
       font-size:.85rem;color:var(--text-secondary);
     }
     @media(max-width:820px){
-      .volume-control{display:none}
+      .volume-control{
+        position:relative;
+        display:flex;
+        align-items:center;
+      }
+      .volume-btn{
+        padding:12px;
+        min-width:44px;
+        min-height:44px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      }
+      .volume-slider-container{
+        position:absolute;
+        top:100%;
+        right:0;
+        background:var(--bg-secondary);
+        border:1px solid var(--border);
+        border-radius:8px;
+        padding:1rem;
+        box-shadow:0 4px 12px rgba(0,0,0,.15);
+        min-width:200px;
+        z-index:1000;
+        transform:translateY(8px);
+        opacity:0;
+        visibility:hidden;
+        transition:all .2s ease;
+      }
+      .volume-slider-container.show{
+        opacity:1;
+        visibility:visible;
+        transform:translateY(4px);
+      }
+      .volume-slider{
+        width:100%;
+        height:6px;
+        margin:.5rem 0;
+      }
+      .volume-slider::-webkit-slider-thumb{
+        width:20px;
+        height:20px;
+      }
+      .volume-slider::-moz-range-thumb{
+        width:20px;
+        height:20px;
+      }
     }
 
     /* Hamburger + Mobile Panel (slide + shadow + stagger) */
@@ -1402,9 +1448,10 @@
         }
       });
 
-      // Volume button click - also initialize audio
-      volumeBtn.addEventListener('click', async (e) => {
+      // Volume button interaction - support both click and touch
+      const handleVolumeButtonInteraction = async (e) => {
         e.stopPropagation();
+        e.preventDefault(); // Prevent double-firing on mobile
         volumeSliderContainer.classList.toggle('show');
         
         // Initialize audio context when user opens volume control
@@ -1412,25 +1459,36 @@
           initAudioContext();
           await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
         }
-      });
+      };
 
-      // Close volume slider when clicking outside
-      document.addEventListener('click', (e) => {
+      volumeBtn.addEventListener('click', handleVolumeButtonInteraction);
+      volumeBtn.addEventListener('touchend', handleVolumeButtonInteraction);
+
+      // Close volume slider when clicking/touching outside
+      const closeVolumeSlider = (e) => {
         if (!document.getElementById('volume-control').contains(e.target)) {
           volumeSliderContainer.classList.remove('show');
         }
-      });
+      };
+
+      document.addEventListener('click', closeVolumeSlider);
+      document.addEventListener('touchend', closeVolumeSlider);
 
       // Initialize volume display
       updateVolumeDisplay();
 
       // Load sounds on first user interaction (fallback)
-      document.addEventListener('click', async () => {
+      const initAudioOnInteraction = async () => {
         if (!audioContext) {
           initAudioContext();
           await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
         }
-      }, { once: true });
+      };
+
+      // Support both click and touch events for mobile
+      document.addEventListener('click', initAudioOnInteraction, { once: true });
+      document.addEventListener('touchstart', initAudioOnInteraction, { once: true });
+      document.addEventListener('touchend', initAudioOnInteraction, { once: true });
 
       // Expose audio functions globally
       window.audioManager = {
@@ -1595,16 +1653,20 @@
         }
       }
 
-      // Toggle message on trigger click
-      welcomeTrigger.addEventListener('click', (e) => {
+      // Toggle message on trigger interaction (click and touch)
+      const handleWelcomeTrigger = (e) => {
         e.stopPropagation();
+        e.preventDefault(); // Prevent double-firing on mobile
         toggleWelcomeMessage();
         
         // Play welcome click sound
         if (window.audioManager) {
           window.audioManager.playSound('welcomeClick');
         }
-      });
+      };
+
+      welcomeTrigger.addEventListener('click', handleWelcomeTrigger);
+      welcomeTrigger.addEventListener('touchend', handleWelcomeTrigger);
 
       // Hide message when clicking outside
       document.addEventListener('click', (e) => {
