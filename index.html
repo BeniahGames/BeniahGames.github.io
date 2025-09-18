@@ -460,6 +460,8 @@
     <section id="faq">
       <h2 data-translate="faq.title">FAQ</h2>
       <p class="lead" data-translate="faq.lead">Questions you might be thinking. If you don't see yours, ping me!</p>
+      
+      <button id="expand-all-faq-btn" class="btn-secondary" data-translate="faq.expand_all">Expand All</button>
 
       <div class="faq">
         <details>
@@ -595,8 +597,10 @@
         'games.early_dev': 'Currently in early development.',
         
         // FAQ section
-        'faq.title': 'FAQ',
-        'faq.lead': 'Questions you might be thinking. If you don\'t see yours, ping me!',
+      'faq.title': 'FAQ',
+      'faq.lead': 'Questions you might be thinking. If you don\'t see yours, ping me!',
+      'faq.expand_all': 'Expand All',
+      'faq.collapse_all': 'Collapse All',
         'faq.q1': 'What tools do you use?',
         'faq.a1': 'I build with <strong>Godot</strong> for the engine. Art & pixels with <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong>, and <strong>SpriteMancer</strong>. 3D and renders in <strong>Blender</strong>.',
         'faq.q2': 'Will you release games on console?',
@@ -670,6 +674,8 @@
         // FAQ section
         'faq.title': 'FAQ',
         'faq.lead': 'Vragen die je misschien denkt. Als je de jouwe niet ziet, ping me!',
+        'faq.expand_all': 'Alles Uitklappen',
+        'faq.collapse_all': 'Alles Inklappen',
         'faq.q1': 'Welke tools gebruik je?',
         'faq.a1': 'Ik bouw met <strong>Godot</strong> voor de engine. Kunst & pixels met <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong>, en <strong>SpriteMancer</strong>. 3D en renders in <strong>Blender</strong>.',
         'faq.q2': 'Ga je spellen uitbrengen op console?',
@@ -743,6 +749,8 @@
         // FAQ section
         'faq.title': 'FAQ',
         'faq.lead': 'Fragen, die du vielleicht denkst. Wenn du deine nicht siehst, ping mich!',
+        'faq.expand_all': 'Alle Erweitern',
+        'faq.collapse_all': 'Alle Einklappen',
         'faq.q1': 'Welche Tools verwendest du?',
         'faq.a1': 'Ich baue mit <strong>Godot</strong> für die Engine. Kunst & Pixel mit <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong> und <strong>SpriteMancer</strong>. 3D und Renders in <strong>Blender</strong>.',
         'faq.q2': 'Wirst du Spiele auf Konsolen veröffentlichen?',
@@ -816,6 +824,8 @@
         // FAQ section
         'faq.title': 'FAQ',
         'faq.lead': 'Domande che potresti pensare. Se non vedi la tua, scrivimi!',
+        'faq.expand_all': 'Espandi Tutto',
+        'faq.collapse_all': 'Comprimi Tutto',
         'faq.q1': 'Che strumenti usi?',
         'faq.a1': 'Costruisco con <strong>Godot</strong> per il motore. Arte & pixel con <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong> e <strong>SpriteMancer</strong>. 3D e render in <strong>Blender</strong>.',
         'faq.q2': 'Rilascerai giochi su console?',
@@ -887,6 +897,8 @@
         // FAQ section
         'faq.title': 'FAQ',
         'faq.lead': 'Preguntas que podrías estar pensando. Si no ves la tuya, ¡escríbeme!',
+        'faq.expand_all': 'Expandir Todo',
+        'faq.collapse_all': 'Contraer Todo',
         'faq.q1': '¿Qué herramientas usas?',
         'faq.a1': 'Construyo con <strong>Godot</strong> para el motor. Arte y píxeles con <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong> y <strong>SpriteMancer</strong>. 3D y renders en <strong>Blender</strong>.',
         'faq.q2': '¿Lanzarás juegos en consola?',
@@ -950,6 +962,8 @@
         // FAQ section
         'faq.title': 'FAQ',
         'faq.lead': 'あなたが考えているかもしれない質問。見つからない場合は、連絡してください！',
+        'faq.expand_all': 'すべて展開',
+        'faq.collapse_all': 'すべて折りたたみ',
         'faq.q1': 'どのようなツールを使用していますか？',
         'faq.a1': 'エンジンには<strong>Godot</strong>を使用しています。アートとピクセルには<strong>Krita</strong>、<strong>Aseprite</strong>、<strong>PixelOver</strong>、<strong>SpriteMancer</strong>を使用。3Dとレンダリングには<strong>Blender</strong>を使用しています。',
         'faq.q2': 'コンソールでゲームをリリースしますか？',
@@ -1478,6 +1492,53 @@
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
       });
+    })();
+
+    // FAQ Expand All Button
+    (() => {
+      const expandAllFaqBtn = document.getElementById('expand-all-faq-btn');
+      const faqDetails = document.querySelectorAll('#faq .faq details');
+      
+      if (!expandAllFaqBtn || !faqDetails.length) return;
+      
+      let allExpanded = false;
+      
+      const updateButtonText = () => {
+        const openDetails = document.querySelectorAll('#faq .faq details[open]');
+        allExpanded = openDetails.length === faqDetails.length;
+        
+        // Update button text based on current state
+        if (allExpanded) {
+          expandAllFaqBtn.setAttribute('data-translate', 'faq.collapse_all');
+          expandAllFaqBtn.textContent = 'Collapse All';
+        } else {
+          expandAllFaqBtn.setAttribute('data-translate', 'faq.expand_all');
+          expandAllFaqBtn.textContent = 'Expand All';
+        }
+      };
+      
+      expandAllFaqBtn.addEventListener('click', () => {
+        const shouldExpand = !allExpanded;
+        
+        faqDetails.forEach(details => {
+          if (shouldExpand) {
+            details.setAttribute('open', '');
+          } else {
+            details.removeAttribute('open');
+          }
+        });
+        
+        updateButtonText();
+      });
+      
+      // Listen for individual details changes to update button state
+      faqDetails.forEach(details => {
+        const observer = new MutationObserver(updateButtonText);
+        observer.observe(details, { attributes: true, attributeFilter: ['open'] });
+      });
+      
+      // Initial button state
+      updateButtonText();
     })();
   </script>
 </body>
