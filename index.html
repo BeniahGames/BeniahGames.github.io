@@ -193,7 +193,6 @@
     .now-playing:hover{background:rgba(30,215,96,.15);border-color:rgba(30,215,96,.5)}
     .np-art,.np-art-mobile{width:40px;height:40px;background:#333;border-radius:6px;flex-shrink:0;background-size:cover;background-position:center}
     .np-info,.np-info-mobile{flex:1;min-width:0;overflow:hidden}
-    .np-info:hover,.np-info-mobile:hover{overflow:visible}
     .np-title,.np-title-mobile{font-size:.85rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
     .np-artist,.np-artist-mobile{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
     
@@ -208,14 +207,9 @@
       100% { transform: translateX(calc(var(--scroll-distance, -50px))); }
     }
     
-    .np-title.scrollable, .np-title-mobile.scrollable,
-    .np-artist.scrollable, .np-artist-mobile.scrollable {
-      overflow: visible;
-      text-overflow: clip;
-    }
-    
     .np-title.scrollable:hover, .np-title-mobile.scrollable:hover,
     .np-artist.scrollable:hover, .np-artist-mobile.scrollable:hover {
+      text-overflow: clip;
       animation: scroll-text 4s ease-in-out infinite;
     }
     
