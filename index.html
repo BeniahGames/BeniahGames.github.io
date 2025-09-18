@@ -218,7 +218,16 @@
     }
     
     /* Create a wrapper for the full text that can scroll */
-    .np-title.scrollable:hover::before, .np-title-mobile.scrollable:hover::before,
+    .np-title.scrollable:hover::before, .np-title-mobile.scrollable:hover::before {
+      content: attr(data-full-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      white-space: nowrap;
+      animation: scroll-text 4s ease-in-out infinite;
+      color: var(--text);
+    }
+    
     .np-artist.scrollable:hover::before, .np-artist-mobile.scrollable:hover::before {
       content: attr(data-full-text);
       position: absolute;
@@ -226,7 +235,7 @@
       left: 0;
       white-space: nowrap;
       animation: scroll-text 4s ease-in-out infinite;
-      color: inherit;
+      color: var(--muted);
     }
     
     /* Desktop Now Playing */
