@@ -324,61 +324,61 @@
     .welcome-element {
       position: fixed;
       top: 50%;
-      right: 20px;
-      transform: translateY(-50%);
+      right: 0;
+      transform: translateY(-50%) translateX(calc(100% - 40px));
       z-index: 1000;
+      display: flex;
+      align-items: center;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .welcome-element.show {
+      transform: translateY(-50%) translateX(0);
     }
 
     .welcome-trigger {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
+      width: 40px;
+      height: 80px;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       box-shadow: var(--shadow);
       transition: all 0.3s ease;
-      position: relative;
+      border-radius: 8px 0 0 8px;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
     }
 
     .welcome-trigger:hover {
-      transform: scale(1.1);
-      box-shadow: 0 15px 40px rgba(255, 204, 0, 0.3);
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      box-shadow: 0 10px 30px rgba(255, 204, 0, 0.2);
     }
 
     .welcome-message {
-      position: absolute;
-      right: 60px;
-      top: 50%;
-      transform: translateY(-50%) translateX(20px);
       background: linear-gradient(180deg, var(--panel), var(--panel-2));
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      max-width: 300px;
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      padding: 1rem;
+      width: 280px;
       box-shadow: var(--shadow);
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
+      display: flex;
+      align-items: center;
     }
 
-    .welcome-message.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(-50%) translateX(0);
-      pointer-events: auto;
+    .welcome-content {
+      width: 100%;
     }
 
     .welcome-content p {
-      margin: 0 0 1rem 0;
+      margin: 0 0 0.75rem 0;
       color: var(--text);
-      font-size: 0.9rem;
-      line-height: 1.5;
+      font-size: 0.8rem;
+      line-height: 1.4;
     }
 
     .welcome-content p:last-child {
@@ -388,23 +388,23 @@
     /* Mobile adjustments */
     @media (max-width: 768px) {
       .welcome-element {
-        right: 15px;
+        transform: translateY(-50%) translateX(calc(100% - 35px));
       }
       
       .welcome-trigger {
-        width: 45px;
-        height: 45px;
-        font-size: 1.3rem;
+        width: 35px;
+        height: 70px;
+        font-size: 1rem;
       }
       
       .welcome-message {
-        right: 55px;
-        max-width: 250px;
-        padding: 1rem;
+        width: 240px;
+        padding: 0.8rem;
       }
       
       .welcome-content p {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
       }
     }
   </style>
@@ -1314,6 +1314,7 @@
 
     // Welcome Message
     (() => {
+      const welcomeElement = document.getElementById('welcome-element');
       const welcomeTrigger = document.getElementById('welcome-trigger');
       const welcomeMessage = document.getElementById('welcome-message');
       let isMessageVisible = false;
@@ -1322,16 +1323,16 @@
         isMessageVisible = !isMessageVisible;
         
         if (isMessageVisible) {
-          welcomeMessage.classList.add('show');
+          welcomeElement.classList.add('show');
         } else {
-          welcomeMessage.classList.remove('show');
+          welcomeElement.classList.remove('show');
         }
       }
 
       function hideWelcomeMessage() {
         if (isMessageVisible) {
           isMessageVisible = false;
-          welcomeMessage.classList.remove('show');
+          welcomeElement.classList.remove('show');
         }
       }
 
@@ -1343,7 +1344,7 @@
 
       // Hide message when clicking outside
       document.addEventListener('click', (e) => {
-        if (!welcomeTrigger.contains(e.target) && !welcomeMessage.contains(e.target)) {
+        if (!welcomeElement.contains(e.target)) {
           hideWelcomeMessage();
         }
       });
