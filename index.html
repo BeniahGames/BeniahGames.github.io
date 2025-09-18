@@ -238,7 +238,8 @@
     .card{
       background:linear-gradient(180deg,var(--panel),var(--panel-2));
       border:2px solid var(--accent);border-radius:14px;padding:1.1rem;box-shadow:var(--shadow);
-      cursor:pointer;opacity:0;translate:0 14px;transition:.25s;filter:saturate(.95)
+      cursor:pointer;opacity:0;translate:0 14px;transition:.25s;filter:saturate(.95);
+      align-self:start
     }
     .card.revealed{opacity:1;translate:0 0;transition:opacity .6s,translate .6s}
     .card:hover{transform:translateY(-4px)}
