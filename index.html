@@ -358,6 +358,16 @@
       box-shadow: 0 10px 30px rgba(255, 204, 0, 0.2);
     }
 
+    .welcome-trigger.faded {
+      opacity: 0.4;
+      transition: opacity 1s ease;
+    }
+
+    .welcome-trigger:not(.faded) {
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
     .welcome-message {
       background: linear-gradient(180deg, var(--panel), var(--panel-2));
       border: 2px solid var(--accent);
@@ -1318,14 +1328,34 @@
       const welcomeTrigger = document.getElementById('welcome-trigger');
       const welcomeMessage = document.getElementById('welcome-message');
       let isMessageVisible = false;
+      let fadeTimeout;
+
+      function startFadeTimeout() {
+        clearFadeTimeout();
+        fadeTimeout = setTimeout(() => {
+          if (!isMessageVisible) {
+            welcomeTrigger.classList.add('faded');
+          }
+        }, 3000);
+      }
+
+      function clearFadeTimeout() {
+        if (fadeTimeout) {
+          clearTimeout(fadeTimeout);
+          fadeTimeout = null;
+        }
+        welcomeTrigger.classList.remove('faded');
+      }
 
       function toggleWelcomeMessage() {
         isMessageVisible = !isMessageVisible;
         
         if (isMessageVisible) {
           welcomeElement.classList.add('show');
+          clearFadeTimeout();
         } else {
           welcomeElement.classList.remove('show');
+          startFadeTimeout();
         }
       }
 
@@ -1333,6 +1363,7 @@
         if (isMessageVisible) {
           isMessageVisible = false;
           welcomeElement.classList.remove('show');
+          startFadeTimeout();
         }
       }
 
@@ -1363,6 +1394,17 @@
           toggleWelcomeMessage();
         }
       });
+
+      // Reset fade on hover
+      welcomeTrigger.addEventListener('mouseenter', clearFadeTimeout);
+      welcomeTrigger.addEventListener('mouseleave', () => {
+        if (!isMessageVisible) {
+          startFadeTimeout();
+        }
+      });
+
+      // Start initial fade timeout
+      startFadeTimeout();
     })();
 
     // Hamburger menu
