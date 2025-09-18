@@ -1336,7 +1336,23 @@
     // Audio Manager System
     (() => {
       let audioContext;
-      let masterVolume = 0; // Start muted
+      
+      // Load saved volume level from localStorage
+      let masterVolume = 0; // Default to muted
+      try {
+        const savedVolume = localStorage.getItem('sound-level');
+        if (savedVolume !== null) {
+          const parsedVolume = parseFloat(savedVolume);
+          // Validate the saved volume is within acceptable range
+          if (!isNaN(parsedVolume) && parsedVolume >= 0 && parsedVolume <= 100) {
+            masterVolume = parsedVolume;
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to load saved volume level:', error);
+        // masterVolume remains 0 (muted) as fallback
+      }
+      
       const sounds = {};
 
       // Initialize audio context on first user interaction
@@ -1434,6 +1450,13 @@
         volumeSlider.value = masterVolume;
         volumePercentage.textContent = `${masterVolume}%`;
         updateVolumeIcon();
+        
+        // Save volume level to localStorage
+        try {
+          localStorage.setItem('sound-level', masterVolume);
+        } catch (error) {
+          console.warn('Failed to save volume level to localStorage:', error);
+        }
       }
 
       // Volume slider change
