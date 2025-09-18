@@ -168,67 +168,28 @@
     .menu-panel.open .menu-panel-inner a:nth-child(5){opacity:1;transform:none;transition-delay:240ms}
     @media (prefers-reduced-motion:reduce){.menu-panel,.menu-panel a{transition:none !important;transform:none !important}}
 
-    /* Now Playing widget */
-    .np-widget{
-      position:relative;
-      display:grid;
-      grid-template-columns:auto 1fr;
-      gap:12px;
-      align-items:center;
-      background:linear-gradient(180deg,var(--panel),var(--panel-2));
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:.75rem 1rem;
-      box-shadow:var(--shadow);
-      max-width:520px;
-      overflow:hidden;
-      transition:transform .35s ease, background .35s ease, padding .25s ease;
-      margin-left:1rem;
-    }
-    .np-cover{
-      width:64px;height:64px;border-radius:10px;
-      background:#222 center/cover no-repeat;
-      border:1px solid var(--border);
-      transition:width .35s ease,height .35s ease,border-radius .35s ease,transform .35s ease;
-    }
-    .np-info{min-width:0; transition:opacity .25s ease, transform .25s ease;}
-    .np-title{font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-    .np-artist{color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-    .np-link{color:var(--link); display:inline-block; margin-top:.25rem;}
+    /* Spotify Now Playing */
+    .now-playing{display:flex;align-items:center;gap:.75rem;padding:.5rem;background:rgba(30,215,96,.1);border:1px solid rgba(30,215,96,.3);border-radius:8px;transition:all .3s ease}
+    .now-playing:hover{background:rgba(30,215,96,.15);border-color:rgba(30,215,96,.5)}
+    .np-art,.np-art-mobile{width:40px;height:40px;background:#333;border-radius:6px;flex-shrink:0;background-size:cover;background-position:center}
+    .np-info,.np-info-mobile{flex:1;min-width:0}
+    .np-title,.np-title-mobile{font-size:.85rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .np-artist,.np-artist-mobile{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .np-link,.np-link-mobile{font-size:.7rem;color:#1db954;text-decoration:none;margin-top:.25rem;display:inline-block}
+    .np-link:hover,.np-link-mobile:hover{text-decoration:underline}
     
-    /* Expanded = "cover-only" mode */
-    .np-widget[aria-expanded="true"]{
-      grid-template-columns:1fr;
-      padding:0; /* let the art breathe */
-    }
-    .np-widget[aria-expanded="true"] .np-cover{
-      width:100%; height:280px; border-radius:14px 14px 0 0;
-    }
-    .np-widget[aria-expanded="true"] .np-info{
-      opacity:0; transform:translateY(6px); pointer-events:none; height:0;
-    }
-    /* Dots indicator (auto-fades) */
-    .np-dots{
-      position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
-      display:flex; gap:8px; opacity:0; transition:opacity .4s ease;
-      background:rgba(0,0,0,.25); padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.08);
-    }
-    .np-dots.show{opacity:1;}
-    .np-dots .dot{
-      width:6px; height:6px; border-radius:50%;
-      background:rgba(255,255,255,.35);
-      transition:background .25s ease, transform .25s ease;
-    }
-    .np-dots .dot.active{
-      background:var(--accent);
-      transform:scale(1.15);
-    }
-    /* Hover polish */
-    .np-widget:hover{transform:translateY(-2px);}
+    /* Desktop Now Playing */
+    .now-playing.desktop-only{margin-left:1rem;max-width:200px}
     
-    /* Mobile responsive */
+    /* Mobile Now Playing */
+    .now-playing.mobile-only{margin:1rem;background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.2)}
+    
+    /* Responsive visibility */
+    .desktop-only{display:flex}
+    .mobile-only{display:none}
     @media (max-width:768px){
-      .np-widget{margin:1rem;max-width:calc(100% - 2rem);}
+      .desktop-only{display:none}
+      .mobile-only{display:flex}
     }
 
     /* Hero */
@@ -316,17 +277,13 @@
         <a href="#games" data-translate="nav.games">Games</a>
         <a href="#contact" data-translate="nav.contact">Contact</a>
         
-        <!-- Spotify Now Playing (Enhanced) -->
-        <div class="np-widget" id="np-widget" aria-expanded="false" tabindex="0">
-          <div class="np-cover" id="np-art"></div>
+        <!-- Spotify Now Playing (Desktop) -->
+        <div class="now-playing desktop-only" id="now-playing-desktop">
+          <div class="np-art" id="np-art"></div>
           <div class="np-info">
             <div class="np-title" id="np-title" data-translate="spotify.not_playing">Not playing</div>
             <div class="np-artist" id="np-artist"></div>
-            <a class="np-link" id="np-link" href="#" target="_blank" rel="noopener" data-translate="spotify.open">Open in Spotify</a>
-          </div>
-          <div class="np-dots" id="np-dots" aria-hidden="true">
-            <span class="dot active"></span>
-            <span class="dot"></span>
+            <a class="np-link" id="np-link" href="#" target="_blank" rel="noopener" style="display:none;" data-translate="spotify.listen">♪ Listen</a>
           </div>
         </div>
         
@@ -387,7 +344,15 @@
     </div>
   </nav>
 
-
+  <!-- Spotify Now Playing (Mobile) -->
+  <div class="now-playing mobile-only" id="now-playing-mobile">
+    <div class="np-art-mobile" id="np-art-mobile"></div>
+    <div class="np-info-mobile">
+      <div class="np-title-mobile" id="np-title-mobile" data-translate="spotify.not_playing">Not playing</div>
+      <div class="np-artist-mobile" id="np-artist-mobile"></div>
+      <a class="np-link-mobile" id="np-link-mobile" href="#" target="_blank" rel="noopener" style="display:none;" data-translate="spotify.listen">♪ Listen</a>
+    </div>
+  </div>
 
   <!-- Hero -->
   <header class="hero scanlines">
@@ -603,8 +568,7 @@
         
         // Spotify Now Playing
         'spotify.not_playing': 'Not playing',
-        'spotify.listen': '♪ Listen',
-        'spotify.open': 'Open in Spotify'
+        'spotify.listen': '♪ Listen'
       },
       
       nl: {
@@ -667,8 +631,7 @@
         
         // Spotify Now Playing
         'spotify.not_playing': 'Niet aan het spelen',
-        'spotify.listen': '♪ Luisteren',
-        'spotify.open': 'Openen in Spotify'
+        'spotify.listen': '♪ Luisteren'
       },
       
       de: {
@@ -731,8 +694,7 @@
         
         // Spotify Now Playing
         'spotify.not_playing': 'Spielt nicht',
-        'spotify.listen': '♪ Anhören',
-        'spotify.open': 'In Spotify öffnen'
+        'spotify.listen': '♪ Anhören'
       },
       
       it: {
@@ -795,8 +757,7 @@
         
         // Spotify Now Playing
         'spotify.not_playing': 'Non in riproduzione',
-        'spotify.listen': '♪ Ascolta',
-        'spotify.open': 'Apri in Spotify'
+        'spotify.listen': '♪ Ascolta'
       },
       
       es: {
@@ -859,8 +820,7 @@
         
         // Spotify Now Playing
         'spotify.not_playing': 'No reproduciendo',
-        'spotify.listen': '♪ Escuchar',
-        'spotify.open': 'Abrir en Spotify'
+        'spotify.listen': '♪ Escuchar'
       },
       
       ja: {
@@ -923,8 +883,7 @@
         
         // Spotify Now Playing
         'spotify.not_playing': '再生していません',
-        'spotify.listen': '♪ 聴く',
-        'spotify.open': 'Spotifyで開く'
+        'spotify.listen': '♪ 聴く'
       }
     };
 
@@ -1239,13 +1198,21 @@
       });
     })();
 
-    // ---- Spotify Now Playing (enhanced with new DOM ids) ----
+    // Spotify Now Playing
     (() => {
       const API = 'https://now-playing-api-one.vercel.app/api/now-playing';
+      
+      // Desktop elements
       const art = document.getElementById('np-art');
       const title = document.getElementById('np-title');
       const artist = document.getElementById('np-artist');
       const link = document.getElementById('np-link');
+      
+      // Mobile elements
+      const artMobile = document.getElementById('np-art-mobile');
+      const titleMobile = document.getElementById('np-title-mobile');
+      const artistMobile = document.getElementById('np-artist-mobile');
+      const linkMobile = document.getElementById('np-link-mobile');
 
       async function refresh() {
         try {
@@ -1253,78 +1220,50 @@
           const data = await r.json();
 
           if (!data.isPlaying) {
+            // Desktop
             title.textContent = translations[currentLanguage]['spotify.not_playing'] || "Not playing";
             artist.textContent = "";
             link.style.display = "none";
             art.style.backgroundImage = "";
+            
+            // Mobile
+            titleMobile.textContent = translations[currentLanguage]['spotify.not_playing'] || "Not playing";
+            artistMobile.textContent = "";
+            linkMobile.style.display = "none";
+            artMobile.style.backgroundImage = "";
             return;
           }
-          title.textContent = data.name || "Unknown track";
-          artist.textContent = data.artists || "";
-          link.href = data.url || "#";
-          link.style.display = data.url ? "inline-block" : "none";
-          art.style.backgroundImage = data.albumArt ? `url(${data.albumArt})` : "";
+
+          const trackName = data.name || "Unknown track";
+          const trackArtists = data.artists || "";
+          const trackUrl = data.url || "#";
+          const albumArt = data.albumArt;
+
+          // Desktop
+          title.textContent = trackName;
+          artist.textContent = trackArtists;
+          link.href = trackUrl;
+          link.style.display = trackUrl !== "#" ? "inline-block" : "none";
+          art.style.backgroundImage = albumArt ? `url(${albumArt})` : "";
+          art.style.backgroundSize = "cover";
+          art.style.backgroundPosition = "center";
+          
+          // Mobile
+          titleMobile.textContent = trackName;
+          artistMobile.textContent = trackArtists;
+          linkMobile.href = trackUrl;
+          linkMobile.style.display = trackUrl !== "#" ? "inline-block" : "none";
+          artMobile.style.backgroundImage = albumArt ? `url(${albumArt})` : "";
+          artMobile.style.backgroundSize = "cover";
+          artMobile.style.backgroundPosition = "center";
         } catch (e) {
           // swallow errors; keep last state
           console.log('Spotify API error:', e);
         }
       }
+
       refresh();
-      setInterval(refresh, 30000);
-    })();
-
-    // ---- Compact ↔ Cover-only interaction (scroll/drag/click, dots w/ auto-hide) ----
-    (() => {
-      const widget = document.getElementById('np-widget');
-      const dots = document.getElementById('np-dots');
-      const [dotCompact, dotCover] = dots.querySelectorAll('.dot');
-      let hideDotsTimer = null;
-      const showDots = () => {
-        dots.classList.add('show');
-        clearTimeout(hideDotsTimer);
-        hideDotsTimer = setTimeout(()=>dots.classList.remove('show'), 1400);
-      };
-      const setExpanded = (on) => {
-        widget.setAttribute('aria-expanded', on ? 'true' : 'false');
-        dotCompact.classList.toggle('active', !on);
-        dotCover.classList.toggle('active', on);
-        showDots();
-      };
-      // Wheel (scroll): down expands, up collapses (small hysteresis)
-      let accum = 0;
-      widget.addEventListener('wheel', (e) => {
-        // Only act when the pointer is on the widget
-        e.preventDefault();
-        accum += e.deltaY;
-        if (accum > 40) { setExpanded(true);  accum = 0; }
-        if (accum < -40){ setExpanded(false); accum = 0; }
-      }, { passive: false });
-      // Touch drag: swipe up to expand, down to collapse
-      let startY = null;
-      widget.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; }, {passive:true});
-      widget.addEventListener('touchmove', (e) => {
-        if (startY == null) return;
-        const dy = e.touches[0].clientY - startY;
-        if (dy < -24) { setExpanded(true); startY = null; }
-        if (dy >  24) { setExpanded(false); startY = null; }
-      }, {passive:true});
-      widget.addEventListener('touchend', () => { startY = null; });
-      // Keyboard + click toggle (accessibility)
-      widget.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(widget.getAttribute('aria-expanded') !== 'true'); }
-        if (e.key === 'ArrowDown') { setExpanded(true); }
-        if (e.key === 'ArrowUp') { setExpanded(false); }
-      });
-      widget.addEventListener('click', (e) => {
-        if (e.target.closest('#np-link')) return;
-        setExpanded(widget.getAttribute('aria-expanded') !== 'true');
-      });
-      let primed = false;
-      const prime = () => { if (primed) return; primed = true; showDots(); };
-      widget.addEventListener('mouseenter', prime);
-      widget.addEventListener('focus', prime);
-
-      setExpanded(false);
+      setInterval(refresh, 30000); // Refresh every 30 seconds
     })();
   </script>
 </body>
