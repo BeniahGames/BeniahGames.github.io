@@ -193,7 +193,7 @@
     .now-playing:hover{background:rgba(30,215,96,.15);border-color:rgba(30,215,96,.5)}
     .np-art,.np-art-mobile{width:40px;height:40px;background:#333;border-radius:6px;flex-shrink:0;background-size:cover;background-position:center}
     .np-info,.np-info-mobile{flex:1;min-width:0;overflow:hidden}
-    .np-info.has-scrollable,.np-info-mobile.has-scrollable{overflow:visible}
+    .np-info:hover,.np-info-mobile:hover{overflow:visible}
     .np-title,.np-title-mobile{font-size:.85rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
     .np-artist,.np-artist-mobile{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}
     
@@ -1399,7 +1399,6 @@
       if (!element || !element.textContent.trim()) {
         element?.classList.remove('scrollable');
         element?.style.removeProperty('--scroll-distance');
-        updateParentScrollableClass(element);
         return;
       }
       
@@ -1416,21 +1415,6 @@
         element.classList.add('scrollable');
       } else {
         element.style.removeProperty('--scroll-distance');
-      }
-      
-      updateParentScrollableClass(element);
-    }
-    
-    // Function to update parent container's has-scrollable class
-    function updateParentScrollableClass(element) {
-      const parent = element?.closest('.np-info, .np-info-mobile');
-      if (!parent) return;
-      
-      const hasScrollableChildren = parent.querySelector('.scrollable');
-      if (hasScrollableChildren) {
-        parent.classList.add('has-scrollable');
-      } else {
-        parent.classList.remove('has-scrollable');
       }
     }
 
