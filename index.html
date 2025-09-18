@@ -247,7 +247,7 @@
     .chev{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;transition:.35s}
     .card[aria-expanded="true"] .chev{transform:rotate(180deg);background:#191d25}
     .collapsible{overflow:hidden;max-height:0;opacity:0;transform:translateY(-4px) scale(.995);transition:max-height .55s cubic-bezier(.2,.7,.2,1),opacity .35s,transform .45s;border-top:1px dashed #2a3142;margin-top:.75rem;padding-top:.75rem}
-    .card[aria-expanded="true"] > .collapsible{opacity:1;transform:translateY(0) scale(1)}
+    .card[aria-expanded="true"] > .collapsible{opacity:1;transform:translateY(0) scale(1);max-height:500px}
     .preview figure{margin:0;background:#0e1015;border:1px solid var(--border);border-radius:10px;overflow:hidden}
     .preview img{display:block;width:100%;height:auto}
 
@@ -1063,36 +1063,36 @@
     // Collapsible cards (all)
     (() => {
       const cards = document.querySelectorAll('#games .card');
-      cards.forEach(card => {
-        const body = card.querySelector('.collapsible');
-        if (!body) return;
+      cards.forEach((card, index) => {
+        const collapsibleContent = card.querySelector('.collapsible');
+        if (!collapsibleContent) return;
 
         // prevent toggling when clicking links/buttons inside
         card.querySelectorAll('.no-toggle, .no-toggle *')
             .forEach(el => el.addEventListener('click', e => e.stopPropagation()));
 
-        function setExpanded(expand){
-          card.setAttribute('aria-expanded', expand);
-          if (expand) {
-            body.style.maxHeight = '0px';
-            const full = body.scrollHeight;
-            body.getBoundingClientRect();
-            body.style.maxHeight = full + 'px';
-          } else {
-            body.style.maxHeight = '0px';
-          }
+        function toggleCard(shouldExpand) {
+          // Only affect this specific card - let CSS handle the animation
+          card.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
         }
 
-        card.addEventListener('click', () => {
-          const isExpanded = card.getAttribute('aria-expanded') === 'true';
-          setExpanded(!isExpanded);
+        card.addEventListener('click', (e) => {
+          // Prevent event bubbling
+          e.stopPropagation();
+          
+          // Only toggle this specific card
+          const isCurrentlyExpanded = card.getAttribute('aria-expanded') === 'true';
+          toggleCard(!isCurrentlyExpanded);
         });
 
         card.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            const isExpanded = card.getAttribute('aria-expanded') === 'true';
-            setExpanded(!isExpanded);
+            e.stopPropagation();
+            
+            // Only toggle this specific card
+            const isCurrentlyExpanded = card.getAttribute('aria-expanded') === 'true';
+            toggleCard(!isCurrentlyExpanded);
           }
         });
       });
@@ -1125,11 +1125,7 @@
         const shouldExpand = !allExpanded;
         
         gameCards.forEach(card => {
-          const collapsible = card.querySelector('.collapsible');
-          if (collapsible) {
-            card.setAttribute('aria-expanded', shouldExpand);
-            collapsible.style.maxHeight = shouldExpand ? collapsible.scrollHeight + 'px' : '0';
-          }
+          card.setAttribute('aria-expanded', shouldExpand);
         });
         
         updateButtonText();
