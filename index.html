@@ -1392,8 +1392,19 @@
             if (!audioContext) {
               initAudioContext();
             }
-            if (!sounds[name] && name === 'welcomeClick') {
-              await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
+            if (!sounds[name]) {
+              // Load sound on demand based on name
+              const soundPaths = {
+                'welcomeClick': 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav',
+                'alienOpen': 'assets/0110000101110101011001000110100101101111/Alien Interface Open-1.wav',
+                'alienClose': 'assets/0110000101110101011001000110100101101111/Alien Interface Close-1.wav',
+                'gadgetOpen': 'assets/0110000101110101011001000110100101101111/Small High-Tech Gadget Open.wav',
+                'gadgetClose': 'assets/0110000101110101011001000110100101101111/Small High-Tech Gadget Close.wav',
+                'holographicOpen': 'assets/0110000101110101011001000110100101101111/Holographic Open Panel.wav'
+              };
+              if (soundPaths[name]) {
+                await loadSound(name, soundPaths[name]);
+              }
             }
           } catch (error) {
             console.error('Failed to auto-initialize audio:', error);
@@ -1520,7 +1531,15 @@
       const initAudioOnInteraction = async () => {
         if (!audioContext) {
           initAudioContext();
-          await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
+          // Load all sound files
+          await Promise.all([
+            loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav'),
+            loadSound('alienOpen', 'assets/0110000101110101011001000110100101101111/Alien Interface Open-1.wav'),
+            loadSound('alienClose', 'assets/0110000101110101011001000110100101101111/Alien Interface Close-1.wav'),
+            loadSound('gadgetOpen', 'assets/0110000101110101011001000110100101101111/Small High-Tech Gadget Open.wav'),
+            loadSound('gadgetClose', 'assets/0110000101110101011001000110100101101111/Small High-Tech Gadget Close.wav'),
+            loadSound('holographicOpen', 'assets/0110000101110101011001000110100101101111/Holographic Open Panel.wav')
+          ]);
           audioReadyForImmediate = false; // Audio is now ready
         }
       };
@@ -1578,23 +1597,45 @@
           }
         }
 
-        card.addEventListener('click', (e) => {
+        card.addEventListener('click', async (e) => {
           // Prevent event bubbling
           e.stopPropagation();
           
           // Only toggle this specific card
           const isCurrentlyExpanded = card.getAttribute('aria-expanded') === 'true';
-          toggleCard(!isCurrentlyExpanded);
+          const willExpand = !isCurrentlyExpanded;
+          
+          // Play appropriate sound effect
+          if (window.audioManager) {
+            if (willExpand) {
+              await window.audioManager.playSound('gadgetOpen');
+            } else {
+              await window.audioManager.playSound('gadgetClose');
+            }
+          }
+          
+          toggleCard(willExpand);
         });
 
-        card.addEventListener('keydown', (e) => {
+        card.addEventListener('keydown', async (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             e.stopPropagation();
             
             // Only toggle this specific card
             const isCurrentlyExpanded = card.getAttribute('aria-expanded') === 'true';
-            toggleCard(!isCurrentlyExpanded);
+            const willExpand = !isCurrentlyExpanded;
+            
+            // Play appropriate sound effect
+            if (window.audioManager) {
+              if (willExpand) {
+                await window.audioManager.playSound('gadgetOpen');
+              } else {
+                await window.audioManager.playSound('gadgetClose');
+              }
+            }
+            
+            toggleCard(willExpand);
           }
         });
       });
@@ -1623,8 +1664,17 @@
         }
       };
       
-      expandAllBtn.addEventListener('click', () => {
+      expandAllBtn.addEventListener('click', async () => {
         const shouldExpand = !allExpanded;
+        
+        // Play appropriate sound effect
+        if (window.audioManager) {
+          if (shouldExpand) {
+            await window.audioManager.playSound('alienOpen');
+          } else {
+            await window.audioManager.playSound('alienClose');
+          }
+        }
         
         gameCards.forEach(card => {
           card.setAttribute('aria-expanded', shouldExpand);
@@ -1747,8 +1797,14 @@
       const hamburger = document.getElementById('hamburger');
       const panel = document.getElementById('menu-panel');
       
-      hamburger.addEventListener('click', () => {
+      hamburger.addEventListener('click', async () => {
         const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+        
+        // Play sound effect when opening menu
+        if (window.audioManager && !isOpen) {
+          await window.audioManager.playSound('holographicOpen');
+        }
+        
         hamburger.setAttribute('aria-expanded', !isOpen);
         panel.classList.toggle('open', !isOpen);
       });
@@ -2145,8 +2201,17 @@
         }
       };
       
-      expandAllFaqBtn.addEventListener('click', () => {
+      expandAllFaqBtn.addEventListener('click', async () => {
         const shouldExpand = !allExpanded;
+        
+        // Play appropriate sound effect
+        if (window.audioManager) {
+          if (shouldExpand) {
+            await window.audioManager.playSound('alienOpen');
+          } else {
+            await window.audioManager.playSound('alienClose');
+          }
+        }
         
         faqDetails.forEach(details => {
           if (shouldExpand) {
@@ -2163,6 +2228,17 @@
       faqDetails.forEach(details => {
         const observer = new MutationObserver(updateButtonText);
         observer.observe(details, { attributes: true, attributeFilter: ['open'] });
+        
+        // Add sound effects for FAQ toggle
+        details.addEventListener('toggle', async () => {
+          if (window.audioManager) {
+            if (details.open) {
+              await window.audioManager.playSound('gadgetOpen');
+            } else {
+              await window.audioManager.playSound('gadgetClose');
+            }
+          }
+        });
       });
       
       // Initial button state
