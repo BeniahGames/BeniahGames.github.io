@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Games — Beniah.games</title>
+  <meta name="description" content="Explore all games by Beniah.games - indie games featuring quirky humor, engaging gameplay, and unique mechanics." />
+  <link rel="icon" href="../assets/Beniah.Games.Icon.png" type="image/png" />
+  <style>
+    :root{
+      --bg:#0d0e10; --panel:#14161b; --panel-2:#1a1d24; --text:#e9eef6; --muted:#a8b0bd;
+      --accent:#ffcc00; --accent-2:#ffd84d; --link:#ffcc00; --border:#242834;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial,sans-serif;
+      background:var(--bg);color:var(--text);
+      line-height:1.6;
+    }
+
+    /* Layout */
+    .container{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+    .grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+    
+    /* Header */
+    .header{
+      background:var(--panel);
+      border-bottom:1px solid var(--border);
+      padding:1rem 0;
+      position:sticky;
+      top:0;
+      z-index:100;
+      backdrop-filter:blur(10px);
+    }
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:0.5rem;
+      text-decoration:none;
+      color:var(--text);
+      font-weight:600;
+    }
+    .brand img{
+      height:32px;
+    }
+    .nav-links{
+      display:flex;
+      gap:2rem;
+      list-style:none;
+      margin:0;
+      padding:0;
+    }
+    .nav-links a{
+      color:var(--muted);
+      text-decoration:none;
+      transition:color 0.2s;
+    }
+    .nav-links a:hover{
+      color:var(--accent);
+    }
+
+    /* Main content */
+    .main{
+      padding:3rem 0;
+    }
+    .page-header{
+      text-align:center;
+      margin-bottom:3rem;
+    }
+    .page-title{
+      font-size:2.5rem;
+      margin:0 0 1rem 0;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .page-subtitle{
+      font-size:1.2rem;
+      color:var(--muted);
+      margin:0;
+    }
+
+    /* Cards */
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:1.5rem;
+      transition:transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover{
+      transform:translateY(-4px);
+      box-shadow:var(--shadow);
+    }
+    .card h3{
+      margin:0 0 0.5rem 0;
+      color:var(--accent);
+      font-size:1.4rem;
+    }
+    .pill{
+      display:inline-block;
+      padding:0.2rem 0.5rem;
+      border:1px solid var(--border);
+      border-radius:999px;
+      color:var(--muted);
+      font-size:0.78rem;
+      margin-bottom:0.75rem;
+    }
+    .card-description{
+      color:var(--text);
+      margin:1rem 0;
+    }
+    .card-status{
+      color:var(--muted);
+      font-style:italic;
+      font-size:0.9rem;
+      margin:1rem 0 0 0;
+    }
+    .card-actions{
+      display:flex;
+      gap:0.6rem;
+      flex-wrap:wrap;
+      margin-top:1rem;
+    }
+
+    /* Buttons */
+    .btn{
+      display:inline-block;
+      padding:0.5rem 1rem;
+      background:var(--accent);
+      color:var(--bg);
+      text-decoration:none;
+      border-radius:4px;
+      font-weight:500;
+      transition:background 0.2s;
+      border:none;
+      cursor:pointer;
+    }
+    .btn:hover{
+      background:var(--accent-2);
+    }
+    .btn-secondary{
+      background:transparent;
+      color:var(--accent);
+      border:1px solid var(--accent);
+    }
+    .btn-secondary:hover{
+      background:var(--accent);
+      color:var(--bg);
+    }
+
+    /* Game preview images */
+    .game-preview{
+      margin:1rem 0;
+      border-radius:4px;
+      overflow:hidden;
+    }
+    .game-preview img{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    /* Footer */
+    .footer{
+      background:var(--panel);
+      border-top:1px solid var(--border);
+      padding:2rem 0;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links{
+        display:none;
+      }
+      .page-title{
+        font-size:2rem;
+      }
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <a href="../" class="brand">
+          <img src="../assets/Beniah.Games.Logo.png" alt="Beniah.games">
+          <span>Beniah.games</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="../#about">About</a></li>
+          <li><a href="../#games">Games</a></li>
+          <li><a href="../devlogs/">Devlogs</a></li>
+          <li><a href="../#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Games</h1>
+        <p class="page-subtitle">Quirky, funny, and endlessly fun indie games</p>
+      </div>
+
+      <!-- Games Grid -->
+      <div class="grid">
+        
+        <!-- Is This My Floor? -->
+        <article class="card">
+          <span class="pill">Idle • Funny</span>
+          <h3>Is This My Floor?</h3>
+          <p class="card-description">
+            An idle elevator adventure about going nowhere—while somehow calling it progress. Strange passengers, lost-and-found upgrades, and prestige rides that push your elevator higher each run.
+          </p>
+          <div class="game-preview">
+            <img src="../assets/is-this-my-floor-preview.gif" alt="Is This My Floor? gameplay preview" loading="lazy">
+          </div>
+          <div class="card-actions">
+            <a href="../#contact" class="btn">Contact</a>
+            <a href="#" class="btn-secondary">Steam (soon)</a>
+          </div>
+          <p class="card-status">Store page coming soon</p>
+        </article>
+
+        <!-- C.A.R.T.R.I.D.G.E -->
+        <article class="card">
+          <span class="pill">Roguelike • Deckbuilder</span>
+          <h3>C.A.R.T.R.I.D.G.E</h3>
+          <p class="card-description">
+            <strong>C.A.R.T.R.I.D.G.E</strong> is a retro sci-fi roguelike card battler where you don't play cards — you load cartridges. Each run takes you deeper into a corrupted facility as QB, a cube-bot fighting glitches, viruses, and rogue machines. Discover synergies between modules, manage heat and power, and survive long enough to rewrite your firmware.
+          </p>
+          <div class="card-actions">
+            <a href="../#contact" class="btn">Contact</a>
+            <a href="#" class="btn-secondary">Steam (soon)</a>
+          </div>
+          <p class="card-status">Currently in early development</p>
+        </article>
+
+        <!-- My Guildies! -->
+        <article class="card">
+          <span class="pill">Fantasy • Management</span>
+          <h3>My Guildies!</h3>
+          <p class="card-description">
+            <strong>My Guildies!</strong> is a whimsical yet deep guild management sim. Recruit and train heroes, send squads on quests, and watch them grow. Expand halls, unlock facilities like alchemy labs and dojos, craft gear, and balance risk vs. reward to build the most renowned guild in the realm.
+          </p>
+          <div class="card-actions">
+            <a href="../#contact" class="btn">Contact</a>
+            <a href="#" class="btn-secondary">Steam (soon)</a>
+          </div>
+          <p class="card-status">Currently in early development</p>
+        </article>
+
+      </div>
+
+      <!-- Back to Home -->
+      <div style="text-align: center; margin-top: 3rem;">
+        <a href="../" class="btn">← Back to Home</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2024 Beniah.games. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
