@@ -1382,8 +1382,24 @@
       }
 
       // Play sound with volume control
-      function playSound(name, volume = 1) {
+      async function playSound(name, volume = 1) {
         console.log(`Attempting to play sound: ${name}, volume: ${masterVolume}%, audioContext: ${!!audioContext}, soundLoaded: ${!!sounds[name]}`);
+        
+        // Auto-initialize audio if volume > 0 but audio not ready
+        if (masterVolume > 0 && (!audioContext || !sounds[name])) {
+          console.log('Auto-initializing audio for immediate playback...');
+          try {
+            if (!audioContext) {
+              initAudioContext();
+            }
+            if (!sounds[name] && name === 'welcomeClick') {
+              await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
+            }
+          } catch (error) {
+            console.error('Failed to auto-initialize audio:', error);
+            return;
+          }
+        }
         
         if (!audioContext) {
           console.warn('Audio context not initialized');
@@ -1493,11 +1509,19 @@
       // Initialize volume display
       updateVolumeDisplay();
 
+      // If volume is loaded from localStorage and > 0, prepare audio system for immediate use
+      let audioReadyForImmediate = false;
+      if (masterVolume > 0) {
+        // Set flag to initialize audio on first interaction
+        audioReadyForImmediate = true;
+      }
+
       // Load sounds on first user interaction (fallback)
       const initAudioOnInteraction = async () => {
         if (!audioContext) {
           initAudioContext();
           await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
+          audioReadyForImmediate = false; // Audio is now ready
         }
       };
 
@@ -1508,7 +1532,7 @@
 
       // Expose audio functions globally
       window.audioManager = {
-        playSound,
+        playSound: async (name, volume) => await playSound(name, volume),
         loadSound,
         setVolume: (vol) => {
           masterVolume = Math.max(0, Math.min(100, vol));
@@ -1520,7 +1544,7 @@
             initAudioContext();
             await loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav');
           }
-          playSound('welcomeClick');
+          await playSound('welcomeClick');
         },
         getSoundStatus: () => ({
           audioContext: !!audioContext,
@@ -1670,15 +1694,15 @@
       }
 
       // Toggle message on trigger interaction (click and touch)
-      const handleWelcomeTrigger = (e) => {
+      const handleWelcomeTrigger = async (e) => {
         e.stopPropagation();
         e.preventDefault(); // Prevent double-firing on mobile
         toggleWelcomeMessage();
         
-        // Play welcome click sound
-        if (window.audioManager) {
-          window.audioManager.playSound('welcomeClick');
-        }
+        // Play welcome click sound (auto-initializes audio if needed)
+         if (window.audioManager) {
+           await window.audioManager.playSound('welcomeClick');
+         }
       };
 
       welcomeTrigger.addEventListener('click', handleWelcomeTrigger);
