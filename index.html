@@ -2186,6 +2186,7 @@
       if (!expandAllFaqBtn || !faqDetails.length) return;
       
       let allExpanded = false;
+      let isExpandingAll = false; // Flag to prevent individual sounds during expand all
       
       const updateButtonText = () => {
         const openDetails = document.querySelectorAll('#faq .faq details[open]');
@@ -2203,6 +2204,9 @@
       
       expandAllFaqBtn.addEventListener('click', async () => {
         const shouldExpand = !allExpanded;
+        
+        // Set flag to prevent individual sounds
+        isExpandingAll = true;
         
         // Play appropriate sound effect
         if (window.audioManager) {
@@ -2222,6 +2226,11 @@
         });
         
         updateButtonText();
+        
+        // Reset flag after a short delay to allow all toggle events to process
+        setTimeout(() => {
+          isExpandingAll = false;
+        }, 100);
       });
       
       // Listen for individual details changes to update button state
@@ -2231,6 +2240,9 @@
         
         // Add sound effects for FAQ toggle
         details.addEventListener('toggle', async () => {
+          // Don't play individual sounds when expanding/collapsing all
+          if (isExpandingAll) return;
+          
           if (window.audioManager) {
             if (details.open) {
               await window.audioManager.playSound('gadgetOpen');
