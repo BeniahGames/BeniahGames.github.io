@@ -11,11 +11,10 @@
       "featured": true
     }
   ],
-  "games": [
-    {
-      "id": "general",
+  "games": {
+    "General": {
       "name": "General",
       "description": "General development updates and announcements"
     }
-  ]
+  }
 }
