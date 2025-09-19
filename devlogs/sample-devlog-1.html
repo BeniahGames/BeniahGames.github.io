@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome to the Devlog — Beniah.games</title>
+  <meta name="description" content="Starting our development journey with regular updates and insights." />
+  <link rel="icon" href="../assets/Beniah.Games.Icon.png" type="image/png" />
+  <style>
+    :root{
+      --bg:#0d0e10; --panel:#14161b; --panel-2:#1a1d24; --text:#e9eef6; --muted:#a8b0bd;
+      --accent:#ffcc00; --accent-2:#ffd84d; --link:#ffcc00; --border:#242834;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial,sans-serif;
+      background:var(--bg);color:var(--text);line-height:1.6;
+    }
+
+    /* Header */
+    header{
+      background:var(--panel);border-bottom:1px solid var(--border);
+      padding:1rem 0;position:sticky;top:0;z-index:100;
+    }
+    .header-content{
+      max-width:1200px;margin:0 auto;padding:0 2rem;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .logo{
+      display:flex;align-items:center;gap:1rem;text-decoration:none;color:var(--text);
+    }
+    .logo img{width:40px;height:40px;border-radius:8px;}
+    .logo h1{margin:0;font-size:1.5rem;font-weight:700;}
+    .nav-links{display:flex;gap:2rem;align-items:center;}
+    .nav-links a{color:var(--muted);text-decoration:none;transition:color .2s;}
+    .nav-links a:hover{color:var(--accent);}
+
+    /* Article Content */
+    .article-container{max-width:800px;margin:0 auto;padding:2rem;}
+    .article-header{margin-bottom:3rem;}
+    .breadcrumb{margin-bottom:1rem;}
+    .breadcrumb a{color:var(--muted);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--accent);}
+    .breadcrumb span{color:var(--muted);margin:0 .5rem;}
+    
+    .article-meta{display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;}
+    .game-badge{
+      background:var(--accent);color:var(--bg);padding:.5rem 1rem;
+      border-radius:20px;font-size:.875rem;font-weight:600;
+    }
+    .article-date{color:var(--muted);}
+    
+    .article-title{font-size:2.5rem;margin:0 0 1rem 0;line-height:1.2;}
+    .article-excerpt{font-size:1.2rem;color:var(--muted);margin:0 0 2rem 0;}
+    
+    .article-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem;}
+    .tag{
+      background:var(--panel-2);color:var(--muted);padding:.25rem .75rem;
+      border-radius:20px;font-size:.875rem;
+    }
+
+    /* Article Body */
+    .article-body{font-size:1.1rem;line-height:1.7;}
+    .article-body h2{color:var(--accent);margin:2rem 0 1rem 0;font-size:1.5rem;}
+    .article-body h3{margin:1.5rem 0 .75rem 0;font-size:1.25rem;}
+    .article-body p{margin:0 0 1.5rem 0;}
+    .article-body ul,.article-body ol{margin:0 0 1.5rem 0;padding-left:2rem;}
+    .article-body li{margin-bottom:.5rem;}
+    .article-body a{color:var(--link);text-decoration:none;}
+    .article-body a:hover{text-decoration:underline;}
+    .article-body code{
+      background:var(--panel-2);color:var(--accent);padding:.2rem .4rem;
+      border-radius:4px;font-size:.9em;
+    }
+    .article-body pre{
+      background:var(--panel-2);padding:1rem;border-radius:8px;
+      overflow-x:auto;margin:0 0 1.5rem 0;
+    }
+    .article-body blockquote{
+      border-left:4px solid var(--accent);padding-left:1rem;
+      margin:0 0 1.5rem 0;font-style:italic;color:var(--muted);
+    }
+
+    /* Navigation */
+    .article-nav{
+      margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .nav-btn{
+      background:var(--panel);border:1px solid var(--border);color:var(--text);
+      padding:.75rem 1.5rem;border-radius:8px;text-decoration:none;
+      transition:all .2s;
+    }
+    .nav-btn:hover{
+      background:var(--accent);color:var(--bg);border-color:var(--accent);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content{padding:0 1rem;}
+      .article-container{padding:1rem;}
+      .article-title{font-size:2rem;}
+      .article-meta{flex-direction:column;align-items:flex-start;}
+      .article-nav{flex-direction:column;gap:1rem;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a href="../" class="logo">
+        <img src="../assets/Beniah.Games.Icon.png" alt="Beniah.games">
+        <h1>Beniah.games</h1>
+      </a>
+      <nav class="nav-links">
+        <a href="../#games">Games</a>
+        <a href="../#about">About</a>
+        <a href="../#faq">FAQ</a>
+        <a href="../#contact">Contact</a>
+        <a href="./" style="color: var(--accent);">Devlogs</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="article-container">
+    <div class="article-header">
+      <div class="breadcrumb">
+        <a href="../">Home</a>
+        <span>/</span>
+        <a href="./">Devlogs</a>
+        <span>/</span>
+        <span>Welcome to the Devlog</span>
+      </div>
+      
+      <div class="article-meta">
+        <span class="game-badge">General</span>
+        <span class="article-date">January 1, 2025</span>
+      </div>
+      
+      <h1 class="article-title">Welcome to the Devlog</h1>
+      <p class="article-excerpt">Starting our development journey with regular updates and insights into the game development process.</p>
+      
+      <div class="article-tags">
+        <span class="tag">announcement</span>
+        <span class="tag">general</span>
+      </div>
+    </div>
+
+    <article class="article-body">
+      <p>Welcome to the Beniah.games development blog! This is where I'll be sharing regular updates about my game development journey, behind-the-scenes insights, and the creative process that goes into making indie games.</p>
+
+      <h2>What to Expect</h2>
+      <p>In these devlogs, you can expect to see:</p>
+      <ul>
+        <li><strong>Development Progress:</strong> Regular updates on current projects, milestones reached, and challenges overcome</li>
+        <li><strong>Technical Insights:</strong> Deep dives into interesting technical problems and their solutions</li>
+        <li><strong>Design Decisions:</strong> The reasoning behind gameplay mechanics, art direction, and user experience choices</li>
+        <li><strong>Community Updates:</strong> News about releases, events, and community feedback</li>
+      </ul>
+
+      <h2>The Journey Ahead</h2>
+      <p>Game development is a marathon, not a sprint. Each project brings its own unique challenges and learning opportunities. Through these devlogs, I hope to share not just the successes, but also the struggles and lessons learned along the way.</p>
+
+      <blockquote>
+        "The best way to learn game development is by making games, and the best way to improve is by sharing your journey with others."
+      </blockquote>
+
+      <h3>Stay Connected</h3>
+      <p>Make sure to check back regularly for new updates, or join our <a href="https://discord.gg/PW6UZWtZ7C">Discord community</a> to discuss development progress and connect with other indie game enthusiasts.</p>
+
+      <p>Thanks for joining me on this adventure. Let's make some amazing games together!</p>
+    </article>
+
+    <nav class="article-nav">
+      <a href="./" class="nav-btn">← Back to Devlogs</a>
+      <span></span> <!-- Placeholder for next article -->
+    </nav>
+  </main>
+</body>
+</html>

@@ -411,6 +411,35 @@
     .faq details[open]{border-color:var(--accent);}
     .faq details[open] summary{color:var(--accent);}
 
+    /* Devlog Preview */
+    .devlog-preview{margin-top:1rem;}
+    .devlog-card-preview{
+      background:linear-gradient(180deg,var(--panel),var(--panel-2));
+      border:1px solid var(--border);border-radius:12px;padding:1.5rem;
+      transition:transform .2s,box-shadow .2s;
+    }
+    .devlog-card-preview:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+    .devlog-meta-preview{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;}
+    .devlog-game-preview{
+      background:var(--accent);color:var(--bg);padding:.5rem 1rem;
+      border-radius:20px;font-size:.875rem;font-weight:600;
+    }
+    .devlog-date-preview{color:var(--muted);font-size:.875rem;}
+    .devlog-title-preview{font-size:1.5rem;font-weight:600;margin:0 0 .75rem 0;line-height:1.3;}
+    .devlog-title-preview a{color:var(--text);text-decoration:none;}
+    .devlog-title-preview a:hover{color:var(--accent);}
+    .devlog-excerpt-preview{color:var(--muted);margin:0 0 1rem 0;font-size:1.1rem;line-height:1.6;}
+    .devlog-tags-preview{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+    .devlog-tag-preview{
+      background:var(--panel-2);color:var(--muted);padding:.25rem .75rem;
+      border-radius:20px;font-size:.75rem;
+    }
+    .devlog-read-more{
+      display:inline-flex;align-items:center;gap:.5rem;color:var(--accent);
+      text-decoration:none;font-weight:500;transition:color .2s;
+    }
+    .devlog-read-more:hover{color:var(--accent-2);}
+
     /* Welcome Message Element */
     .welcome-element {
       position: fixed;
@@ -704,6 +733,22 @@
       </div>
     </section>
 
+    <!-- Latest Devlog -->
+    <section id="devlog">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 data-translate="devlog.title">Latest Update</h2>
+        <a href="devlogs/" class="btn-secondary" data-translate="devlog.view_all">View All Devlogs</a>
+      </div>
+      <p class="lead" data-translate="devlog.lead">Stay up to date with the latest development progress and insights.</p>
+
+      <div id="latest-devlog-container" class="devlog-preview">
+        <!-- Latest devlog will be loaded here -->
+        <div class="devlog-loading" style="text-align: center; padding: 2rem; color: var(--muted);">
+          <span data-translate="devlog.loading">Loading latest update...</span>
+        </div>
+      </div>
+    </section>
+
     <!-- FAQ -->
     <section id="faq">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -868,6 +913,13 @@
         'faq.q6': 'Are all games on the site being actively worked on?',
         'faq.a6': 'Not at the same time. Whenever I come up with a feature idea that doesn\'t quite fit my current project, I build a quick prototype to test it out. If it turns out fun, I add it to my list of projects. Once the prototype phase is done, I usually put it on hold and return to my main project. Every game listed on this site is something I believe in and plan to eventually release in a playable state.',
         
+        // Devlog section
+        'devlog.title': 'Latest Devlog',
+        'devlog.view_all': 'View All Devlogs',
+        'devlog.lead': 'Stay updated with the latest development progress and insights.',
+        'devlog.loading': 'Loading latest devlog...',
+        'devlog.no_entries': 'No devlog entries available yet.',
+        
         // Contact section
         'contact.title': 'Contact',
         'contact.lead': 'Say hi, ask a question, or talk shop.',
@@ -942,6 +994,13 @@
         'faq.a5': 'Neem contact op via <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a> of post in de Discord server. Om me te helpen het sneller op te lossen, voeg toe: <ul><li>Je OS + versie (bijv. Windows 11 23H2)</li><li>Spel versie/build datum</li><li>Stappen om te reproduceren (wat je deed vlak voordat het gebeurde)</li><li>Screenshots of een korte clip indien mogelijk</li><li>Eventuele error tekst of logs</li></ul>',
         'faq.q6': 'Worden alle spellen op de site actief ontwikkeld?',
         'faq.a6': 'Niet tegelijkertijd. Wanneer ik een feature idee krijg dat niet helemaal past bij mijn huidige project, bouw ik een snelle prototype om het uit te testen. Als het leuk blijkt, voeg ik het toe aan mijn lijst van projecten. Zodra de prototype fase klaar is, zet ik het meestal on hold en ga terug naar mijn hoofdproject. Elk spel op deze site is iets waar ik in geloof en van plan ben uiteindelijk uit te brengen in een speelbare staat.',
+        
+        // Devlog section
+        'devlog.title': 'Laatste Devlog',
+        'devlog.view_all': 'Bekijk Alle Devlogs',
+        'devlog.lead': 'Blijf op de hoogte van de laatste ontwikkelingsvoortgang en inzichten.',
+        'devlog.loading': 'Laatste devlog laden...',
+        'devlog.no_entries': 'Nog geen devlog entries beschikbaar.',
         
         // Contact section
         'contact.title': 'Contact',
@@ -1018,6 +1077,13 @@
         'faq.q6': 'Werden alle Spiele auf der Website aktiv entwickelt?',
         'faq.a6': 'Nicht gleichzeitig. Wann immer mir eine Feature-Idee einfällt, die nicht ganz zu meinem aktuellen Projekt passt, baue ich einen schnellen Prototyp, um sie zu testen. Wenn es sich als spaßig erweist, füge ich es zu meiner Projektliste hinzu. Sobald die Prototyp-Phase abgeschlossen ist, pausiere ich es normalerweise und kehre zu meinem Hauptprojekt zurück. Jedes Spiel auf dieser Website ist etwas, an das ich glaube und das ich schließlich in einem spielbaren Zustand veröffentlichen möchte.',
         
+        // Devlog section
+        'devlog.title': 'Neuester Devlog',
+        'devlog.view_all': 'Alle Devlogs Anzeigen',
+        'devlog.lead': 'Bleibe über die neuesten Entwicklungsfortschritte und Einblicke auf dem Laufenden.',
+        'devlog.loading': 'Neuester Devlog wird geladen...',
+        'devlog.no_entries': 'Noch keine Devlog-Einträge verfügbar.',
+        
         // Contact section
         'contact.title': 'Kontakt',
         'contact.lead': 'Sag hallo, stell eine Frage oder rede Fachsimpelei.',
@@ -1093,6 +1159,13 @@
         'faq.q6': 'Tutti i giochi sul sito sono in sviluppo attivo?',
         'faq.a6': 'Non allo stesso tempo. Ogni volta che mi viene un\'idea per una funzionalità che non si adatta perfettamente al mio progetto attuale, costruisco un prototipo veloce per testarla. Se risulta divertente, la aggiungo alla mia lista di progetti. Una volta finita la fase di prototipo, di solito la metto in pausa e torno al mio progetto principale. Ogni gioco elencato su questo sito è qualcosa in cui credo e che ho intenzione di rilasciare eventualmente in uno stato giocabile.',
         
+        // Devlog section
+        'devlog.title': 'Ultimo Devlog',
+        'devlog.view_all': 'Visualizza Tutti i Devlog',
+        'devlog.lead': 'Rimani aggiornato sui progressi di sviluppo e approfondimenti più recenti.',
+        'devlog.loading': 'Caricamento ultimo devlog...',
+        'devlog.no_entries': 'Nessun entry devlog ancora disponibile.',
+        
         // Contact section
         'contact.title': 'Contatti',
         'contact.lead': 'Saluta, fai una domanda, o parla di lavoro.',
@@ -1166,6 +1239,13 @@
         'faq.q6': '¿Todos los juegos en el sitio están siendo trabajados activamente?',
         'faq.a6': 'No al mismo tiempo. Cada vez que se me ocurre una idea de característica que no encaja perfectamente en mi proyecto actual, construyo un prototipo rápido para probarla. Si resulta divertida, la agrego a mi lista de proyectos. Una vez que la fase de prototipo está terminada, usualmente la pongo en pausa y regreso a mi proyecto principal. Cada juego listado en este sitio es algo en lo que creo y planeo eventualmente lanzar en un estado jugable.',
         
+        // Devlog section
+        'devlog.title': 'Último Devlog',
+        'devlog.view_all': 'Ver Todos los Devlogs',
+        'devlog.lead': 'Mantente actualizado con los últimos progresos de desarrollo e insights.',
+        'devlog.loading': 'Cargando último devlog...',
+        'devlog.no_entries': 'Aún no hay entradas de devlog disponibles.',
+        
         // Contact section
         'contact.title': 'Contacto',
         'contact.lead': 'Saluda, haz una pregunta, o habla de trabajo.',
@@ -1230,6 +1310,13 @@
         'faq.a5': '<a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>に連絡するか、Discordサーバーに投稿してください。より早く修正するために、以下を含めてください：<ul><li>あなたのOS +バージョン（例：Windows 11 23H2）</li><li>ゲームバージョン/ビルド日</li><li>再現手順（それが起こる直前に何をしたか）</li><li>可能であればスクリーンショットまたは短いクリップ</li><li>エラーテキストまたはログ</li></ul>',
         'faq.q6': 'サイト上のすべてのゲームは積極的に開発されていますか？',
         'faq.a6': '同時にではありません。現在のプロジェクトにあまり合わない機能のアイデアを思いついたときは、それをテストするために素早くプロトタイプを作ります。楽しいことがわかれば、プロジェクトリストに追加します。プロトタイプ段階が終わったら、通常それを保留にしてメインプロジェクトに戻ります。このサイトにリストされているすべてのゲームは、私が信じているものであり、最終的にプレイ可能な状態でリリースする予定のものです。',
+        
+        // Devlog section
+        'devlog.title': '最新のDevlog',
+        'devlog.view_all': 'すべてのDevlogを表示',
+        'devlog.lead': '最新の開発進捗と洞察を常に把握してください。',
+        'devlog.loading': '最新のdevlogを読み込み中...',
+        'devlog.no_entries': 'まだdevlogエントリーはありません。',
         
         // Contact section
         'contact.title': 'お問い合わせ',
@@ -2261,6 +2348,47 @@
       // Initial button state
       updateButtonText();
     })();
+
+    // Load latest devlog for main page
+    async function loadLatestDevlog() {
+      const container = document.getElementById('latest-devlog-content');
+      if (!container) return;
+
+      try {
+        const response = await fetch('./devlogs/devlogs.json');
+        const data = await response.json();
+        
+        if (!data.devlogs || data.devlogs.length === 0) {
+          container.innerHTML = `<p data-translate="devlog.no_entries">No devlog entries available yet.</p>`;
+          return;
+        }
+
+        // Sort by date (newest first) and get the latest
+        const sortedDevlogs = data.devlogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const latest = sortedDevlogs[0];
+
+        // Create preview card
+        const gameInfo = data.games[latest.game] || { name: latest.game, description: 'Game development updates' };
+        
+        container.innerHTML = `
+          <div class="devlog-card-preview">
+            <div class="devlog-meta">
+              <span class="devlog-game">${gameInfo.name}</span>
+              <span class="devlog-date">${new Date(latest.date).toLocaleDateString()}</span>
+            </div>
+            <h3 class="devlog-title">${latest.title}</h3>
+            <p class="devlog-excerpt">${latest.excerpt}</p>
+            <a href="./devlogs/${latest.id}.html" class="devlog-read-more">Read More →</a>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Failed to load latest devlog:', error);
+        container.innerHTML = `<p data-translate="devlog.no_entries">No devlog entries available yet.</p>`;
+      }
+    }
+
+    // Load latest devlog when page loads
+    document.addEventListener('DOMContentLoaded', loadLatestDevlog);
   </script>
 </body>
 </html>

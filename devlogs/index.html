@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Devlogs — Beniah.games</title>
+  <meta name="description" content="Development logs and updates for Beniah.games indie projects." />
+  <link rel="icon" href="../assets/Beniah.Games.Icon.png" type="image/png" />
+  <style>
+    :root{
+      --bg:#0d0e10; --panel:#14161b; --panel-2:#1a1d24; --text:#e9eef6; --muted:#a8b0bd;
+      --accent:#ffcc00; --accent-2:#ffd84d; --link:#ffcc00; --border:#242834;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial,sans-serif;
+      background:var(--bg);color:var(--text);line-height:1.6;
+    }
+
+    /* Header */
+    header{
+      background:var(--panel);border-bottom:1px solid var(--border);
+      padding:1rem 0;position:sticky;top:0;z-index:100;
+    }
+    .header-content{
+      max-width:1200px;margin:0 auto;padding:0 2rem;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .logo{
+      display:flex;align-items:center;gap:1rem;text-decoration:none;color:var(--text);
+    }
+    .logo img{width:40px;height:40px;border-radius:8px;}
+    .logo h1{margin:0;font-size:1.5rem;font-weight:700;}
+    .nav-links{display:flex;gap:2rem;align-items:center;}
+    .nav-links a{color:var(--muted);text-decoration:none;transition:color .2s;}
+    .nav-links a:hover{color:var(--accent);}
+
+    /* Main Content */
+    main{max-width:1200px;margin:0 auto;padding:2rem;}
+    .page-header{text-align:center;margin-bottom:3rem;}
+    .page-header h1{font-size:3rem;margin:0 0 1rem 0;color:var(--accent);}
+    .page-header p{font-size:1.2rem;color:var(--muted);margin:0;}
+
+    /* Game Filter */
+    .filter-section{margin-bottom:2rem;}
+    .filter-buttons{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;}
+    .filter-btn{
+      background:var(--panel);border:1px solid var(--border);color:var(--text);
+      padding:.5rem 1rem;border-radius:8px;cursor:pointer;transition:all .2s;
+    }
+    .filter-btn:hover,.filter-btn.active{
+      background:var(--accent);color:var(--bg);border-color:var(--accent);
+    }
+
+    /* Devlog Grid */
+    .devlogs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:2rem;}
+    .devlog-card{
+      background:var(--panel);border:1px solid var(--border);border-radius:12px;
+      padding:1.5rem;transition:transform .2s,box-shadow .2s;
+    }
+    .devlog-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);}
+    .devlog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+    .devlog-game{
+      background:var(--accent);color:var(--bg);padding:.25rem .75rem;
+      border-radius:20px;font-size:.875rem;font-weight:600;
+    }
+    .devlog-date{color:var(--muted);font-size:.875rem;}
+    .devlog-title{font-size:1.25rem;font-weight:600;margin:0 0 .5rem 0;}
+    .devlog-title a{color:var(--text);text-decoration:none;}
+    .devlog-title a:hover{color:var(--accent);}
+    .devlog-excerpt{color:var(--muted);margin:0 0 1rem 0;}
+    .devlog-tags{display:flex;gap:.5rem;flex-wrap:wrap;}
+    .devlog-tag{
+      background:var(--panel-2);color:var(--muted);padding:.25rem .5rem;
+      border-radius:4px;font-size:.75rem;
+    }
+
+    /* Empty State */
+    .empty-state{
+      text-align:center;padding:4rem 2rem;color:var(--muted);
+    }
+    .empty-state h3{margin:0 0 1rem 0;font-size:1.5rem;}
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content{padding:0 1rem;}
+      main{padding:1rem;}
+      .page-header h1{font-size:2rem;}
+      .devlogs-grid{grid-template-columns:1fr;}
+      .filter-buttons{justify-content:flex-start;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a href="../" class="logo">
+        <img src="../assets/Beniah.Games.Icon.png" alt="Beniah.games">
+        <h1>Beniah.games</h1>
+      </a>
+      <nav class="nav-links">
+        <a href="../#games">Games</a>
+        <a href="../#about">About</a>
+        <a href="../#faq">FAQ</a>
+        <a href="../#contact">Contact</a>
+        <a href="./" style="color: var(--accent);">Devlogs</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1>Development Logs</h1>
+      <p>Behind-the-scenes updates and insights from game development</p>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-game="all">All Games</button>
+        <!-- Game filter buttons will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <div class="devlogs-grid" id="devlogs-container">
+      <!-- Devlog entries will be populated by JavaScript -->
+    </div>
+
+    <div class="empty-state" id="empty-state" style="display: none;">
+      <h3>No devlogs yet</h3>
+      <p>Check back soon for development updates and behind-the-scenes content!</p>
+    </div>
+  </main>
+
+  <script>
+    let devlogs = [];
+    let games = [];
+
+    // Load devlog data from JSON
+    async function loadDevlogs() {
+      try {
+        const response = await fetch('./devlogs.json');
+        const data = await response.json();
+        devlogs = data.devlogs || [];
+        games = data.games || [];
+        
+        // Sort devlogs by date (newest first)
+        devlogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Populate filter buttons
+        populateFilterButtons();
+        
+        // Initial render
+        renderDevlogs();
+        
+        // Make latest devlog available globally
+        window.latestDevlog = devlogs[0] || null;
+        
+      } catch (error) {
+        console.error('Failed to load devlogs:', error);
+        document.getElementById('empty-state').style.display = 'block';
+      }
+    }
+
+    // Populate filter buttons based on available games
+    function populateFilterButtons() {
+      const filterButtons = document.querySelector('.filter-buttons');
+      const uniqueGames = [...new Set(devlogs.map(log => log.game))];
+      
+      uniqueGames.forEach(game => {
+        if (game !== 'General') {
+          const button = document.createElement('button');
+          button.className = 'filter-btn';
+          button.setAttribute('data-game', game.toLowerCase());
+          button.textContent = game;
+          filterButtons.appendChild(button);
+        }
+      });
+    }
+
+    // Render devlogs
+    function renderDevlogs(filteredLogs = devlogs) {
+      const container = document.getElementById('devlogs-container');
+      const emptyState = document.getElementById('empty-state');
+      
+      if (filteredLogs.length === 0) {
+        container.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      container.style.display = 'grid';
+      emptyState.style.display = 'none';
+      
+      container.innerHTML = filteredLogs.map(log => `
+        <article class="devlog-card">
+          <div class="devlog-meta">
+            <span class="devlog-game">${log.game}</span>
+            <span class="devlog-date">${new Date(log.date).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</span>
+          </div>
+          <h2 class="devlog-title">
+            <a href="${log.content}">${log.title}</a>
+          </h2>
+          <p class="devlog-excerpt">${log.excerpt}</p>
+          <div class="devlog-tags">
+            ${log.tags.map(tag => `<span class="devlog-tag">${tag}</span>`).join('')}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // Filter functionality
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('filter-btn')) {
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        // Filter devlogs
+        const selectedGame = e.target.getAttribute('data-game');
+        const filtered = selectedGame === 'all' 
+          ? devlogs 
+          : devlogs.filter(log => log.game.toLowerCase() === selectedGame);
+        
+        renderDevlogs(filtered);
+      }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', loadDevlogs);
+
+    // Export function for main page
+    window.getLatestDevlog = () => window.latestDevlog || null;
+  </script>
+</body>
+</html>
