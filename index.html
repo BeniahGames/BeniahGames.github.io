@@ -2355,7 +2355,7 @@
       if (!container) return;
 
       try {
-        const response = await fetch('./devlogs/devlogs.json');
+        const response = await fetch('./devlogs/devlogs.json?v=' + Date.now());
         const data = await response.json();
         
         if (!data.devlogs || data.devlogs.length === 0) {

@@ -140,7 +140,7 @@
     // Load devlog data from JSON
     async function loadDevlogs() {
       try {
-        const response = await fetch('./devlogs.json');
+        const response = await fetch('./devlogs.json?v=' + Date.now());
         const data = await response.json();
         devlogs = data.devlogs || [];
         games = data.games || [];
