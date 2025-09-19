@@ -37,6 +37,37 @@
     .nav-links a{color:var(--muted);text-decoration:none;transition:color .2s;}
     .nav-links a:hover{color:var(--accent);}
 
+    /* Hamburger + Mobile Panel */
+    .hamburger{display:none;flex-direction:column;gap:.45rem;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--accent);border-radius:10px;cursor:pointer;background:transparent}
+    .hamburger span{width:20px;height:2px;background:var(--accent);transition:.25s}
+    .hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .hamburger[aria-expanded="true"] span:nth-child(2){opacity:0}
+    .hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+    @media(max-width:820px){
+      .nav-links{display:flex}
+      .nav-links > a{display:none}
+      .hamburger{display:flex}
+    }
+    .menu-panel{
+      position:fixed;top:80px;left:0;right:0;background:var(--panel);border-bottom:1px solid var(--border);
+      transform:scaleY(0);transform-origin:top;opacity:0;pointer-events:none;transition:transform .25s,opacity .25s;z-index:99;
+    }
+    .menu-panel.open{transform:scaleY(1);opacity:1;pointer-events:auto;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+    .menu-panel-inner{max-width:1100px;margin:0 auto;padding:.75rem 1rem;display:grid;gap:.5rem}
+    .menu-panel a{
+      position:relative;color:var(--text);text-decoration:none;padding:.75rem 1rem;border-radius:8px;
+      transition:background .2s,transform .25s,opacity .25s;opacity:0;transform:translateY(-10px);
+    }
+    .menu-panel a:hover{background:#171a21}
+    .menu-panel a::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s}
+    .menu-panel a:hover::after{transform:scaleX(1)}
+    .menu-panel.open .menu-panel-inner a:nth-child(1){opacity:1;transform:none;transition-delay:40ms}
+    .menu-panel.open .menu-panel-inner a:nth-child(2){opacity:1;transform:none;transition-delay:90ms}
+    .menu-panel.open .menu-panel-inner a:nth-child(3){opacity:1;transform:none;transition-delay:140ms}
+    .menu-panel.open .menu-panel-inner a:nth-child(4){opacity:1;transform:none;transition-delay:190ms}
+    .menu-panel.open .menu-panel-inner a:nth-child(5){opacity:1;transform:none;transition-delay:240ms}
+    .menu-panel.open .menu-panel-inner a:nth-child(6){opacity:1;transform:none;transition-delay:290ms}
+
     /* Article Content */
     .article-container{max-width:800px;margin:0 auto;padding:2rem;}
     .article-header{margin-bottom:3rem;}
@@ -120,7 +151,24 @@
         <a href="../#faq">FAQ</a>
         <a href="../#contact">Contact</a>
         <a href="./" style="color: var(--accent);">Devlogs</a>
+        
+        <!-- Hamburger Menu Button -->
+        <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
       </nav>
+
+      <!-- Mobile Panel -->
+      <div class="menu-panel" id="menu-panel">
+        <div class="menu-panel-inner">
+          <a href="../#about">About</a>
+          <a href="../#games">Games</a>
+          <a href="./" style="color: var(--accent);">Devlogs</a>
+          <a href="../#faq">FAQ</a>
+          <a href="../#contact">Contact</a>
+          <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -178,5 +226,35 @@
       <span></span> <!-- Placeholder for next article -->
     </nav>
   </main>
+
+  <script>
+    // Hamburger menu functionality
+    (() => {
+      const hamburger = document.getElementById('hamburger');
+      const panel = document.getElementById('menu-panel');
+      
+      hamburger.addEventListener('click', () => {
+        const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+        hamburger.setAttribute('aria-expanded', !isOpen);
+        panel.classList.toggle('open', !isOpen);
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!hamburger.contains(e.target) && !panel.contains(e.target)) {
+          hamburger.setAttribute('aria-expanded', 'false');
+          panel.classList.remove('open');
+        }
+      });
+
+      // Close menu when pressing escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          hamburger.setAttribute('aria-expanded', 'false');
+          panel.classList.remove('open');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
