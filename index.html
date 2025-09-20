@@ -1499,8 +1499,10 @@
                 'welcomeClick': 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav',
                 'alienOpen': 'assets/0110000101110101011001000110100101101111/Alien Interface Open-1.wav',
                 'alienClose': 'assets/0110000101110101011001000110100101101111/Alien Interface Close-1.wav',
-                'gadgetOpen': 'assets/0110000101110101011001000110100101101111/Micro Clicks Motion.wav',
-                'gadgetClose': 'assets/0110000101110101011001000110100101101111/Micro Mechanism Extend Short.wav',
+                'gadgetOpen': 'assets/0110000101110101011001000110100101101111/Small High-Tech Gadget Open.wav',
+                'gadgetClose': 'assets/0110000101110101011001000110100101101111/Small High-Tech Gadget Close.wav',
+                'faqOpen': 'assets/0110000101110101011001000110100101101111/Micro Clicks Motion.wav',
+                'faqClose': 'assets/0110000101110101011001000110100101101111/Micro Mechanism Extend Short.wav',
                 'holographicOpen': 'assets/0110000101110101011001000110100101101111/Holographic Open Panel.wav'
               };
               if (soundPaths[name]) {
@@ -1637,8 +1639,10 @@
             loadSound('welcomeClick', 'assets/0110000101110101011001000110100101101111/FUI Ping Simple High.wav'),
             loadSound('alienOpen', 'assets/0110000101110101011001000110100101101111/Alien Interface Open-1.wav'),
             loadSound('alienClose', 'assets/0110000101110101011001000110100101101111/Alien Interface Close-1.wav'),
-            loadSound('gadgetOpen', 'assets/0110000101110101011001000110100101101111/Micro Clicks Motion.wav'),
-            loadSound('gadgetClose', 'assets/0110000101110101011001000110100101101111/Micro Mechanism Extend Short.wav'),
+            loadSound('gadgetOpen', 'assets/0110000101110101011001000110100101101111/Small High-Tech Gadget Open.wav'),
+            loadSound('gadgetClose', 'assets/0110000101110101011001000110100101101111/Small High-Tech Gadget Close.wav'),
+            loadSound('faqOpen', 'assets/0110000101110101011001000110100101101111/Micro Clicks Motion.wav'),
+            loadSound('faqClose', 'assets/0110000101110101011001000110100101101111/Micro Mechanism Extend Short.wav'),
             loadSound('holographicOpen', 'assets/0110000101110101011001000110100101101111/Holographic Open Panel.wav')
           ]);
           audioReadyForImmediate = false; // Audio is now ready
@@ -2347,9 +2351,9 @@
           
           if (window.audioManager) {
             if (details.open) {
-              await window.audioManager.playSound('gadgetOpen');
+              await window.audioManager.playSound('faqOpen');
             } else {
-              await window.audioManager.playSound('gadgetClose');
+              await window.audioManager.playSound('faqClose');
             }
           }
         });
