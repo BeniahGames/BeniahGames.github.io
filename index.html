@@ -385,6 +385,33 @@
     .card.expanded > .collapsible{opacity:1!important;transform:translateY(0) scale(1)!important;max-height:500px!important}
     .preview figure{margin:0;background:#0e1015;border:1px solid var(--border);border-radius:10px;overflow:hidden}
     .preview img{display:block;width:100%;height:auto}
+    
+    /* Floor Game Card Background */
+    #floor-game-card{
+      position:relative;
+      overflow:hidden;
+    }
+    #floor-game-card::before{
+      content:'';
+      position:absolute;
+      top:0;
+      right:0;
+      bottom:0;
+      width:60%;
+      background:url('assets/Elevathor.png') no-repeat center right;
+      background-size:contain;
+      opacity:0.15;
+      z-index:0;
+      pointer-events:none;
+      transition:opacity 0.3s ease;
+    }
+    #floor-game-card:hover::before{
+      opacity:0.25;
+    }
+    #floor-game-card > *{
+      position:relative;
+      z-index:1;
+    }
 
     /* Footer + Back to Top */
     footer{border-top:1px solid var(--accent);color:#98a1b3;text-align:center;padding:2rem 1rem;backdrop-filter:saturate(140%) blur(6px);background:linear-gradient(0deg,rgba(13,14,16,.85),rgba(13,14,16,.65))}
@@ -694,7 +721,7 @@
       <div class="grid">
 
         <!-- Is This My Floor? -->
-        <article class="card reveal" aria-expanded="false" role="button" tabindex="0">
+        <article id="floor-game-card" class="card reveal" aria-expanded="false" role="button" tabindex="0">
           <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
             <div><span class="pill">Idle • Funny</span><h3>Is This My Floor?</h3></div>
             <span class="chev" aria-hidden="true">⌄</span>
