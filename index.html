@@ -371,42 +371,31 @@
       background:linear-gradient(180deg,var(--panel),var(--panel-2));
       border:2px solid var(--accent);border-radius:14px;padding:1.1rem;box-shadow:var(--shadow);
       cursor:pointer;opacity:0;translate:0 14px;transition:.25s;filter:saturate(.95);
-      align-self:start;position:relative;overflow:hidden
+      align-self:start;position:relative
     }
     .card::before{
-      content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;
-      border-radius:14px;
-      background:conic-gradient(from var(--ripple-angle, 0deg), 
-        transparent 0deg, 
-        var(--accent) 45deg, 
-        #00d4ff 90deg, 
-        var(--accent) 135deg, 
-        #ff6b6b 180deg, 
-        var(--accent) 225deg, 
-        #00d4ff 270deg, 
-        var(--accent) 315deg, 
-        transparent 360deg);
-      opacity:0;z-index:-1;transition:opacity .3s ease
-    }
-    .card::after{
-      content:'';position:absolute;top:0;left:0;right:0;bottom:0;
-      background:linear-gradient(180deg,var(--panel),var(--panel-2));
-      border-radius:12px;z-index:-1
+      content:'';position:absolute;top:-3px;left:-3px;right:-3px;bottom:-3px;
+      border-radius:17px;
+      background:linear-gradient(45deg, var(--accent), #00d4ff, #ff6b6b, var(--accent));
+      background-size:400% 400%;
+      opacity:0;z-index:-1;transition:opacity .3s ease;
+      pointer-events:none
     }
     .card.revealed{opacity:1;translate:0 0;transition:opacity .6s,translate .6s}
     .card:hover{transform:translateY(-4px)}
-    .card:hover::before{opacity:1;animation:ripple-border 1.5s ease-out infinite}
+    .card:hover::before{opacity:0.7;animation:ripple-border 2s ease-in-out infinite}
     @keyframes ripple-border{
       0%{
-        transform:rotate(0deg) scale(0.8);
-        opacity:0;
+        background-position:0% 50%;
+        opacity:0.7;
       }
-      25%{
+      50%{
+        background-position:100% 50%;
         opacity:1;
       }
       100%{
-        transform:rotate(360deg) scale(1.1);
-        opacity:0;
+        background-position:200% 50%;
+        opacity:0.7;
       }
     }
     .card h3{margin:.35rem 0;color:var(--accent)}
@@ -1778,23 +1767,37 @@
 
     // Ripple Border Effect
     (() => {
-      const gameCards = document.querySelectorAll('#games .card');
-      
-      gameCards.forEach(card => {
-        card.addEventListener('mouseenter', (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
+      // Wait for DOM to be ready
+      const initRippleEffect = () => {
+        const gameCards = document.querySelectorAll('#games .card');
+        console.log('Found game cards:', gameCards.length);
+        
+        gameCards.forEach((card, index) => {
+          console.log(`Adding ripple effect to card ${index + 1}`);
           
-          // Calculate angle from mouse position to center
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
-          
-          // Update CSS custom property for ripple start position
-          card.style.setProperty('--ripple-angle', `${angle}deg`);
+          card.addEventListener('mouseenter', (e) => {
+            console.log('Mouse entered card');
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Calculate angle from mouse position to center
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+            
+            // Update CSS custom property for ripple start position
+            card.style.setProperty('--ripple-angle', `${angle}deg`);
+            console.log('Set ripple angle:', angle);
+          });
         });
-      });
+      };
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initRippleEffect);
+      } else {
+        initRippleEffect();
+      }
     })();
 
     // Expand All Button
