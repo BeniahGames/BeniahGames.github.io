@@ -123,9 +123,6 @@
     .nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s}
     .nav-links a:hover::after{transform:scaleX(1)}
 
-    /* Auth Button Container */
-    .auth-button{position:relative;display:inline-block}
-    
     /* User Menu */
     .user-menu{position:relative;display:inline-block}
     .user-link{
@@ -881,14 +878,12 @@
         <a href="devlogs/" data-translate="nav.devlogs">Devlogs</a>
         <a href="#contact" data-translate="nav.contact">Contact</a>
         <!-- Auth Button - transforms from signup to user menu when logged in -->
-        <div class="auth-button" id="auth-button">
+        <div class="user-menu" id="auth-button">
           <a href="#signup" id="signup-link" data-translate="nav.signup">Sign Up</a>
-          <div class="user-menu" id="user-menu" style="display: none;">
-            <a href="profile.html" class="user-link" id="user-link" data-translate="nav.profile">Profile</a>
-            <div class="user-dropdown">
-              <a href="profile.html" data-translate="nav.profile">Profile</a>
-              <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
-            </div>
+          <a href="profile.html" class="user-link" id="user-link" data-translate="nav.profile" style="display: none;">Profile</a>
+          <div class="user-dropdown">
+            <a href="profile.html" data-translate="nav.profile">Profile</a>
+            <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
           </div>
         </div>
         
@@ -3063,11 +3058,11 @@
           if (user) {
             // User is logged in
             document.getElementById('signup-link').style.display = 'none';
-            document.getElementById('user-menu').style.display = 'inline-block';
+            document.getElementById('user-link').style.display = 'inline-block';
           } else {
             // User is not logged in
             document.getElementById('signup-link').style.display = 'inline-block';
-            document.getElementById('user-menu').style.display = 'none';
+            document.getElementById('user-link').style.display = 'none';
           }
         } catch (error) {
           console.error('Error checking auth state:', error);
