@@ -782,8 +782,18 @@
                 </a>
             </div>
 
-            <!-- User Controls -->
-            <div class="user-controls">
+            <!-- Mobile -->
+            <div class="mobile-nav">
+                <!-- Spotify Now Playing (Mobile) -->
+                <div class="now-playing mobile-only" id="now-playing-mobile">
+                    <div class="np-art" id="np-art-mobile"></div>
+                    <div class="np-info">
+                        <div class="np-title" id="np-title-mobile" data-translate="spotify.not_playing">Not playing</div>
+                        <div class="np-artist" id="np-artist-mobile"></div>
+                        <a class="np-link" id="np-link-mobile" href="#" target="_blank" rel="noopener" style="display:none;" data-translate="spotify.listen">♪ Listen</a>
+                    </div>
+                </div>
+
                 <!-- Language Selector -->
                 <div class="language-selector" id="language-selector">
                     <button class="language-btn" id="language-btn" aria-label="Select language">
@@ -829,21 +839,6 @@
                     <div class="volume-slider-container" id="volume-slider-container">
                         <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="0" aria-label="Volume level">
                         <div class="volume-percentage" id="volume-percentage">0%</div>
-                    </div>
-                </div>
-
-
-            </div>
-
-            <!-- Mobile -->
-            <div class="mobile-nav">
-                <!-- Spotify Now Playing (Mobile) -->
-                <div class="now-playing mobile-only" id="now-playing-mobile">
-                    <div class="np-art" id="np-art-mobile"></div>
-                    <div class="np-info">
-                        <div class="np-title" id="np-title-mobile" data-translate="spotify.not_playing">Not playing</div>
-                        <div class="np-artist" id="np-artist-mobile"></div>
-                        <a class="np-link" id="np-link-mobile" href="#" target="_blank" rel="noopener" style="display:none;" data-translate="spotify.listen">♪ Listen</a>
                     </div>
                 </div>
 
@@ -1305,7 +1300,240 @@
                  // Start initial fade timeout
                  startFadeTimeout();
              }
-         })();
-     </script>
+          })();
+
+          // Volume Control
+          (() => {
+              const volumeBtn = document.getElementById('volume-btn');
+              const volumeIcon = document.getElementById('volume-icon');
+              const volumeSliderContainer = document.getElementById('volume-slider-container');
+              const volumeSlider = document.getElementById('volume-slider');
+              const volumePercentage = document.getElementById('volume-percentage');
+              
+              if (volumeBtn && volumeIcon && volumeSliderContainer && volumeSlider && volumePercentage) {
+                  let masterVolume = 50; // Default volume
+                  
+                  // Load saved volume from localStorage
+                  try {
+                      const savedVolume = localStorage.getItem('sound-level');
+                      if (savedVolume !== null) {
+                          masterVolume = parseInt(savedVolume);
+                      }
+                  } catch (error) {
+                      console.warn('Failed to load volume from localStorage:', error);
+                  }
+
+                  function updateVolumeIcon() {
+                      if (masterVolume === 0) {
+                          volumeIcon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+                          volumeBtn.classList.add('muted');
+                      } else if (masterVolume < 30) {
+                          volumeIcon.innerHTML = '<path d="M7 9v6h4l5 5V4l-5 5H7z"/>';
+                          volumeBtn.classList.remove('muted');
+                      } else if (masterVolume < 70) {
+                          volumeIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>';
+                          volumeBtn.classList.remove('muted');
+                      } else {
+                          volumeIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+                          volumeBtn.classList.remove('muted');
+                      }
+                  }
+
+                  function updateVolumeDisplay() {
+                      volumeSlider.value = masterVolume;
+                      volumePercentage.textContent = `${masterVolume}%`;
+                      updateVolumeIcon();
+                      
+                      // Save volume level to localStorage
+                      try {
+                          localStorage.setItem('sound-level', masterVolume);
+                      } catch (error) {
+                          console.warn('Failed to save volume level to localStorage:', error);
+                      }
+                  }
+
+                  // Volume slider change
+                  volumeSlider.addEventListener('input', async (e) => {
+                      masterVolume = parseInt(e.target.value);
+                      updateVolumeDisplay();
+                  });
+
+                  // Volume button interaction - support both click and touch
+                  const handleVolumeButtonInteraction = async (e) => {
+                      e.stopPropagation();
+                      e.preventDefault(); // Prevent double-firing on mobile
+                      volumeSliderContainer.classList.toggle('show');
+                  };
+
+                  volumeBtn.addEventListener('click', handleVolumeButtonInteraction);
+                  volumeBtn.addEventListener('touchend', handleVolumeButtonInteraction);
+
+                  // Close volume slider when clicking/touching outside
+                  const closeVolumeSlider = (e) => {
+                      if (!document.getElementById('volume-control').contains(e.target)) {
+                          volumeSliderContainer.classList.remove('show');
+                      }
+                  };
+
+                  document.addEventListener('click', closeVolumeSlider);
+                  document.addEventListener('touchend', closeVolumeSlider);
+
+                  // Initialize volume display
+                  updateVolumeDisplay();
+              }
+          })();
+
+          // Language switching functionality
+          (() => {
+              const languageSelector = document.querySelector('#language-selector');
+              const languageButton = document.querySelector('#language-btn');
+              const languageOptions = document.querySelector('#language-dropdown');
+              const languageItems = document.querySelectorAll('.language-option');
+              
+              // Check if all elements exist
+              if (!languageSelector || !languageButton || !languageOptions) {
+                  console.error('Language selector elements not found');
+                  return;
+              }
+              
+              // Get current language from localStorage or default to 'en'
+              let currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
+              
+              // Function to update all translatable elements
+              const updateTranslations = (lang) => {
+                  const elements = document.querySelectorAll('[data-translate]');
+                  elements.forEach(element => {
+                      const key = element.getAttribute('data-translate');
+                      if (translations[lang] && translations[lang][key]) {
+                          // Special handling for Spotify widget - only update if showing "Not playing" text
+                          if (key === 'spotify.not_playing') {
+                              // Check if the element currently shows a "Not playing" translation in any language
+                              const isShowingNotPlaying = Object.values(translations).some(langTranslations => 
+                                  langTranslations['spotify.not_playing'] === element.textContent
+                              );
+                              // Only update if it's currently showing "Not playing" text
+                              if (isShowingNotPlaying) {
+                                  element.innerHTML = translations[lang][key];
+                              }
+                          } else {
+                              element.innerHTML = translations[lang][key];
+                          }
+                      }
+                  });
+              };
+              
+              // Function to update the language button display
+              const updateLanguageButton = (lang) => {
+                  const flagMap = {
+                      'en': '🇺🇸',
+                      'nl': '🇳🇱', 
+                      'de': '🇩🇪',
+                      'it': '🇮🇹',
+                      'es': '🇪🇸',
+                      'fr': '🇫🇷'
+                  };
+                  
+                  const langMap = {
+                      'en': 'EN',
+                      'nl': 'NL',
+                      'de': 'DE', 
+                      'it': 'IT',
+                      'es': 'ES',
+                      'fr': 'FR'
+                  };
+                  
+                  const currentFlag = document.getElementById('current-flag');
+                  const currentLang = document.getElementById('current-lang');
+                  
+                  if (currentFlag && currentLang) {
+                      currentFlag.textContent = flagMap[lang];
+                      currentLang.textContent = langMap[lang];
+                  }
+                  
+                  // Update active state in dropdown
+                  languageItems.forEach(item => {
+                      item.classList.toggle('active', item.dataset.lang === lang);
+                  });
+              };
+              
+              // Function to change language
+              const changeLanguage = (lang) => {
+                  if (translations[lang]) {
+                      currentLanguage = lang;
+                      localStorage.setItem('selectedLanguage', lang);
+                      updateTranslations(lang);
+                      updateLanguageButton(lang);
+                      
+                      // Close dropdown
+                      languageOptions.classList.remove('show');
+                      languageButton.setAttribute('aria-expanded', 'false');
+                  }
+              };
+              
+              // Initialize with current language
+              updateTranslations(currentLanguage);
+              updateLanguageButton(currentLanguage);
+              
+              // Toggle dropdown
+              languageButton.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  
+                  const isOpen = languageOptions.classList.contains('show');
+                  languageOptions.classList.toggle('show');
+                  languageButton.setAttribute('aria-expanded', !isOpen);
+              });
+              
+              // Handle language selection
+              languageItems.forEach(item => {
+                  item.addEventListener('click', (e) => {
+                      e.preventDefault();
+                      const selectedLang = item.dataset.lang;
+                      changeLanguage(selectedLang);
+                  });
+              });
+              
+              // Close dropdown when clicking outside
+              document.addEventListener('click', (e) => {
+                  if (!languageSelector.contains(e.target)) {
+                      languageOptions.classList.remove('show');
+                      languageButton.setAttribute('aria-expanded', 'false');
+                  }
+              });
+              
+              // Close dropdown on escape key
+              document.addEventListener('keydown', (e) => {
+                  if (e.key === 'Escape' && languageOptions.classList.contains('show')) {
+                      languageOptions.classList.remove('show');
+                      languageButton.setAttribute('aria-expanded', 'false');
+                  }
+              });
+              
+              // Handle keyboard navigation in dropdown
+              languageButton.addEventListener('keydown', (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      languageButton.click();
+                  }
+              });
+              
+              languageItems.forEach((item, index) => {
+                  item.addEventListener('keydown', (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          item.click();
+                      } else if (e.key === 'ArrowDown') {
+                          e.preventDefault();
+                          const nextItem = languageItems[index + 1] || languageItems[0];
+                          nextItem.focus();
+                      } else if (e.key === 'ArrowUp') {
+                          e.preventDefault();
+                          const prevItem = languageItems[index - 1] || languageItems[languageItems.length - 1];
+                          prevItem.focus();
+                      }
+                  });
+              });
+          })();
+      </script>
 </body>
 </html>
