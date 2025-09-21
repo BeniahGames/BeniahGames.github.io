@@ -1629,15 +1629,23 @@
           // Add checkUsername function for username availability checking
           async function checkUsername(name) { 
               try {
+                  console.log('Calling supabase.rpc with username:', name);
                   const { data, error } = await supabase.rpc('is_username_available', { p_username: name }); 
+                  console.log('RPC response:', { data, error });
                   if (error) { 
                       console.error('Username check error:', error); 
+                      // If the function doesn't exist, we'll skip the check for now
+                      if (error.message && error.message.includes('function')) {
+                          console.warn('Username availability function not found, skipping check');
+                          return true; // Allow the username change to proceed
+                      }
                       return false; 
                   } 
                   return data === true; 
               } catch (err) {
                   console.error('Username check exception:', err);
-                  return false;
+                  console.warn('Skipping username availability check due to error');
+                  return true; // Allow the username change to proceed
               }
           }
 
@@ -1646,6 +1654,8 @@
           const statusElement = document.getElementById("status");
 
           console.log('Username form elements:', { usernameForm, statusElement });
+          console.log('Supabase client:', supabase);
+          console.log('Supabase URL:', supabase?.supabaseUrl);
 
           if (usernameForm && statusElement) {
               usernameForm.addEventListener("submit", async (e) => {

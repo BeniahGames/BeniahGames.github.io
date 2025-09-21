@@ -3022,7 +3022,7 @@
         const { data, error } = await supabase
           .from('profiles')
           .upsert(
-            { id: user.id, display_name: username, email: user.email },  // id is REQUIRED
+            { id: user.id, display_name: username, username: username },  // id is REQUIRED
             { onConflict: 'id' }                      // ensure upsert uses PK
           )
           .select()

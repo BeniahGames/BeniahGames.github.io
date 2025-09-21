@@ -1,0 +1,5 @@
+supabase_setup.sql
+profiles_rows.json
+user_current_role_rows.json
+user_progress_rows.json
+user_roles_unlocked_rows.json
