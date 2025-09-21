@@ -763,15 +763,7 @@
                 <a href="../#games" data-translate="nav.games">Games</a>
                 <a href="../devlogs/" data-translate="nav.devlogs">Devlogs</a>
                 <a href="../#contact" data-translate="nav.contact">Contact</a>
-                <!-- Auth Button - transforms from signup to user menu when logged in -->
-        <div class="user-menu" id="auth-button">
-          <a href="../#signup" id="signup-link" data-translate="nav.signup">Sign Up</a>
-          <a href="/user/" class="user-link" id="user-link" data-translate="nav.profile" style="display: none;">Profile</a>
-          <div class="user-dropdown" id="user-menu" style="display: none;">
-            <a href="/user/" data-translate="nav.profile">Profile</a>
-            <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
-          </div>
-        </div>
+
                 
 
                 <!-- Spotify Now Playing (Desktop) -->
@@ -836,6 +828,19 @@
                         <input type="range" id="volume-range" min="0" max="100" value="50" aria-label="Volume">
                     </div>
                 </div>
+
+                <!-- User Icon -->
+                <div class="user-icon-container">
+                    <button class="user-icon" id="user-icon" aria-label="User menu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </button>
+                    <div class="user-icon-dropdown" id="user-icon-dropdown" style="display: none;">
+                        <a href="/user/" data-translate="nav.profile">Profile</a>
+                        <a href="#" id="user-icon-logout" data-translate="nav.logout">Logout</a>
+                    </div>
+                </div>
             </div>
 
             <!-- Mobile -->
@@ -863,9 +868,6 @@
                     <a href="../devlogs/" data-translate="nav.devlogs">Devlogs</a>
                     <a href="../#contact" data-translate="nav.contact">Contact</a>
                     <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener" data-translate="nav.discord">Join Discord</a>
-                    <a href="../#signup" id="mobile-signup-link" data-translate="nav.signup">Sign Up</a>
-                    <a href="/user/" class="user-link" id="mobile-user-link" data-translate="nav.profile" style="display: none;">Profile</a>
-                    <a href="#" id="mobile-logout-btn" data-translate="nav.logout" style="display: none;">Logout</a>
                 </div>
             </div>
         </div>
@@ -1099,24 +1101,15 @@
 
 
         // User authentication state handling
+        let isUserLoggedIn = false;
+        
         async function checkAuthState() {
             try {
                 const { data: { user }, error } = await supabase.auth.getUser();
                 
                 if (user) {
                     // User is logged in
-                    document.getElementById('signup-link').style.display = 'none';
-                    document.getElementById('user-link').style.display = 'inline-block';
-                    document.getElementById('user-menu').style.display = 'block';
-                    
-                    // Mobile elements
-                    const mobileSignupLink = document.getElementById('mobile-signup-link');
-                    const mobileUserLink = document.getElementById('mobile-user-link');
-                    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-                    
-                    if (mobileSignupLink) mobileSignupLink.style.display = 'none';
-                    if (mobileUserLink) mobileUserLink.style.display = 'block';
-                    if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'block';
+                    isUserLoggedIn = true;
                 } else {
                     // User is not logged in - redirect to main page
                     window.location.href = '../#signup';
@@ -1127,8 +1120,30 @@
             }
         }
 
-        // Logout functionality
-        document.getElementById('logout-btn').addEventListener('click', async (e) => {
+        // User icon click handler - shows dropdown
+        const userIcon = document.getElementById('user-icon');
+        userIcon.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Toggle dropdown
+            const dropdown = document.getElementById('user-icon-dropdown');
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('user-icon-dropdown');
+            const container = document.querySelector('.user-icon-container');
+            
+            if (!container.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Logout functionality for user icon dropdown
+        document.getElementById('user-icon-logout').addEventListener('click', async (e) => {
             e.preventDefault();
             
             try {
@@ -1143,26 +1158,6 @@
                 alert('Error logging out. Please try again.');
             }
         });
-
-        // Mobile logout functionality
-        const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-        if (mobileLogoutBtn) {
-            mobileLogoutBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                
-                try {
-                    const { error } = await supabase.auth.signOut();
-                    if (error) throw error;
-                    
-                    // Redirect to main page after logout
-                    window.location.href = '../';
-                    
-                } catch (error) {
-                    console.error('Logout error:', error);
-                    alert('Error logging out. Please try again.');
-                }
-            });
-        }
 
         // Load profile when page loads
         document.addEventListener('DOMContentLoaded', () => {
