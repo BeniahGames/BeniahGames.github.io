@@ -1343,7 +1343,7 @@
         
         // Login form
         'login.title': 'Login',
-        'login.identifier': 'Username or Email',
+        'login.email': 'Email',
         'login.password': 'Password',
         'login.submit': 'Login',
         
@@ -1444,7 +1444,7 @@
         
         // Login form
         'login.title': 'Inloggen',
-        'login.identifier': 'Gebruikersnaam of Email',
+        'login.email': 'Email',
         'login.password': 'Wachtwoord',
         'login.submit': 'Inloggen',
         
@@ -1721,7 +1721,7 @@
         
         // Login form
         'login.title': 'Iniciar Sesión',
-        'login.identifier': 'Usuario o Email',
+        'login.email': 'Email',
         'login.password': 'Contraseña',
         'login.submit': 'Iniciar Sesión',
         
@@ -1812,7 +1812,7 @@
         
         // Login form
         'login.title': 'ログイン',
-        'login.identifier': 'ユーザー名またはメール',
+        'login.email': 'メール',
         'login.password': 'パスワード',
         'login.submit': 'ログイン',
         
@@ -2925,20 +2925,10 @@
       const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
       // Username and Profile Functions
-      async function checkUsernameAvailability(username) {
-        // Check if username already exists (case-insensitive)
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id')
-          .ilike('display_name', username)
-          .limit(1);
-
-        if (error) {
-          console.error('Username availability check error:', error);
-          throw error;
-        }
-
-        return data.length === 0; // true if available, false if taken
+      async function checkUsername(name) { 
+        const { data, error } = await supabase.rpc('is_username_available', { p_username: name }); 
+        if (error) { console.error(error); return false; } 
+        return data === true; 
       }
 
       async function saveUsername(username) {
@@ -2954,7 +2944,7 @@
           console.log('Username unchanged, skipping uniqueness check');
         } else {
           // Check if username is available
-          const isAvailable = await checkUsernameAvailability(username);
+          const isAvailable = await checkUsername(username);
           if (!isAvailable) {
             throw new Error('Username is already taken. Please choose a different one.');
           }
@@ -2984,7 +2974,7 @@
           // Test username availability check
           console.log('Testing username availability check...');
           const testUsername = 'test_user_' + Date.now();
-          const isAvailable = await checkUsernameAvailability(testUsername);
+          const isAvailable = await checkUsername(testUsername);
           console.log(`✅ Username availability check works: ${testUsername} is ${isAvailable ? 'available' : 'taken'}`);
           
           // Test if user is signed in
@@ -3006,7 +2996,7 @@
               console.log('✅ Username found in profile:', profile.display_name);
               
               // Test checking availability of current username
-              const currentUsernameAvailable = await checkUsernameAvailability(profile.display_name);
+              const currentUsernameAvailable = await checkUsername(profile.display_name);
               console.log(`✅ Current username availability check: ${profile.display_name} is ${currentUsernameAvailable ? 'available' : 'taken (as expected)'}`);
             } else {
               console.log('⚠️ No username set in profile');
@@ -3169,7 +3159,7 @@
         // Debounce the check
         usernameCheckTimeout = setTimeout(async () => {
           try {
-            const isAvailable = await checkUsernameAvailability(username);
+            const isAvailable = await checkUsername(username);
             if (isAvailable) {
               showUsernameFeedback('✓ Username is available', 'available');
             } else {
@@ -3211,7 +3201,7 @@
 
         // Check username availability before creating account
         try {
-          const isUsernameAvailable = await checkUsernameAvailability(username);
+          const isUsernameAvailable = await checkUsername(username);
           if (!isUsernameAvailable) {
             showMessage('Username is already taken. Please choose a different one.', 'error');
             return;
@@ -3298,45 +3288,16 @@
         e.preventDefault();
         console.log('Login form submission started');
         
-        const identifier = document.getElementById('login-identifier').value;
+        const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
         
-        console.log('Login values:', { identifier, password: '***' });
+        console.log('Login values:', { email, password: '***' });
         
         // Clear previous messages
         loginMessageDiv.style.display = 'none';
         loginMessageDiv.className = 'message';
         
         try {
-          let email = identifier;
-          
-          // Check if identifier is a username (doesn't contain @)
-          if (!identifier.includes('@')) {
-            console.log('Identifier appears to be username, looking up email...');
-            
-            try {
-              // Query Supabase to find user by display_name (username)
-              const { data: userData, error: userError } = await supabase
-                .from('profiles')
-                .select('email')
-                .eq('display_name', identifier)
-                .single();
-              
-              if (userError || !userData) {
-                console.log('Username not found or profiles table not set up:', userError);
-                showLoginMessage('Username not found. Please use your email address to sign in.', 'error');
-                return;
-              }
-              
-              email = userData.email;
-              console.log('Found email for username');
-            } catch (profileError) {
-              console.log('Profiles table not accessible:', profileError);
-              showLoginMessage('Username login not available. Please use your email address.', 'error');
-              return;
-            }
-          }
-          
           // Sign in with email and password
           const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
@@ -3360,7 +3321,7 @@
 
         } catch (error) {
           console.error('Login error:', error);
-          showLoginMessage('Invalid username/email or password.', 'error');
+          showLoginMessage('Invalid email or password.', 'error');
         }
       });
       
@@ -3454,8 +3415,8 @@
       <div id="login-form-container" class="form-container active">
         <form id="login-form">
           <div class="form-group">
-            <label for="login-identifier" data-translate="login.identifier">Username or Email:</label>
-            <input type="text" id="login-identifier" name="identifier" required>
+            <label for="login-email" data-translate="login.email">Email:</label>
+            <input type="email" id="login-email" name="email" required>
           </div>
           <div class="form-group">
             <label for="login-password" data-translate="login.password">Password:</label>
