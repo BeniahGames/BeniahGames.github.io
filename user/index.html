@@ -1072,6 +1072,10 @@
                         .order('created_at', { ascending: false })
                         .single();
                     
+                    console.log('Profile fetch result:', { profileData, pErr });
+                    console.log('User metadata:', user.user_metadata);
+                    console.log('User email:', user.email);
+                    
                     if (pErr && (pErr.code === 'PGRST116' || pErr.code === 'PGRST205')) {
                         // Profile table doesn't exist, use user auth data as fallback
                         console.log('Using user auth data as fallback...');
@@ -1084,17 +1088,42 @@
                             ...user.user_metadata
                         };
                         targetUserId = user.id;
-                    } else if (pErr) {
-                        console.log('Profile fetch error, using auth data:', pErr);
-                        profile = {
-                            id: user.id,
-                            email: user.email,
-                            username: user.user_metadata?.username || user.email.split('@')[0],
-                            display_name: user.user_metadata?.username || user.email.split('@')[0],
-                            created_at: user.created_at,
-                            ...user.user_metadata
-                        };
+                    } else if (pErr && pErr.code === 'PGRST001') {
+                        // No profile found for this user - let's create one
+                        console.log('No profile found for user, creating one...');
+                        const defaultUsername = user.email.split('@')[0];
+                        
+                        const { data: newProfile, error: createError } = await supabase
+                            .from('profiles')
+                            .upsert({
+                                id: user.id,
+                                username: defaultUsername,
+                                display_name: defaultUsername,
+                                email: user.email
+                            })
+                            .select()
+                            .single();
+                            
+                        console.log('Profile creation result:', { newProfile, createError });
+                        
+                        if (createError) {
+                            console.error('Failed to create profile:', createError);
+                            // Fall back to auth data
+                            profile = {
+                                id: user.id,
+                                email: user.email,
+                                username: defaultUsername,
+                                display_name: defaultUsername,
+                                created_at: user.created_at
+                            };
+                        } else {
+                            profile = newProfile;
+                        }
                         targetUserId = user.id;
+                    } else if (pErr) {
+                        console.error('Profile fetch error - this should not fallback to auth data:', pErr);
+                        // Don't fallback to auth data for other errors - throw the error instead
+                        throw new Error(`Failed to fetch profile: ${pErr.message}`);
                     } else {
                         profile = profileData;
                         targetUserId = profileData.id;
