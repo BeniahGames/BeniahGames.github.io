@@ -125,14 +125,16 @@
 
     /* User Menu */
     .user-menu{position:relative;display:inline-block}
-    .user-avatar{
-      width:32px;height:32px;border-radius:50%;
-      background:linear-gradient(45deg,var(--accent),#764ba2);
-      display:flex;align-items:center;justify-content:center;
-      color:white;font-weight:bold;cursor:pointer;
-      transition:transform .2s ease;
+    .user-link{
+      color:var(--text);text-decoration:none;opacity:.9;position:relative;
     }
-    .user-avatar:hover{transform:scale(1.1)}
+    .user-link:hover{opacity:1}
+    .user-link::after{
+      content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;
+      background:var(--accent);transform:scaleX(0);transform-origin:left;
+      transition:transform .25s;
+    }
+    .user-link:hover::after{transform:scaleX(1)}
     .user-dropdown{
       position:absolute;top:100%;right:0;margin-top:.5rem;
       background:var(--panel);border:1px solid var(--border);border-radius:10px;
@@ -879,7 +881,7 @@
         
         <!-- User Menu (shown when logged in) -->
         <div class="user-menu" id="user-menu" style="display: none;">
-          <div class="user-avatar" id="user-avatar">U</div>
+          <a href="profile.html" class="user-link" id="user-link" data-translate="nav.profile">Profile</a>
           <div class="user-dropdown">
             <a href="profile.html" data-translate="nav.profile">Profile</a>
             <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
@@ -3027,8 +3029,8 @@
           setTimeout(() => {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
-            // Redirect to profile or refresh page
-            window.location.reload();
+            // Redirect to profile page
+            window.location.href = 'profile.html';
           }, 2000);
 
         } catch (error) {
@@ -3058,19 +3060,6 @@
             // User is logged in
             document.getElementById('signup-link').style.display = 'none';
             document.getElementById('user-menu').style.display = 'inline-block';
-            
-            // Get user profile for avatar
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('username')
-              .eq('id', user.id)
-              .single();
-            
-            const avatarInitial = profile?.username ? 
-              profile.username.charAt(0).toUpperCase() : 
-              user.email.charAt(0).toUpperCase();
-            
-            document.getElementById('user-avatar').textContent = avatarInitial;
           } else {
             // User is not logged in
             document.getElementById('signup-link').style.display = 'inline-block';

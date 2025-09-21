@@ -223,13 +223,37 @@
                 }
 
                 // Get user profile data
-                const { data: profile, error: profileError } = await supabase
+                let { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('*')
                     .eq('id', user.id)
                     .single();
 
-                if (profileError) {
+                // If profile doesn't exist, create one
+                if (profileError && profileError.code === 'PGRST116') {
+                    console.log('Profile not found, creating new profile...');
+                    
+                    const { data: newProfile, error: createError } = await supabase
+                        .from('profiles')
+                        .insert([
+                            {
+                                id: user.id,
+                                email: user.email,
+                                username: user.email.split('@')[0], // Default username from email
+                                created_at: new Date().toISOString()
+                            }
+                        ])
+                        .select()
+                        .single();
+
+                    if (createError) {
+                        console.error('Error creating profile:', createError);
+                        showError('Failed to create profile. Please try again.');
+                        return;
+                    }
+                    
+                    profile = newProfile;
+                } else if (profileError) {
                     console.error('Profile error:', profileError);
                     showError('Failed to load profile data.');
                     return;
