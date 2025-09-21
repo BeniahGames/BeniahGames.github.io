@@ -7,7 +7,7 @@
   <meta name="description" content="Indie game developer from Belgium making quirky, funny, endlessly fun games." />
   <link rel="icon" href="assets/Beniah.Games.Icon.png" type="image/png" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   <style>
     :root{
       --bg:#0d0e10; --panel:#14161b; --panel-2:#1a1d24; --text:#e9eef6; --muted:#a8b0bd;
@@ -2849,7 +2849,7 @@
         }
 
         // Validate captcha
-        const captchaResponse = grecaptcha.getResponse();
+        const captchaResponse = hcaptcha.getResponse();
         if (!captchaResponse) {
           showMessage(translations[currentLang]['signup.captcha_required'], 'error');
           return;
@@ -2873,7 +2873,7 @@
 
           showMessage('Registration successful! Please check your email to verify your account.', 'success');
           signupForm.reset();
-          grecaptcha.reset();
+          hcaptcha.reset();
           
           // Close modal after 3 seconds
           setTimeout(() => {
