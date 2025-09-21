@@ -222,41 +222,34 @@
                     return;
                 }
 
-                // Get user profile data
+                // Try to get user profile data from profiles table
                 let { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('*')
                     .eq('id', user.id)
                     .single();
 
-                // If profile doesn't exist, create one
-                if (profileError && profileError.code === 'PGRST116') {
-                    console.log('Profile not found, creating new profile...');
+                // If profiles table doesn't exist or profile doesn't exist, use user auth data
+                if (profileError) {
+                    console.log('Profile error:', profileError);
                     
-                    const { data: newProfile, error: createError } = await supabase
-                        .from('profiles')
-                        .insert([
-                            {
-                                id: user.id,
-                                email: user.email,
-                                username: user.email.split('@')[0], // Default username from email
-                                created_at: new Date().toISOString()
-                            }
-                        ])
-                        .select()
-                        .single();
-
-                    if (createError) {
-                        console.error('Error creating profile:', createError);
-                        showError('Failed to create profile. Please try again.');
+                    // Check if it's a table not found error or profile not found
+                    if (profileError.code === 'PGRST116' || profileError.message?.includes('relation "public.profiles" does not exist')) {
+                        console.log('Using user auth data as fallback...');
+                        // Create a profile object from user auth data
+                        profile = {
+                            id: user.id,
+                            email: user.email,
+                            username: user.user_metadata?.username || user.email.split('@')[0],
+                            created_at: user.created_at,
+                            // Add any other fields from user metadata
+                            ...user.user_metadata
+                        };
+                    } else {
+                        console.error('Unexpected profile error:', profileError);
+                        showError('Failed to load profile data. Please try again.');
                         return;
                     }
-                    
-                    profile = newProfile;
-                } else if (profileError) {
-                    console.error('Profile error:', profileError);
-                    showError('Failed to load profile data.');
-                    return;
                 }
 
                 // Display profile data
