@@ -7,6 +7,7 @@
   <meta name="description" content="Indie game developer from Belgium making quirky, funny, endlessly fun games." />
   <link rel="icon" href="assets/Beniah.Games.Icon.png" type="image/png" />
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <style>
     :root{
       --bg:#0d0e10; --panel:#14161b; --panel-2:#1a1d24; --text:#e9eef6; --muted:#a8b0bd;
@@ -559,10 +560,10 @@
     }
 
     .modal-content {
-      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      background: linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
       margin: 5% auto;
       padding: 2rem;
-      border: 1px solid var(--accent-primary);
+      border: 1px solid var(--accent);
       border-radius: 15px;
       width: 90%;
       max-width: 500px;
@@ -571,7 +572,7 @@
     }
 
     .close {
-      color: var(--text-secondary);
+      color: var(--muted);
       float: right;
       font-size: 28px;
       font-weight: bold;
@@ -580,7 +581,7 @@
     }
 
     .close:hover {
-      color: var(--accent-primary);
+      color: var(--accent);
     }
 
     .form-group {
@@ -590,32 +591,32 @@
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
-      color: var(--text-primary);
+      color: var(--text);
       font-weight: 500;
     }
 
     .form-group input {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid var(--accent-secondary);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      background: var(--bg);
+      color: var(--text);
       font-size: 1rem;
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     .form-group input:focus {
       outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
     }
 
     #signup-form button {
       width: 100%;
       padding: 0.75rem;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: var(--bg);
       border: none;
       border-radius: 8px;
       font-size: 1rem;
@@ -648,6 +649,17 @@
       background: rgba(244, 67, 54, 0.1);
       color: #f44336;
       border: 1px solid #f44336;
+    }
+
+    .captcha-container {
+      margin: 1.5rem 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .g-recaptcha {
+      transform: scale(0.9);
+      transform-origin: center;
     }
 
     /* Mobile adjustments */
@@ -1083,6 +1095,7 @@
         'signup.password': 'Password',
         'signup.confirm_password': 'Confirm Password',
         'signup.submit': 'Sign Up',
+        'signup.captcha_required': 'Please complete the captcha verification!',
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
@@ -1175,6 +1188,7 @@
         'signup.password': 'Wachtwoord',
         'signup.confirm_password': 'Bevestig Wachtwoord',
         'signup.submit': 'Aanmelden',
+        'signup.captcha_required': 'Voltooi de captcha verificatie!',
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
@@ -1441,6 +1455,7 @@
         'signup.password': 'Contraseña',
         'signup.confirm_password': 'Confirmar Contraseña',
         'signup.submit': 'Registrarse',
+        'signup.captcha_required': '¡Por favor completa la verificación captcha!',
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
@@ -1523,6 +1538,7 @@
         'signup.password': 'パスワード',
         'signup.confirm_password': 'パスワード確認',
         'signup.submit': 'サインアップ',
+        'signup.captcha_required': 'キャプチャ認証を完了してください！',
         
         // Footer and UI
         'footer.copyright': '© 2025 Beniah Gepts.',
@@ -2655,6 +2671,13 @@
           return;
         }
 
+        // Validate captcha
+        const captchaResponse = grecaptcha.getResponse();
+        if (!captchaResponse) {
+          showMessage(translations[currentLang]['signup.captcha_required'], 'error');
+          return;
+        }
+
         try {
           // Sign up user with Supabase Auth
           const { data, error } = await supabase.auth.signUp({
@@ -2673,6 +2696,7 @@
 
           showMessage('Registration successful! Please check your email to verify your account.', 'success');
           signupForm.reset();
+          grecaptcha.reset();
           
           // Close modal after 3 seconds
           setTimeout(() => {
@@ -2715,6 +2739,9 @@
         <div class="form-group">
           <label for="confirm-password" data-translate="signup.confirm_password">Confirm Password:</label>
           <input type="password" id="confirm-password" name="confirm-password" required>
+        </div>
+        <div class="captcha-container">
+          <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
         </div>
         <button type="submit" data-translate="signup.submit">Sign Up</button>
         <div id="signup-message" class="message"></div>
