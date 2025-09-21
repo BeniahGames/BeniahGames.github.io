@@ -1095,6 +1095,22 @@
                     } else {
                         profile = profileData;
                         targetUserId = profileData.id;
+                        
+                        // Fix for existing profiles: if username is null but display_name exists, update username
+                        if (!profile.username && profile.display_name && isOwnProfile) {
+                            console.log('Fixing missing username for existing profile...');
+                            const { error: updateError } = await supabase
+                                .from('profiles')
+                                .update({ username: profile.display_name })
+                                .eq('id', profile.id);
+                            
+                            if (!updateError) {
+                                profile.username = profile.display_name;
+                                console.log('Username updated to:', profile.username);
+                            } else {
+                                console.error('Failed to update username:', updateError);
+                            }
+                        }
                     }
                     
                     // Try to fetch role and progress data (optional)
