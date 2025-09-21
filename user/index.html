@@ -989,6 +989,7 @@
                         <span class="info-label">Last Login:</span>
                         <span class="info-value" id="info-last-login">-</span>
                     </div>
+                    <button id="refresh-profile" style="margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Refresh Profile</button>
                 </div>
                 
                 <div class="info-section">
@@ -1062,11 +1063,13 @@
                 let profile, currentRole, userProgress, targetUserId;
                 
                 try {
-                    // Try to fetch profile data by user ID
+                    // Try to fetch profile data by user ID (with cache busting)
+                    console.log('Fetching fresh profile data for user:', user.id);
                     const { data: profileData, error: pErr } = await supabase
                         .from('profiles')
                         .select('id, display_name, avatar_url, bio, username, email, created_at, games_played, high_score, total_playtime, achievements')
                         .eq('id', user.id)
+                        .order('created_at', { ascending: false })
                         .single();
                     
                     if (pErr && (pErr.code === 'PGRST116' || pErr.code === 'PGRST205')) {
@@ -1150,13 +1153,21 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('profile-content').style.display = 'block';
 
+            // Debug: Log the actual profile data
+            console.log('Profile data loaded:', {
+                username: profile.username,
+                display_name: profile.display_name,
+                email: profile.email,
+                id: profile.id
+            });
+
             // Set avatar initial - use display_name or username
             const displayName = profile.display_name || profile.username || user.email.split('@')[0];
             const avatarInitial = displayName.charAt(0).toUpperCase();
             document.getElementById('profile-avatar').textContent = avatarInitial;
 
-            // Set header info
-            document.getElementById('profile-username').textContent = displayName;
+            // Set header info - prioritize username over display_name for consistency
+            document.getElementById('profile-username').textContent = profile.username || profile.display_name || user.email.split('@')[0];
             document.getElementById('profile-email').textContent = user.email;
 
             // Set account info
@@ -1786,6 +1797,25 @@
               });
           } else {
               console.error('Username form or status element not found');
+          }
+          
+          // Add refresh profile button functionality
+          const refreshButton = document.getElementById('refresh-profile');
+          if (refreshButton) {
+              refreshButton.addEventListener('click', async () => {
+                  console.log('Refreshing profile data...');
+                  refreshButton.textContent = 'Refreshing...';
+                  refreshButton.disabled = true;
+                  
+                  try {
+                      // Reload the page to get fresh data
+                      window.location.reload();
+                  } catch (error) {
+                      console.error('Error refreshing profile:', error);
+                      refreshButton.textContent = 'Refresh Profile';
+                      refreshButton.disabled = false;
+                  }
+              });
           }
       }
       </script>
