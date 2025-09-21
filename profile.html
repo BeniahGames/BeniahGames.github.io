@@ -234,7 +234,7 @@
                     console.log('Profile error:', profileError);
                     
                     // Check if it's a table not found error or profile not found
-                    if (profileError.code === 'PGRST116' || profileError.message?.includes('relation "public.profiles" does not exist')) {
+                    if (profileError.code === 'PGRST116' || profileError.code === 'PGRST205' || profileError.message?.includes('relation "public.profiles" does not exist')) {
                         console.log('Using user auth data as fallback...');
                         // Create a profile object from user auth data
                         profile = {
