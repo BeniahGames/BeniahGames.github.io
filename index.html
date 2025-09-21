@@ -917,8 +917,7 @@
         <a href="devlogs/" data-translate="nav.devlogs">Devlogs</a>
         <a href="#contact" data-translate="nav.contact">Contact</a>
         <!-- Auth Button - transforms from signup to user menu when logged in -->
-        <div class="user-menu" id="auth-button">
-          <a href="#signup" id="signup-link" data-translate="nav.signup">Sign Up</a>
+        <div class="user-menu" id="auth-button" style="display: none;">
           <div class="user-dropdown">
             <a href="/user/" data-translate="nav.profile">Profile</a>
             <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
@@ -2957,7 +2956,8 @@
           // Update UI
           isUserLoggedIn = false;
           document.getElementById('user-icon-dropdown').style.display = 'none';
-          document.getElementById('signup-link').style.display = 'inline-block';
+          const signupLink = document.getElementById('signup-link');
+          if (signupLink) signupLink.style.display = 'inline-block';
           document.getElementById('user-menu').style.display = 'none';
           
           // Show success message
@@ -3082,21 +3082,27 @@
           if (!identifier.includes('@')) {
             console.log('Identifier appears to be username, looking up email...');
             
-            // Query Supabase to find user by username
-            const { data: userData, error: userError } = await supabase
-              .from('profiles')
-              .select('email')
-              .eq('username', identifier)
-              .single();
-            
-            if (userError || !userData) {
-              console.log('Username not found:', userError);
-              showLoginMessage('Invalid username or password.', 'error');
+            try {
+              // Query Supabase to find user by username
+              const { data: userData, error: userError } = await supabase
+                .from('profiles')
+                .select('email')
+                .eq('username', identifier)
+                .single();
+              
+              if (userError || !userData) {
+                console.log('Username not found or profiles table not set up:', userError);
+                showLoginMessage('Username login not available. Please use your email address.', 'error');
+                return;
+              }
+              
+              email = userData.email;
+              console.log('Found email for username');
+            } catch (profileError) {
+              console.log('Profiles table not accessible:', profileError);
+              showLoginMessage('Username login not available. Please use your email address.', 'error');
               return;
             }
-            
-            email = userData.email;
-            console.log('Found email for username');
           }
           
           // Sign in with email and password
@@ -3146,11 +3152,13 @@
           if (user) {
             // User is logged in
             isUserLoggedIn = true;
-            document.getElementById('signup-link').style.display = 'none';
+            const signupLink = document.getElementById('signup-link');
+            if (signupLink) signupLink.style.display = 'none';
           } else {
             // User is not logged in
             isUserLoggedIn = false;
-            document.getElementById('signup-link').style.display = 'inline-block';
+            const signupLink = document.getElementById('signup-link');
+            if (signupLink) signupLink.style.display = 'inline-block';
             document.getElementById('user-icon-dropdown').style.display = 'none';
           }
         } catch (error) {
@@ -3168,7 +3176,8 @@
           if (error) throw error;
           
           // Update UI
-          document.getElementById('signup-link').style.display = 'inline-block';
+          const signupLink = document.getElementById('signup-link');
+          if (signupLink) signupLink.style.display = 'inline-block';
           document.getElementById('user-menu').style.display = 'none';
           
           // Show success message
@@ -3189,7 +3198,8 @@
           checkAuthState();
         } else if (event === 'SIGNED_OUT') {
           isUserLoggedIn = false;
-          document.getElementById('signup-link').style.display = 'inline-block';
+          const signupLink = document.getElementById('signup-link');
+          if (signupLink) signupLink.style.display = 'inline-block';
           document.getElementById('user-menu').style.display = 'none';
           document.getElementById('user-icon-dropdown').style.display = 'none';
         }
