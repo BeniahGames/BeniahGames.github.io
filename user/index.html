@@ -271,33 +271,72 @@
             gap: 0.5rem;
         }
         
+        .user-icon-container {
+          position: relative;
+          display: inline-block;
+        }
+
         .user-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 42px;
-            height: 42px;
-            border: 1px solid var(--accent);
-            border-radius: 10px;
-            cursor: pointer;
-            background: transparent;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 42px;
+          height: 42px;
+          border: 1px solid var(--accent);
+          border-radius: 10px;
+          cursor: pointer;
+          background: transparent;
+          transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         
         .user-icon:hover {
-            background-color: rgba(255, 204, 0, 0.1);
-            border-color: var(--accent-2);
+          background-color: rgba(255, 204, 0, 0.1);
+          border-color: var(--accent-2);
         }
         
         .user-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: var(--accent);
-            transition: fill 0.3s ease;
+          width: 20px;
+          height: 20px;
+          fill: var(--accent);
+          transition: fill 0.3s ease;
         }
         
         .user-icon:hover svg {
-            fill: var(--accent-2);
+          fill: var(--accent-2);
+        }
+
+        .user-icon-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background: rgba(0, 0, 0, 0.95);
+          backdrop-filter: blur(20px);
+          border: 1px solid var(--accent);
+          border-radius: 10px;
+          min-width: 120px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          z-index: 1000;
+          margin-top: 8px;
+          overflow: hidden;
+        }
+
+        .user-icon-dropdown a {
+          display: block;
+          padding: 12px 16px;
+          color: var(--accent);
+          text-decoration: none;
+          transition: background-color 0.3s ease, color 0.3s ease;
+          font-size: 14px;
+          border-bottom: 1px solid rgba(255, 204, 0, 0.1);
+        }
+
+        .user-icon-dropdown a:last-child {
+          border-bottom: none;
+        }
+
+        .user-icon-dropdown a:hover {
+          background: rgba(255, 204, 0, 0.1);
+          color: var(--accent-2);
         }
         
         .hamburger{display:none;flex-direction:column;gap:.45rem;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--accent);border-radius:10px;cursor:pointer;background:transparent}
@@ -734,6 +773,7 @@
           </div>
         </div>
                 
+
                 <!-- Spotify Now Playing (Desktop) -->
                 <div class="now-playing desktop-only" id="now-playing-desktop">
                     <div class="np-art" id="np-art"></div>

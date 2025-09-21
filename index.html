@@ -284,6 +284,11 @@
       gap: 0.5rem;
     }
     
+    .user-icon-container {
+      position: relative;
+      display: inline-block;
+    }
+
     .user-icon {
       display: flex;
       align-items: center;
@@ -311,6 +316,40 @@
     
     .user-icon:hover svg {
       fill: var(--accent-2);
+    }
+
+    .user-icon-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      min-width: 120px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .user-icon-dropdown a {
+      display: block;
+      padding: 12px 16px;
+      color: var(--accent);
+      text-decoration: none;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255, 204, 0, 0.1);
+    }
+
+    .user-icon-dropdown a:last-child {
+      border-bottom: none;
+    }
+
+    .user-icon-dropdown a:hover {
+      background: rgba(255, 204, 0, 0.1);
+      color: var(--accent-2);
     }
     
     .hamburger{display:none;flex-direction:column;gap:.45rem;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--accent);border-radius:10px;cursor:pointer;background:transparent}
@@ -955,11 +994,17 @@
           </div>
         </div>
         
-        <button class="user-icon" id="user-icon" aria-label="User menu">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-        </button>
+        <div class="user-icon-container">
+          <button class="user-icon" id="user-icon" aria-label="User menu">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </button>
+          <div class="user-icon-dropdown" id="user-icon-dropdown" style="display: none;">
+            <a href="/user/" data-translate="nav.profile">Profile</a>
+            <a href="#" id="user-icon-logout" data-translate="nav.logout">Logout</a>
+          </div>
+        </div>
         <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button>
       </div>
 
@@ -2875,10 +2920,55 @@
         });
       });
 
-      // Open modal when user icon is clicked
+      // User icon click handler - shows dropdown if logged in, modal if not
+      let isUserLoggedIn = false;
+      
       userIcon.addEventListener('click', (e) => {
         e.preventDefault();
-        openSignupModal();
+        e.stopPropagation();
+        
+        if (isUserLoggedIn) {
+          // Toggle dropdown
+          const dropdown = document.getElementById('user-icon-dropdown');
+          const isVisible = dropdown.style.display === 'block';
+          dropdown.style.display = isVisible ? 'none' : 'block';
+        } else {
+          // Open signup modal
+          openSignupModal();
+        }
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('user-icon-dropdown');
+        const container = document.querySelector('.user-icon-container');
+        
+        if (!container.contains(e.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+
+      // Logout functionality for user icon dropdown
+      document.getElementById('user-icon-logout').addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) throw error;
+          
+          // Update UI
+          isUserLoggedIn = false;
+          document.getElementById('user-icon-dropdown').style.display = 'none';
+          document.getElementById('signup-link').style.display = 'inline-block';
+          document.getElementById('user-menu').style.display = 'none';
+          
+          // Show success message
+          showMessage('Logged out successfully!', 'success');
+          
+        } catch (error) {
+          console.error('Logout error:', error);
+          showMessage('Error logging out. Please try again.', 'error');
+        }
       });
 
       // Close modal when X is clicked
@@ -3057,15 +3147,19 @@
           
           if (user) {
             // User is logged in
+            isUserLoggedIn = true;
             document.getElementById('signup-link').style.display = 'none';
             document.getElementById('user-link').style.display = 'inline-block';
           } else {
             // User is not logged in
+            isUserLoggedIn = false;
             document.getElementById('signup-link').style.display = 'inline-block';
             document.getElementById('user-link').style.display = 'none';
+            document.getElementById('user-icon-dropdown').style.display = 'none';
           }
         } catch (error) {
           console.error('Error checking auth state:', error);
+          isUserLoggedIn = false;
         }
       }
 
@@ -3098,8 +3192,10 @@
         if (event === 'SIGNED_IN') {
           checkAuthState();
         } else if (event === 'SIGNED_OUT') {
+          isUserLoggedIn = false;
           document.getElementById('signup-link').style.display = 'inline-block';
           document.getElementById('user-menu').style.display = 'none';
+          document.getElementById('user-icon-dropdown').style.display = 'none';
         }
       });
     });
