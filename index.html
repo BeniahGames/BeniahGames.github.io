@@ -2931,7 +2931,18 @@
         return data === true; 
       }
 
-      async function signUpWithUsername({ email, password, username }) { 
+      function generateRandomUsername() {
+        const adjectives = ['Cool', 'Swift', 'Brave', 'Clever', 'Mighty', 'Silent', 'Golden', 'Silver', 'Cosmic', 'Mystic'];
+        const nouns = ['Gamer', 'Player', 'Hero', 'Warrior', 'Explorer', 'Champion', 'Legend', 'Master', 'Ninja', 'Phoenix'];
+        const randomNum = Math.floor(Math.random() * 1000);
+        
+        const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const noun = nouns[Math.floor(Math.random() * nouns.length)];
+        
+        return `${adjective}${noun}${randomNum}`;
+      }
+
+      async function signUpWithUsername({ email, password }) { 
         // 1) Sign up 
         const { data, error } = await supabase.auth.signUp({ email, password }); 
         if (error) throw error; 
@@ -2949,7 +2960,26 @@
           } 
         } 
       
-        // 3) Upsert profile row with correct PK = auth user id 
+        // 3) Generate a random username and ensure it's unique
+        let username = generateRandomUsername();
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        while (attempts < maxAttempts) {
+          const isAvailable = await checkUsername(username);
+          if (isAvailable) {
+            break;
+          }
+          username = generateRandomUsername();
+          attempts++;
+        }
+        
+        if (attempts >= maxAttempts) {
+          // If we can't find a unique username after 10 attempts, use timestamp
+          username = `User${Date.now()}`;
+        }
+      
+        // 4) Upsert profile row with correct PK = auth user id 
         const { data: userData } = await supabase.auth.getUser(); 
         const uid = userData?.user?.id; 
         if (!uid) return { partial: true, reason: 'no_uid' }; 
@@ -2967,7 +2997,7 @@
           return { partial: true, reason: upsertErr.message }; 
         } 
       
-        return { partial: false }; 
+        return { partial: false, username }; 
       }
 
       async function saveUsername(username) {
@@ -3163,65 +3193,18 @@
         }
       });
 
-      // Username availability checking
-      const usernameInput = document.getElementById('username');
-      const usernameFeedback = document.getElementById('username-feedback');
-      let usernameCheckTimeout;
 
-      function showUsernameFeedback(message, type) {
-        usernameFeedback.textContent = message;
-        usernameFeedback.className = `username-feedback ${type}`;
-        usernameFeedback.style.display = 'block';
-      }
-
-      function hideUsernameFeedback() {
-        usernameFeedback.style.display = 'none';
-      }
-
-      usernameInput.addEventListener('input', (e) => {
-        const username = e.target.value.trim();
-        
-        // Clear previous timeout
-        if (usernameCheckTimeout) {
-          clearTimeout(usernameCheckTimeout);
-        }
-
-        // Hide feedback if empty
-        if (!username) {
-          hideUsernameFeedback();
-          return;
-        }
-
-        // Show checking state
-        showUsernameFeedback('Checking availability...', 'checking');
-
-        // Debounce the check
-        usernameCheckTimeout = setTimeout(async () => {
-          try {
-            const isAvailable = await checkUsername(username);
-            if (isAvailable) {
-              showUsernameFeedback('✓ Username is available', 'available');
-            } else {
-              showUsernameFeedback('✗ Username is already taken', 'taken');
-            }
-          } catch (error) {
-            console.error('Username check error:', error);
-            showUsernameFeedback('Unable to check availability', 'taken');
-          }
-        }, 500); // 500ms delay
-      });
 
       // Form submission
       signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         console.log('Form submission started');
         
-        const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
         
-        console.log('Form values:', { username, email, password: '***', confirmPassword: '***' });
+        console.log('Form values:', { email, password: '***', confirmPassword: '***' });
 
         // Clear previous messages
         messageDiv.style.display = 'none';
@@ -3235,19 +3218,6 @@
 
         if (password.length < 6) {
           showMessage('Password must be at least 6 characters long!', 'error');
-          return;
-        }
-
-        // Check username availability before creating account
-        try {
-          const isUsernameAvailable = await checkUsername(username);
-          if (!isUsernameAvailable) {
-            showMessage('Username is already taken. Please choose a different one.', 'error');
-            return;
-          }
-        } catch (usernameError) {
-          console.error('Username availability check failed:', usernameError);
-          showMessage('Unable to verify username availability. Please try again.', 'error');
           return;
         }
 
@@ -3269,7 +3239,7 @@
 
         try {
           // Use the new signUpWithUsername function
-          const result = await signUpWithUsername({ email, password, username });
+          const result = await signUpWithUsername({ email, password });
 
           if (result.partial) {
             // Handle partial signup scenarios
@@ -3469,11 +3439,6 @@
       <!-- Signup Form -->
       <div id="signup-form-container" class="form-container">
         <form id="signup-form">
-          <div class="form-group">
-            <label for="username" data-translate="signup.username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <div id="username-feedback" class="username-feedback"></div>
-          </div>
           <div class="form-group">
             <label for="email" data-translate="signup.email">Email:</label>
             <input type="email" id="email" name="email" required>

@@ -596,6 +596,72 @@
             border-color: var(--accent);
         }
 
+        /* Username form styling */
+        #username-form {
+            margin-top: 1rem;
+        }
+
+        #username-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        #username-form label {
+            display: block;
+            color: var(--text);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        #username-form input[type="text"] {
+            width: 100%;
+            background: var(--panel-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: var(--text);
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        #username-form input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        #username-form button[type="submit"] {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #username-form button[type="submit"]:hover {
+            background: var(--accent-hover);
+        }
+
+        #status {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        #status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        #status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -917,6 +983,18 @@
                         <span class="info-label">Last Login:</span>
                         <span class="info-value" id="info-last-login">-</span>
                     </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3>Change Username</h3>
+                    <form id="username-form">
+                        <div class="form-group">
+                            <label for="username">New username:</label>
+                            <input type="text" id="username" required />
+                        </div>
+                        <button type="submit">Update</button>
+                        <p id="status"></p>
+                    </form>
                 </div>
                 
                 <div class="info-section">
@@ -1541,6 +1619,69 @@
                   });
               });
           })();
+
+          // Username change functionality
+          const usernameForm = document.getElementById("username-form");
+          const statusElement = document.getElementById("status");
+
+          if (usernameForm && statusElement) {
+              usernameForm.addEventListener("submit", async (e) => {
+                  e.preventDefault();
+                  const newUsername = document.getElementById("username").value.trim();
+
+                  // Clear previous status
+                  statusElement.textContent = "";
+                  statusElement.className = "";
+
+                  if (!newUsername) {
+                      statusElement.textContent = "Please enter a username.";
+                      statusElement.className = "error";
+                      return;
+                  }
+
+                  try {
+                      // Current logged in user
+                      const { data: { user }, error: userErr } = await supabase.auth.getUser();
+                      if (userErr || !user) {
+                          statusElement.textContent = "Not logged in.";
+                          statusElement.className = "error";
+                          return;
+                      }
+
+                      // Update their profile
+                      const { error } = await supabase
+                          .from("profiles")
+                          .update({ username: newUsername, display_name: newUsername })
+                          .eq("id", user.id);
+
+                      if (error) {
+                          if (error.code === "23505") {
+                              statusElement.textContent = "Username already taken.";
+                              statusElement.className = "error";
+                          } else {
+                              statusElement.textContent = "Error: " + error.message;
+                              statusElement.className = "error";
+                          }
+                      } else {
+                          statusElement.textContent = "Username updated successfully!";
+                          statusElement.className = "success";
+                          
+                          // Update the displayed username in the profile
+                          const usernameDisplay = document.getElementById("info-username");
+                          const profileUsername = document.getElementById("profile-username");
+                          if (usernameDisplay) usernameDisplay.textContent = newUsername;
+                          if (profileUsername) profileUsername.textContent = newUsername;
+                          
+                          // Clear the form
+                          document.getElementById("username").value = "";
+                      }
+                  } catch (error) {
+                      console.error("Username update error:", error);
+                      statusElement.textContent = "An unexpected error occurred.";
+                      statusElement.className = "error";
+                  }
+              });
+          }
       </script>
 </body>
 </html>
