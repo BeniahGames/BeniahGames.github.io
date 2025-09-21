@@ -725,14 +725,14 @@
                 <a href="../devlogs/" data-translate="nav.devlogs">Devlogs</a>
                 <a href="../#contact" data-translate="nav.contact">Contact</a>
                 <!-- Auth Button - transforms from signup to user menu when logged in -->
-                <div class="user-menu" id="auth-button">
-                    <a href="../#signup" id="signup-link" data-translate="nav.signup">Sign Up</a>
-                    <a href="/user/" class="user-link" id="user-link" data-translate="nav.profile" style="display: none;">Profile</a>
-                    <div class="user-dropdown">
-                        <a href="/user/" data-translate="nav.profile">Profile</a>
-                        <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
-                    </div>
-                </div>
+        <div class="user-menu" id="auth-button">
+          <a href="../#signup" id="signup-link" data-translate="nav.signup">Sign Up</a>
+          <a href="/user/" class="user-link" id="user-link" data-translate="nav.profile" style="display: none;">Profile</a>
+          <div class="user-dropdown" id="user-menu" style="display: none;">
+            <a href="/user/" data-translate="nav.profile">Profile</a>
+            <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
+          </div>
+        </div>
                 
                 <!-- Spotify Now Playing (Desktop) -->
                 <div class="now-playing desktop-only" id="now-playing-desktop">
@@ -1058,8 +1058,84 @@
 
 
 
+        // User authentication state handling
+        async function checkAuthState() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (user) {
+                    // User is logged in
+                    document.getElementById('signup-link').style.display = 'none';
+                    document.getElementById('user-link').style.display = 'inline-block';
+                    document.getElementById('user-menu').style.display = 'block';
+                    
+                    // Mobile elements
+                    const mobileSignupLink = document.getElementById('mobile-signup-link');
+                    const mobileUserLink = document.getElementById('mobile-user-link');
+                    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+                    
+                    if (mobileSignupLink) mobileSignupLink.style.display = 'none';
+                    if (mobileUserLink) mobileUserLink.style.display = 'block';
+                    if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'block';
+                } else {
+                    // User is not logged in - redirect to main page
+                    window.location.href = '../#signup';
+                }
+            } catch (error) {
+                console.error('Error checking auth state:', error);
+                window.location.href = '../#signup';
+            }
+        }
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                
+                // Redirect to main page after logout
+                window.location.href = '../';
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Error logging out. Please try again.');
+            }
+        });
+
+        // Mobile logout functionality
+        const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+        if (mobileLogoutBtn) {
+            mobileLogoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                
+                try {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) throw error;
+                    
+                    // Redirect to main page after logout
+                    window.location.href = '../';
+                    
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('Error logging out. Please try again.');
+                }
+            });
+        }
+
         // Load profile when page loads
-        document.addEventListener('DOMContentLoaded', loadProfile);
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthState();
+            loadProfile();
+        });
+
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') {
+                window.location.href = '../';
+            }
+        });
     </script>
 </body>
 </html>
