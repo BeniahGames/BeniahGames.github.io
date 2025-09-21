@@ -662,6 +662,12 @@
             border: 1px solid #f5c6cb;
         }
 
+        #status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -1620,14 +1626,34 @@
               });
           })();
 
+          // Add checkUsername function for username availability checking
+          async function checkUsername(name) { 
+              try {
+                  const { data, error } = await supabase.rpc('is_username_available', { p_username: name }); 
+                  if (error) { 
+                      console.error('Username check error:', error); 
+                      return false; 
+                  } 
+                  return data === true; 
+              } catch (err) {
+                  console.error('Username check exception:', err);
+                  return false;
+              }
+          }
+
           // Username change functionality
           const usernameForm = document.getElementById("username-form");
           const statusElement = document.getElementById("status");
 
+          console.log('Username form elements:', { usernameForm, statusElement });
+
           if (usernameForm && statusElement) {
               usernameForm.addEventListener("submit", async (e) => {
                   e.preventDefault();
+                  console.log('Username form submitted');
+                  
                   const newUsername = document.getElementById("username").value.trim();
+                  console.log('New username:', newUsername);
 
                   // Clear previous status
                   statusElement.textContent = "";
@@ -1639,30 +1665,58 @@
                       return;
                   }
 
+                  // Show loading state
+                  statusElement.textContent = "Updating username...";
+                  statusElement.className = "loading";
+
                   try {
                       // Current logged in user
+                      console.log('Getting current user...');
                       const { data: { user }, error: userErr } = await supabase.auth.getUser();
+                      console.log('User data:', { user, userErr });
+                      
                       if (userErr || !user) {
-                          statusElement.textContent = "Not logged in.";
+                          console.error('User authentication error:', userErr);
+                          statusElement.textContent = "Not logged in. Please refresh and try again.";
+                          statusElement.className = "error";
+                          return;
+                      }
+
+                      // Check if username is available
+                      console.log('Checking username availability...');
+                      const isAvailable = await checkUsername(newUsername);
+                      console.log('Username availability:', isAvailable);
+                      
+                      if (!isAvailable) {
+                          statusElement.textContent = "Username is already taken. Please choose a different one.";
                           statusElement.className = "error";
                           return;
                       }
 
                       // Update their profile
-                      const { error } = await supabase
+                      console.log('Updating profile for user ID:', user.id);
+                      const { data: updateData, error } = await supabase
                           .from("profiles")
                           .update({ username: newUsername, display_name: newUsername })
-                          .eq("id", user.id);
+                          .eq("id", user.id)
+                          .select();
+
+                      console.log('Update result:', { updateData, error });
 
                       if (error) {
+                          console.error('Profile update error:', error);
                           if (error.code === "23505") {
                               statusElement.textContent = "Username already taken.";
+                              statusElement.className = "error";
+                          } else if (error.code === "42501") {
+                              statusElement.textContent = "Permission denied. Please check your account permissions.";
                               statusElement.className = "error";
                           } else {
                               statusElement.textContent = "Error: " + error.message;
                               statusElement.className = "error";
                           }
                       } else {
+                          console.log('Username updated successfully');
                           statusElement.textContent = "Username updated successfully!";
                           statusElement.className = "success";
                           
@@ -1676,11 +1730,13 @@
                           document.getElementById("username").value = "";
                       }
                   } catch (error) {
-                      console.error("Username update error:", error);
-                      statusElement.textContent = "An unexpected error occurred.";
+                      console.error("Username update exception:", error);
+                      statusElement.textContent = "An unexpected error occurred: " + error.message;
                       statusElement.className = "error";
                   }
               });
+          } else {
+              console.error('Username form or status element not found');
           }
       </script>
 </body>
