@@ -369,14 +369,50 @@
     }
     
     @media(max-width:768px){
-      .nav-links{display:flex;flex-wrap:wrap;gap:0.5rem}
+      .nav-links{display:none} /* Hide nav-links on mobile */
       .nav-links > a{display:none}
       .hamburger{display:flex}
-      /* Ensure proper spacing and scaling on mobile */
-      .nav-inner{padding:.5rem 1rem;flex-wrap:wrap}
-      .brand{flex-shrink:0}
+      /* Create two-row layout for mobile navigation */
+      .nav-inner{
+        padding:.5rem 1rem;
+        flex-direction:column;
+        gap:0.5rem;
+        align-items:stretch;
+      }
+      /* First row: brand and hamburger */
+      .nav-inner > .brand,
+      .nav-inner > .hamburger {
+        align-self:flex-start;
+      }
+      .nav-inner > .brand {
+        flex-shrink:0;
+      }
+      /* Second row: user controls */
+      .user-controls {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        width:100%;
+        padding:0.25rem 0;
+        gap:0.5rem;
+      }
+      /* Position hamburger in top right */
+      .hamburger {
+        position:absolute;
+        top:0.5rem;
+        right:1rem;
+      }
       /* Hide desktop Spotify widget in navigation on mobile */
       .nav-links .now-playing.desktop-only{display:none !important}
+      
+      /* Show mobile Discord button and hide desktop one */
+      .nav-links .btn-discord {
+        display: none;
+      }
+      
+      .user-controls .mobile-discord {
+        display: flex;
+      }
     }
     .menu-panel{
       position:absolute;top:100%;left:0;right:0;background:rgba(13,14,16,.97);border-bottom:1px solid var(--border);
@@ -916,8 +952,14 @@
     }
 
     .user-controls .language-selector,
-    .user-controls .volume-control {
+    .user-controls .volume-control,
+    .user-controls .btn-discord {
       margin: 0;
+    }
+
+    /* Hide mobile Discord button on desktop */
+    .user-controls .mobile-discord {
+      display: none;
     }
   </style>
 </head>
@@ -981,6 +1023,11 @@
 
       <!-- User Controls -->
       <div class="user-controls">
+        <!-- Discord Button (Mobile) -->
+        <a class="btn-discord mobile-discord" href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener" aria-label="Discord">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.865-.608 1.249a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.077.077 0 00.084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.104c-.652-.247-1.27-.55-1.845-.899a.077.077 0 01-.007-.127c.124-.093.248-.19.366-.287a.074.074 0 01.077-.01c3.869 1.776 8.065 1.776 11.896 0a.075.075 0 01.078.009c.118.098.242.195.366.288a.077.077 0 01-.006.127 12.298 12.298 0 01-1.846.898.077.077 0 00-.04.105c.36.698.772 1.364 1.225 1.994a.076.076 0 00.084.027 19.876 19.876 0 005.994-3.03.077.077 0 00.031-.056c.5-5.177-.838-9.673-3.548-13.66a.06.06 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.947 2.419-2.157 2.419z"/></svg>
+          Discord
+        </a>
         <!-- Language Selector -->
         <div class="language-selector" id="language-selector">
           <button class="language-btn" id="language-btn" aria-label="Select language">
