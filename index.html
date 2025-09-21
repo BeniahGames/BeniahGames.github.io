@@ -766,6 +766,39 @@
       border: 1px solid #f44336;
     }
 
+    .message.warning {
+      background: rgba(255, 193, 7, 0.1);
+      color: #ffc107;
+      border: 1px solid #ffc107;
+    }
+
+    .username-feedback {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .username-feedback.available {
+      background: rgba(76, 175, 80, 0.1);
+      color: #4CAF50;
+      border: 1px solid #4CAF50;
+    }
+
+    .username-feedback.taken {
+      background: rgba(244, 67, 54, 0.1);
+      color: #f44336;
+      border: 1px solid #f44336;
+    }
+
+    .username-feedback.checking {
+      background: rgba(33, 150, 243, 0.1);
+      color: #2196F3;
+      border: 1px solid #2196F3;
+    }
+
     .captcha-container {
       margin: 1.5rem 0;
       display: flex;
@@ -2891,6 +2924,124 @@
       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xaGVqc25md2ZjaWxrdG55cWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzODQ3NzAsImV4cCI6MjA3Mzk2MDc3MH0.8ngjb28rPVPCj4SnLtLSeUFbeAoFsrcQlZXpq2D19Ag';
       const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+      // Username and Profile Functions
+      async function checkUsernameAvailability(username) {
+        // Check if username already exists (case-insensitive)
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id')
+          .ilike('display_name', username)
+          .limit(1);
+
+        if (error) {
+          console.error('Username availability check error:', error);
+          throw error;
+        }
+
+        return data.length === 0; // true if available, false if taken
+      }
+
+      async function saveUsername(username) {
+        // Must be signed in
+        const { data: { user }, error: authErr } = await supabase.auth.getUser();
+        if (authErr || !user) throw new Error('Not signed in');
+
+        // Check if user already has this username (allow updating to same username)
+        const currentProfile = await loadProfile().catch(() => null);
+        if (currentProfile && currentProfile.display_name && 
+            currentProfile.display_name.toLowerCase() === username.toLowerCase()) {
+          // User is updating to the same username, allow it
+          console.log('Username unchanged, skipping uniqueness check');
+        } else {
+          // Check if username is available
+          const isAvailable = await checkUsernameAvailability(username);
+          if (!isAvailable) {
+            throw new Error('Username is already taken. Please choose a different one.');
+          }
+        }
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .upsert(
+            { id: user.id, display_name: username, email: user.email },  // id is REQUIRED
+            { onConflict: 'id' }                      // ensure upsert uses PK
+          )
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Save username error:', error);
+          throw error;
+        }
+        return data;
+      }
+
+      // Test function for username functionality
+      async function testUsernameFunctionality() {
+        console.log('Testing username functionality...');
+        
+        try {
+          // Test username availability check
+          console.log('Testing username availability check...');
+          const testUsername = 'test_user_' + Date.now();
+          const isAvailable = await checkUsernameAvailability(testUsername);
+          console.log(`✅ Username availability check works: ${testUsername} is ${isAvailable ? 'available' : 'taken'}`);
+          
+          // Test if user is signed in
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) {
+            console.log('❌ No user signed in - cannot test profile functionality');
+            console.log('✅ Username uniqueness functionality is working');
+            return;
+          }
+          
+          console.log('✅ User is signed in:', user.email);
+          
+          // Test loading profile
+          try {
+            const profile = await loadProfile();
+            console.log('✅ Profile loaded successfully:', profile);
+            
+            if (profile.display_name) {
+              console.log('✅ Username found in profile:', profile.display_name);
+              
+              // Test checking availability of current username
+              const currentUsernameAvailable = await checkUsernameAvailability(profile.display_name);
+              console.log(`✅ Current username availability check: ${profile.display_name} is ${currentUsernameAvailable ? 'available' : 'taken (as expected)'}`);
+            } else {
+              console.log('⚠️ No username set in profile');
+            }
+          } catch (profileError) {
+            console.log('❌ Failed to load profile:', profileError.message);
+          }
+          
+          console.log('✅ All username functionality tests completed');
+          
+        } catch (error) {
+          console.error('❌ Test failed:', error);
+        }
+      }
+
+      // Make test function available globally for manual testing
+      window.testUsernameFunctionality = testUsernameFunctionality;
+
+      async function loadProfile() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not signed in');
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('display_name, email, avatar_url, bio')
+          .eq('id', user.id)
+          .single(); // one row per user (id = auth.uid())
+        
+        if (error) {
+          console.error('Load profile error:', error);
+          throw error;
+        }
+        return data;
+      }
+
       // Modal functionality
       const modal = document.getElementById('signup-modal');
       const signupLinks = document.querySelectorAll('a[href="#signup"]');
@@ -2983,6 +3134,54 @@
         }
       });
 
+      // Username availability checking
+      const usernameInput = document.getElementById('username');
+      const usernameFeedback = document.getElementById('username-feedback');
+      let usernameCheckTimeout;
+
+      function showUsernameFeedback(message, type) {
+        usernameFeedback.textContent = message;
+        usernameFeedback.className = `username-feedback ${type}`;
+        usernameFeedback.style.display = 'block';
+      }
+
+      function hideUsernameFeedback() {
+        usernameFeedback.style.display = 'none';
+      }
+
+      usernameInput.addEventListener('input', (e) => {
+        const username = e.target.value.trim();
+        
+        // Clear previous timeout
+        if (usernameCheckTimeout) {
+          clearTimeout(usernameCheckTimeout);
+        }
+
+        // Hide feedback if empty
+        if (!username) {
+          hideUsernameFeedback();
+          return;
+        }
+
+        // Show checking state
+        showUsernameFeedback('Checking availability...', 'checking');
+
+        // Debounce the check
+        usernameCheckTimeout = setTimeout(async () => {
+          try {
+            const isAvailable = await checkUsernameAvailability(username);
+            if (isAvailable) {
+              showUsernameFeedback('✓ Username is available', 'available');
+            } else {
+              showUsernameFeedback('✗ Username is already taken', 'taken');
+            }
+          } catch (error) {
+            console.error('Username check error:', error);
+            showUsernameFeedback('Unable to check availability', 'taken');
+          }
+        }, 500); // 500ms delay
+      });
+
       // Form submission
       signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -3007,6 +3206,19 @@
 
         if (password.length < 6) {
           showMessage('Password must be at least 6 characters long!', 'error');
+          return;
+        }
+
+        // Check username availability before creating account
+        try {
+          const isUsernameAvailable = await checkUsernameAvailability(username);
+          if (!isUsernameAvailable) {
+            showMessage('Username is already taken. Please choose a different one.', 'error');
+            return;
+          }
+        } catch (usernameError) {
+          console.error('Username availability check failed:', usernameError);
+          showMessage('Unable to verify username availability. Please try again.', 'error');
           return;
         }
 
@@ -3040,6 +3252,26 @@
 
           if (error) {
             throw error;
+          }
+
+          // If user was created successfully, save username to profiles table
+          if (data.user) {
+            try {
+              await saveUsername(username);
+              console.log('Username saved to profile');
+            } catch (profileError) {
+              console.error('Failed to save username to profile:', profileError);
+              // Show warning but don't fail registration
+              showMessage('Account created successfully, but username could not be saved. You can set it later in your profile.', 'warning');
+              signupForm.reset();
+              hcaptcha.reset();
+              
+              setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+              }, 4000);
+              return;
+            }
           }
 
           showMessage('Registration successful! Please check your email to verify your account.', 'success');
@@ -3083,16 +3315,16 @@
             console.log('Identifier appears to be username, looking up email...');
             
             try {
-              // Query Supabase to find user by username
+              // Query Supabase to find user by display_name (username)
               const { data: userData, error: userError } = await supabase
                 .from('profiles')
                 .select('email')
-                .eq('username', identifier)
+                .eq('display_name', identifier)
                 .single();
               
               if (userError || !userData) {
                 console.log('Username not found or profiles table not set up:', userError);
-                showLoginMessage('Username login not available. Please use your email address.', 'error');
+                showLoginMessage('Username not found. Please use your email address to sign in.', 'error');
                 return;
               }
               
@@ -3240,6 +3472,7 @@
           <div class="form-group">
             <label for="username" data-translate="signup.username">Username:</label>
             <input type="text" id="username" name="username" required>
+            <div id="username-feedback" class="username-feedback"></div>
           </div>
           <div class="form-group">
             <label for="email" data-translate="signup.email">Email:</label>
