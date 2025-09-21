@@ -552,15 +552,21 @@
         async function getUserName() {
             // Check if user is authenticated
             const user = await getCurrentUser();
+            const signInMessage = document.querySelector('.join-form p');
+            
             if (user && user.username) {
                 gameState.myId = user.id;
                 gameState.myName = user.username;
                 document.getElementById('currentUserName').textContent = user.username;
+                // Hide sign-in message for authenticated users
+                if (signInMessage) signInMessage.style.display = 'none';
             } else {
                 // Generate a guest name and ID
                 gameState.myId = 'guest_' + Math.random().toString(36).substr(2, 9);
                 gameState.myName = 'Guest' + Math.floor(Math.random() * 1000);
                 document.getElementById('currentUserName').textContent = gameState.myName;
+                // Show sign-in message for guests
+                if (signInMessage) signInMessage.style.display = 'block';
             }
         }
 
@@ -876,6 +882,10 @@
             
             // Add player to room
             await addPlayerToRoom(room.id);
+            
+            // Load initial game data (including players)
+            await loadInitialGameData();
+            
             addSystemMessage(`Room ${roomCode} created! Share this code with friends.`);
         }
 
@@ -910,6 +920,10 @@
             
             // Add player to room
             await addPlayerToRoom(room.id);
+            
+            // Load initial game data (including players)
+            await loadInitialGameData();
+            
             addSystemMessage(`Joined room ${roomCode.toUpperCase()}`);
         }
 
@@ -1219,6 +1233,11 @@
                 
                 playersList.appendChild(div);
             });
+            
+            // Update player count display
+            const playerCount = gameState.players.size;
+            const maxPlayers = 10; // Default max players
+            document.getElementById('playerCount').textContent = `${playerCount}/${maxPlayers}`;
         }
 
         function startGame() {
@@ -1398,30 +1417,6 @@
         function addPlayer(id, name, score) {
             gameState.players.set(id, { id, name, score });
             updatePlayerList();
-            updatePlayerCount();
-        }
-
-        function updatePlayerList() {
-            const list = document.getElementById('playerList');
-            list.innerHTML = '';
-            
-            gameState.players.forEach(player => {
-                const div = document.createElement('div');
-                div.className = 'player';
-                if (player.id === gameState.currentPlayer) {
-                    div.classList.add('current-turn');
-                }
-                
-                div.innerHTML = `
-                    <span class="player-name">${player.name}</span>
-                    <span class="player-score">${player.score}</span>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function updatePlayerCount() {
-            document.getElementById('playerCount').textContent = gameState.players.size;
         }
 
         async function sendMessage() {
