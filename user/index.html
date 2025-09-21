@@ -211,31 +211,28 @@
 
         async function loadProfile() {
             try {
-                // Get username from URL path (e.g., /user/leyno or /leyno)
-                const pathParts = window.location.pathname.split('/').filter(part => part);
-                let requestedUsername = pathParts[pathParts.length - 1]; // Get the last part of the path
+                // Get username from URL parameters (e.g., /user/?u=leyno or /user/#leyno)
+                const urlParams = new URLSearchParams(window.location.search);
+                let requestedUsername = urlParams.get('u') || urlParams.get('user');
                 
-                // Handle different URL patterns
-                if (pathParts.length >= 2 && pathParts[pathParts.length - 2] === 'user') {
-                    // URL like /user/leyno
-                    requestedUsername = pathParts[pathParts.length - 1];
-                } else if (pathParts.length === 1 && pathParts[0] !== 'user') {
-                    // URL like /leyno (direct username)
-                    requestedUsername = pathParts[0];
-                } else {
-                    // URL like /user/ or /user/index.html
-                    requestedUsername = null;
+                // Also check hash for username (e.g., /user/#leyno)
+                if (!requestedUsername && window.location.hash) {
+                    const hashUsername = window.location.hash.substring(1); // Remove the #
+                    if (hashUsername && hashUsername !== 'signup') {
+                        requestedUsername = hashUsername;
+                    }
                 }
                 
                 // Check if user is authenticated
                 const { data: { user }, error: authError } = await supabase.auth.getUser();
                 
                 // Debug information
-                console.log('Path parts:', pathParts);
+                console.log('URL params:', window.location.search);
+                console.log('Hash:', window.location.hash);
                 console.log('Requested username:', requestedUsername);
                 
                 // If no specific username is requested, redirect to current user's profile
-                if (!requestedUsername || requestedUsername === 'user' || requestedUsername === 'index.html') {
+                if (!requestedUsername) {
                     if (authError || !user) {
                         showError('Please log in to view your profile.');
                         setTimeout(() => {
@@ -246,8 +243,8 @@
                     
                     // Get current user's username and redirect
                     const currentUsername = user.user_metadata?.username || user.email.split('@')[0];
-                    // Use relative path for better compatibility
-                    window.location.href = `/user/${currentUsername}`;
+                    // Use URL parameter for GitHub Pages compatibility
+                    window.location.href = `/user/?u=${currentUsername}`;
                     return;
                 }
                 
