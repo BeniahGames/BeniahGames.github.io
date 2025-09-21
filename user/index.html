@@ -822,25 +822,17 @@
                 <!-- Volume Control -->
                 <div class="volume-control" id="volume-control">
                     <button class="volume-btn" id="volume-btn" aria-label="Volume control">
-                        <span id="volume-icon">🔊</span>
+                        <svg class="volume-icon" id="volume-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        </svg>
                     </button>
-                    <div class="volume-slider" id="volume-slider">
-                        <input type="range" id="volume-range" min="0" max="100" value="50" aria-label="Volume">
+                    <div class="volume-slider-container" id="volume-slider-container">
+                        <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="0" aria-label="Volume level">
+                        <div class="volume-percentage" id="volume-percentage">0%</div>
                     </div>
                 </div>
 
-                <!-- User Icon -->
-                <div class="user-icon-container">
-                    <button class="user-icon" id="user-icon" aria-label="User menu">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        </svg>
-                    </button>
-                    <div class="user-icon-dropdown" id="user-icon-dropdown" style="display: none;">
-                        <a href="/user/" data-translate="nav.profile">Profile</a>
-                        <a href="#" id="user-icon-logout" data-translate="nav.logout">Logout</a>
-                    </div>
-                </div>
+
             </div>
 
             <!-- Mobile -->
@@ -855,6 +847,17 @@
                     </div>
                 </div>
 
+                <div class="user-icon-container">
+                    <button class="user-icon" id="user-icon" aria-label="User menu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </button>
+                    <div class="user-icon-dropdown" id="user-icon-dropdown" style="display: none;">
+                        <a href="/user/" data-translate="nav.profile">Profile</a>
+                        <a href="#" id="user-icon-logout" data-translate="nav.logout">Logout</a>
+                    </div>
+                </div>
                 <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="Open menu">
                     <span></span><span></span><span></span>
                 </button>
@@ -1171,6 +1174,138 @@
                 window.location.href = '../';
             }
         });
-    </script>
+
+        // Hamburger menu
+        (() => {
+            const hamburger = document.getElementById('hamburger');
+            const panel = document.getElementById('menu-panel');
+            
+            if (hamburger && panel) {
+                hamburger.addEventListener('click', async () => {
+                    const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+                    
+                    // Play sound effect when opening menu
+                    if (window.audioManager && !isOpen) {
+                        await window.audioManager.playSound('holographicOpen');
+                    }
+                    
+                    hamburger.setAttribute('aria-expanded', !isOpen);
+                    panel.classList.toggle('open', !isOpen);
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!hamburger.contains(e.target) && !panel.contains(e.target)) {
+                        hamburger.setAttribute('aria-expanded', 'false');
+                        panel.classList.remove('open');
+                    }
+                });
+
+                // Close menu when pressing escape
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        hamburger.setAttribute('aria-expanded', 'false');
+                        panel.classList.remove('open');
+                    }
+                });
+            }
+         })();
+
+         // Welcome Message
+         (() => {
+             const welcomeElement = document.getElementById('welcome-element');
+             const welcomeTrigger = document.getElementById('welcome-trigger');
+             const welcomeMessage = document.getElementById('welcome-message');
+             let isMessageVisible = false;
+             let fadeTimeout;
+
+             if (welcomeElement && welcomeTrigger) {
+                 function startFadeTimeout() {
+                     clearFadeTimeout();
+                     fadeTimeout = setTimeout(() => {
+                         if (!isMessageVisible) {
+                             welcomeTrigger.classList.add('faded');
+                         }
+                     }, 3000);
+                 }
+
+                 function clearFadeTimeout() {
+                     if (fadeTimeout) {
+                         clearTimeout(fadeTimeout);
+                         fadeTimeout = null;
+                     }
+                     welcomeTrigger.classList.remove('faded');
+                 }
+
+                 function toggleWelcomeMessage() {
+                     isMessageVisible = !isMessageVisible;
+                     
+                     if (isMessageVisible) {
+                         welcomeElement.classList.add('show');
+                         clearFadeTimeout();
+                     } else {
+                         welcomeElement.classList.remove('show');
+                         startFadeTimeout();
+                     }
+                 }
+
+                 function hideWelcomeMessage() {
+                     if (isMessageVisible) {
+                         isMessageVisible = false;
+                         welcomeElement.classList.remove('show');
+                         startFadeTimeout();
+                     }
+                 }
+
+                 // Toggle message on trigger interaction (click and touch)
+                 const handleWelcomeTrigger = async (e) => {
+                     e.stopPropagation();
+                     e.preventDefault(); // Prevent double-firing on mobile
+                     toggleWelcomeMessage();
+                     
+                     // Play welcome click sound (auto-initializes audio if needed)
+                     if (window.audioManager) {
+                         await window.audioManager.playSound('welcomeClick');
+                     }
+                 };
+
+                 welcomeTrigger.addEventListener('click', handleWelcomeTrigger);
+                 welcomeTrigger.addEventListener('touchend', handleWelcomeTrigger);
+
+                 // Hide message when clicking outside
+                 document.addEventListener('click', (e) => {
+                     if (!welcomeElement.contains(e.target)) {
+                         hideWelcomeMessage();
+                     }
+                 });
+
+                 // Hide message on escape key
+                 document.addEventListener('keydown', (e) => {
+                     if (e.key === 'Escape') {
+                         hideWelcomeMessage();
+                     }
+                 });
+
+                 // Handle keyboard navigation for accessibility
+                 welcomeTrigger.addEventListener('keydown', (e) => {
+                     if (e.key === 'Enter' || e.key === ' ') {
+                         e.preventDefault();
+                         toggleWelcomeMessage();
+                     }
+                 });
+
+                 // Reset fade on hover
+                 welcomeTrigger.addEventListener('mouseenter', clearFadeTimeout);
+                 welcomeTrigger.addEventListener('mouseleave', () => {
+                     if (!isMessageVisible) {
+                         startFadeTimeout();
+                     }
+                 });
+
+                 // Start initial fade timeout
+                 startFadeTimeout();
+             }
+         })();
+     </script>
 </body>
 </html>

@@ -919,9 +919,8 @@
         <!-- Auth Button - transforms from signup to user menu when logged in -->
         <div class="user-menu" id="auth-button">
           <a href="#signup" id="signup-link" data-translate="nav.signup">Sign Up</a>
-          <a href="/user/" class="user-link" id="user-link" data-translate="nav.profile" style="display: none;">Profile</a>
-                <div class="user-dropdown">
-                    <a href="/user/" data-translate="nav.profile">Profile</a>
+          <div class="user-dropdown">
+            <a href="/user/" data-translate="nav.profile">Profile</a>
             <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
           </div>
         </div>
@@ -3149,12 +3148,10 @@
             // User is logged in
             isUserLoggedIn = true;
             document.getElementById('signup-link').style.display = 'none';
-            document.getElementById('user-link').style.display = 'inline-block';
           } else {
             // User is not logged in
             isUserLoggedIn = false;
             document.getElementById('signup-link').style.display = 'inline-block';
-            document.getElementById('user-link').style.display = 'none';
             document.getElementById('user-icon-dropdown').style.display = 'none';
           }
         } catch (error) {
