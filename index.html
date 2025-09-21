@@ -2827,11 +2827,14 @@
       // Form submission
       signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        console.log('Form submission started');
         
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
+        
+        console.log('Form values:', { username, email, password: '***', confirmPassword: '***' });
 
         // Clear previous messages
         messageDiv.style.display = 'none';
@@ -2849,11 +2852,20 @@
         }
 
         // Validate captcha
-        const captchaResponse = hcaptcha.getResponse();
-        if (!captchaResponse) {
-          showMessage(translations[currentLang]['signup.captcha_required'], 'error');
+        console.log('Checking captcha...');
+        if (typeof hcaptcha === 'undefined') {
+          console.error('hCaptcha API not loaded');
+          showMessage('Captcha service not available. Please refresh the page.', 'error');
           return;
         }
+        const captchaResponse = hcaptcha.getResponse();
+        console.log('Captcha response:', captchaResponse);
+        if (!captchaResponse) {
+          console.log('Captcha validation failed');
+          showMessage(translations[currentLanguage]['signup.captcha_required'], 'error');
+          return;
+        }
+        console.log('Captcha validation passed');
 
         try {
           // Sign up user with Supabase Auth
