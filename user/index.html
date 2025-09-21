@@ -996,7 +996,7 @@
                     <form id="username-form">
                         <div class="form-group">
                             <label for="username">New username:</label>
-                            <input type="text" id="username" required />
+                            <input type="text" id="username" name="username" autocomplete="username" placeholder="Enter new username" required />
                         </div>
                         <button type="submit">Update</button>
                         <p id="status"></p>
@@ -1268,6 +1268,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             checkAuthState();
             loadProfile();
+            
+            // Initialize username form after DOM is loaded
+            initializeUsernameForm();
         });
 
         // Listen for auth state changes
@@ -1665,15 +1668,18 @@
               }
           }
 
-          // Username change functionality
-          const usernameForm = document.getElementById("username-form");
-          const statusElement = document.getElementById("status");
+          // Username form initialization function
+          function initializeUsernameForm() {
+              console.log('Initializing username form...');
+              
+              const usernameForm = document.getElementById("username-form");
+              const statusElement = document.getElementById("status");
 
-          console.log('Username form elements:', { usernameForm, statusElement });
-          console.log('Supabase client:', supabase);
-          console.log('Supabase URL:', supabase?.supabaseUrl);
+              console.log('Username form elements:', { usernameForm, statusElement });
+              console.log('Supabase client:', supabase);
+              console.log('Supabase URL:', supabase?.supabaseUrl);
 
-          if (usernameForm && statusElement) {
+              if (usernameForm && statusElement) {
               usernameForm.addEventListener("submit", async (e) => {
                   e.preventDefault();
                   console.log('Username form submitted');
@@ -1764,6 +1770,7 @@
           } else {
               console.error('Username form or status element not found');
           }
+      }
       </script>
 </body>
 </html>
