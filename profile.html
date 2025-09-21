@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Beniah Games</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 3rem;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .info-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-section h3 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #ccc;
+        }
+        
+        .info-value {
+            color: white;
+        }
+        
+        .edit-profile-btn {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .edit-profile-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .loading {
+            text-align: center;
+            color: #ccc;
+            font-size: 1.2rem;
+            margin: 2rem 0;
+        }
+        
+        .error {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 1.2rem;
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            
+            .back-btn {
+                top: 1rem;
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
+    
+    <div class="profile-container">
+        <div id="loading" class="loading">Loading profile...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="profile-content" style="display: none;">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profile-avatar">U</div>
+                <h1 id="profile-username">Username</h1>
+                <p id="profile-email">user@example.com</p>
+            </div>
+            
+            <div class="profile-info">
+                <div class="info-section">
+                    <h3>Account Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Username:</span>
+                        <span class="info-value" id="info-username">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="info-email">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Member Since:</span>
+                        <span class="info-value" id="info-created">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Login:</span>
+                        <span class="info-value" id="info-last-login">-</span>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3>Gaming Stats</h3>
+                    <div class="info-item">
+                        <span class="info-label">Games Played:</span>
+                        <span class="info-value" id="info-games-played">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">High Score:</span>
+                        <span class="info-value" id="info-high-score">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total Playtime:</span>
+                        <span class="info-value" id="info-playtime">0 minutes</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Achievements:</span>
+                        <span class="info-value" id="info-achievements">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="edit-profile-btn" onclick="editProfile()">Edit Profile</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://nqhejsnfwfcilktnyqbi.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xaGVqc25md2ZjaWxrdG55cWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzODQ3NzAsImV4cCI6MjA3Mzk2MDc3MH0.8ngjb28rPVPCj4SnLtLSeUFbeAoFsrcQlZXpq2D19Ag';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function loadProfile() {
+            try {
+                // Check if user is authenticated
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                
+                if (authError || !user) {
+                    showError('Please log in to view your profile.');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                    return;
+                }
+
+                // Get user profile data
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profileError) {
+                    console.error('Profile error:', profileError);
+                    showError('Failed to load profile data.');
+                    return;
+                }
+
+                // Display profile data
+                displayProfile(user, profile);
+                
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showError('An error occurred while loading your profile.');
+            }
+        }
+
+        function displayProfile(user, profile) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('profile-content').style.display = 'block';
+
+            // Set avatar initial
+            const avatarInitial = profile.username ? profile.username.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+            document.getElementById('profile-avatar').textContent = avatarInitial;
+
+            // Set header info
+            document.getElementById('profile-username').textContent = profile.username || 'User';
+            document.getElementById('profile-email').textContent = user.email;
+
+            // Set account info
+            document.getElementById('info-username').textContent = profile.username || 'Not set';
+            document.getElementById('info-email').textContent = user.email;
+            document.getElementById('info-created').textContent = new Date(user.created_at).toLocaleDateString();
+            document.getElementById('info-last-login').textContent = user.last_sign_in_at ? 
+                new Date(user.last_sign_in_at).toLocaleDateString() : 'Never';
+
+            // Set gaming stats (placeholder data for now)
+            document.getElementById('info-games-played').textContent = profile.games_played || '0';
+            document.getElementById('info-high-score').textContent = profile.high_score || '0';
+            document.getElementById('info-playtime').textContent = (profile.total_playtime || 0) + ' minutes';
+            document.getElementById('info-achievements').textContent = profile.achievements || '0';
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+
+        function editProfile() {
+            // For now, just show an alert. This could be expanded to show an edit form
+            alert('Edit profile functionality coming soon!');
+        }
+
+        // Load profile when page loads
+        document.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+</body>
+</html>

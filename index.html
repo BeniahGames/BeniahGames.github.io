@@ -123,6 +123,33 @@
     .nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s}
     .nav-links a:hover::after{transform:scaleX(1)}
 
+    /* User Menu */
+    .user-menu{position:relative;display:inline-block}
+    .user-avatar{
+      width:32px;height:32px;border-radius:50%;
+      background:linear-gradient(45deg,var(--accent),#764ba2);
+      display:flex;align-items:center;justify-content:center;
+      color:white;font-weight:bold;cursor:pointer;
+      transition:transform .2s ease;
+    }
+    .user-avatar:hover{transform:scale(1.1)}
+    .user-dropdown{
+      position:absolute;top:100%;right:0;margin-top:.5rem;
+      background:var(--panel);border:1px solid var(--border);border-radius:10px;
+      box-shadow:var(--shadow);min-width:120px;opacity:0;visibility:hidden;
+      transform:translateY(-8px);transition:all .25s ease;z-index:1000;
+    }
+    .user-menu:hover .user-dropdown{
+      opacity:1;visibility:visible;transform:translateY(0);
+    }
+    .user-dropdown a{
+      display:block;padding:.75rem 1rem;color:var(--text);
+      text-decoration:none;transition:background .2s;
+      border-bottom:1px solid var(--border);
+    }
+    .user-dropdown a:last-child{border-bottom:none}
+    .user-dropdown a:hover{background:rgba(255,204,0,.1)}
+
     /* Language Dropdown */
     .language-selector{position:relative;display:inline-block}
     .language-btn{
@@ -848,7 +875,16 @@
         <a href="#games" data-translate="nav.games">Games</a>
         <a href="devlogs/" data-translate="nav.devlogs">Devlogs</a>
         <a href="#contact" data-translate="nav.contact">Contact</a>
-        <a href="#signup" data-translate="nav.signup">Sign Up</a>
+        <a href="#signup" id="signup-link" data-translate="nav.signup">Sign Up</a>
+        
+        <!-- User Menu (shown when logged in) -->
+        <div class="user-menu" id="user-menu" style="display: none;">
+          <div class="user-avatar" id="user-avatar">U</div>
+          <div class="user-dropdown">
+            <a href="profile.html" data-translate="nav.profile">Profile</a>
+            <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
+          </div>
+        </div>
         
         <!-- Spotify Now Playing (Desktop) -->
         <div class="now-playing desktop-only" id="now-playing-desktop">
@@ -1160,6 +1196,8 @@
         'nav.faq': 'FAQ',
         'nav.contact': 'Contact',
         'nav.signup': 'Sign Up',
+        'nav.profile': 'Profile',
+        'nav.logout': 'Logout',
         'nav.discord': 'Discord',
         
         // Hero section
@@ -1227,6 +1265,12 @@
         'contact.form.message_placeholder': 'Tell me what\'s on your mind...',
         'contact.form.send': 'Send Message',
         
+        // Login form
+        'login.title': 'Login',
+        'login.identifier': 'Username or Email',
+        'login.password': 'Password',
+        'login.submit': 'Login',
+        
         // Signup form
         'signup.title': 'Sign Up',
         'signup.username': 'Username',
@@ -1253,6 +1297,8 @@
         'nav.faq': 'Veelgestelde Vragen',
         'nav.contact': 'Contact',
         'nav.signup': 'Aanmelden',
+        'nav.profile': 'Profiel',
+        'nav.logout': 'Uitloggen',
         'nav.discord': 'Discord Deelnemen',
         
         // Hero section
@@ -1320,6 +1366,12 @@
         'contact.form.message_placeholder': 'Vertel me wat je denkt...',
         'contact.form.send': 'Bericht Versturen',
         
+        // Login form
+        'login.title': 'Inloggen',
+        'login.identifier': 'Gebruikersnaam of Email',
+        'login.password': 'Wachtwoord',
+        'login.submit': 'Inloggen',
+        
         // Signup form
         'signup.title': 'Aanmelden',
         'signup.username': 'Gebruikersnaam',
@@ -1346,6 +1398,8 @@
         'nav.faq': 'FAQ',
         'nav.contact': 'Kontakt',
         'nav.signup': 'Anmelden',
+        'nav.profile': 'Profil',
+        'nav.logout': 'Abmelden',
         'nav.discord': 'Discord Beitreten',
         
         // Hero section
@@ -1530,6 +1584,8 @@
         'nav.faq': 'Preguntas Frecuentes',
         'nav.contact': 'Contacto',
         'nav.signup': 'Registrarse',
+        'nav.profile': 'Perfil',
+        'nav.logout': 'Cerrar Sesión',
         'nav.discord': 'Únete a Discord',
         
         // Hero section
@@ -1587,6 +1643,12 @@
         'contact.discord_label': 'Discord:',
         'contact.discord_link': 'Únete al servidor',
         
+        // Login form
+        'login.title': 'Iniciar Sesión',
+        'login.identifier': 'Usuario o Email',
+        'login.password': 'Contraseña',
+        'login.submit': 'Iniciar Sesión',
+        
         // Signup form
         'signup.title': 'Registrarse',
         'signup.username': 'Nombre de Usuario',
@@ -1613,6 +1675,8 @@
         'nav.faq': 'よくある質問',
         'nav.contact': 'お問い合わせ',
         'nav.signup': 'サインアップ',
+        'nav.profile': 'プロフィール',
+        'nav.logout': 'ログアウト',
         'nav.discord': 'Discordに参加',
         
         // Hero section
@@ -1669,6 +1733,12 @@
         'contact.email': 'メール：<a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>',
         'contact.discord_label': 'Discord：',
         'contact.discord_link': 'サーバーに参加',
+        
+        // Login form
+        'login.title': 'ログイン',
+        'login.identifier': 'ユーザー名またはメール',
+        'login.password': 'パスワード',
+        'login.submit': 'ログイン',
         
         // Signup form
         'signup.title': 'サインアップ',
@@ -2899,11 +2969,151 @@
         }
       });
 
+      // Login form submission
+      const loginForm = document.getElementById('login-form');
+      const loginMessageDiv = document.getElementById('login-message');
+      
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('Login form submission started');
+        
+        const identifier = document.getElementById('login-identifier').value;
+        const password = document.getElementById('login-password').value;
+        
+        console.log('Login values:', { identifier, password: '***' });
+        
+        // Clear previous messages
+        loginMessageDiv.style.display = 'none';
+        loginMessageDiv.className = 'message';
+        
+        try {
+          let email = identifier;
+          
+          // Check if identifier is a username (doesn't contain @)
+          if (!identifier.includes('@')) {
+            console.log('Identifier appears to be username, looking up email...');
+            
+            // Query Supabase to find user by username
+            const { data: userData, error: userError } = await supabase
+              .from('profiles')
+              .select('email')
+              .eq('username', identifier)
+              .single();
+            
+            if (userError || !userData) {
+              console.log('Username not found:', userError);
+              showLoginMessage('Invalid username or password.', 'error');
+              return;
+            }
+            
+            email = userData.email;
+            console.log('Found email for username');
+          }
+          
+          // Sign in with email and password
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+
+          if (error) {
+            throw error;
+          }
+
+          showLoginMessage('Login successful! Welcome back.', 'success');
+          loginForm.reset();
+          
+          // Close modal after 2 seconds
+          setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // Redirect to profile or refresh page
+            window.location.reload();
+          }, 2000);
+
+        } catch (error) {
+          console.error('Login error:', error);
+          showLoginMessage('Invalid username/email or password.', 'error');
+        }
+      });
+      
+      function showLoginMessage(text, type) {
+        loginMessageDiv.textContent = text;
+        loginMessageDiv.className = `message ${type}`;
+        loginMessageDiv.style.display = 'block';
+      }
+
       function showMessage(text, type) {
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
         messageDiv.style.display = 'block';
       }
+
+      // User authentication state handling
+      async function checkAuthState() {
+        try {
+          const { data: { user }, error } = await supabase.auth.getUser();
+          
+          if (user) {
+            // User is logged in
+            document.getElementById('signup-link').style.display = 'none';
+            document.getElementById('user-menu').style.display = 'inline-block';
+            
+            // Get user profile for avatar
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('username')
+              .eq('id', user.id)
+              .single();
+            
+            const avatarInitial = profile?.username ? 
+              profile.username.charAt(0).toUpperCase() : 
+              user.email.charAt(0).toUpperCase();
+            
+            document.getElementById('user-avatar').textContent = avatarInitial;
+          } else {
+            // User is not logged in
+            document.getElementById('signup-link').style.display = 'inline-block';
+            document.getElementById('user-menu').style.display = 'none';
+          }
+        } catch (error) {
+          console.error('Error checking auth state:', error);
+        }
+      }
+
+      // Logout functionality
+      document.getElementById('logout-btn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) throw error;
+          
+          // Update UI
+          document.getElementById('signup-link').style.display = 'inline-block';
+          document.getElementById('user-menu').style.display = 'none';
+          
+          // Show success message
+          showMessage('Logged out successfully!', 'success');
+          
+        } catch (error) {
+          console.error('Logout error:', error);
+          showMessage('Error logging out. Please try again.', 'error');
+        }
+      });
+
+      // Check auth state on page load
+      checkAuthState();
+
+      // Listen for auth state changes
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN') {
+          checkAuthState();
+        } else if (event === 'SIGNED_OUT') {
+          document.getElementById('signup-link').style.display = 'inline-block';
+          document.getElementById('user-menu').style.display = 'none';
+        }
+      });
     });
   </script>
 
@@ -2922,8 +3132,8 @@
       <div id="login-form-container" class="form-container active">
         <form id="login-form">
           <div class="form-group">
-            <label for="login-email" data-translate="login.email">Email:</label>
-            <input type="email" id="login-email" name="email" required>
+            <label for="login-identifier" data-translate="login.identifier">Username or Email:</label>
+            <input type="text" id="login-identifier" name="identifier" required>
           </div>
           <div class="form-group">
             <label for="login-password" data-translate="login.password">Password:</label>
