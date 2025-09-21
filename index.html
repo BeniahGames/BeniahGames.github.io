@@ -704,9 +704,49 @@
       justify-content: center;
     }
 
-    .g-recaptcha {
+    .h-captcha {
       transform: scale(0.9);
       transform-origin: center;
+    }
+
+    /* Auth tabs styling */
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--accent);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Form container switching */
+    .form-container {
+      display: none;
+    }
+
+    .form-container.active {
+      display: block;
     }
 
     /* Mobile adjustments */
@@ -2709,6 +2749,28 @@
     // Load latest devlog when page loads
     document.addEventListener('DOMContentLoaded', loadLatestDevlog);
 
+    // Tab switching functionality for auth modal
+    function showForm(formType) {
+      // Hide all form containers
+      document.querySelectorAll('.form-container').forEach(container => {
+        container.classList.remove('active');
+      });
+      
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab-btn').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show the selected form and activate the corresponding tab
+      if (formType === 'login') {
+        document.getElementById('login-form-container').classList.add('active');
+        document.getElementById('login-tab').classList.add('active');
+      } else if (formType === 'signup') {
+        document.getElementById('signup-form-container').classList.add('active');
+        document.getElementById('signup-tab').classList.add('active');
+      }
+    }
+
     // Initialize Supabase and modal functionality when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
       // Initialize Supabase
@@ -2729,6 +2791,10 @@
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
       }
+
+      // Add event listeners for tab switching
+      document.getElementById('login-tab').addEventListener('click', () => showForm('login'));
+      document.getElementById('signup-tab').addEventListener('click', () => showForm('signup'));
 
       // Open modal when signup link is clicked
       signupLinks.forEach(link => {
