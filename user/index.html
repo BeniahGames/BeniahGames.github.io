@@ -1648,19 +1648,31 @@
           // Add checkUsername function for username availability checking
           async function checkUsername(name) { 
               try {
-                  console.log('Calling supabase.rpc with username:', name);
-                  const { data, error } = await supabase.rpc('is_username_available', { p_username: name }); 
-                  console.log('RPC response:', { data, error });
+                  console.log('Checking username availability for:', name);
+                  
+                  // Get current user to exclude their own username from the check
+                  const { data: { user }, error: userError } = await supabase.auth.getUser();
+                  if (userError || !user) {
+                      console.error('Could not get current user for username check:', userError);
+                      return true; // Allow the change if we can't verify
+                  }
+                  
+                  // Check if username exists for other users (case-insensitive)
+                  const { data, error } = await supabase
+                      .from('profiles')
+                      .select('id')
+                      .ilike('username', name) // Case-insensitive match
+                      .neq('id', user.id); // Exclude current user
+                  
+                  console.log('Username check result:', { data, error });
+                  
                   if (error) { 
                       console.error('Username check error:', error); 
-                      // If the function doesn't exist, we'll skip the check for now
-                      if (error.message && error.message.includes('function')) {
-                          console.warn('Username availability function not found, skipping check');
-                          return true; // Allow the username change to proceed
-                      }
-                      return false; 
+                      return true; // Allow the change if check fails
                   } 
-                  return data === true; 
+                  
+                  // Username is available if no other user has it
+                  return data.length === 0; 
               } catch (err) {
                   console.error('Username check exception:', err);
                   console.warn('Skipping username availability check due to error');
@@ -1734,6 +1746,7 @@
                           .select();
 
                       console.log('Update result:', { updateData, error });
+                      console.log('Update data length:', updateData ? updateData.length : 'null');
 
                       if (error) {
                           console.error('Profile update error:', error);
@@ -1747,8 +1760,12 @@
                               statusElement.textContent = "Error: " + error.message;
                               statusElement.className = "error";
                           }
+                      } else if (!updateData || updateData.length === 0) {
+                          console.error('No rows were updated - possible RLS policy issue');
+                          statusElement.textContent = "Update failed: No profile found or permission denied. Please check your account permissions.";
+                          statusElement.className = "error";
                       } else {
-                          console.log('Username updated successfully');
+                          console.log('Username updated successfully:', updateData);
                           statusElement.textContent = "Username updated successfully!";
                           statusElement.className = "success";
                           
