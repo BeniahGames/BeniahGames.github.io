@@ -1067,7 +1067,7 @@
                     console.log('Fetching fresh profile data for user:', user.id);
                     const { data: profileData, error: pErr } = await supabase
                         .from('profiles')
-                        .select('id, display_name, avatar_url, bio, username, email, created_at, games_played, high_score, total_playtime, achievements')
+                        .select('id, display_name, avatar_url, bio, username, created_at, games_played, high_score, total_playtime, achievements')
                         .eq('id', user.id)
                         .order('created_at', { ascending: false })
                         .single();
@@ -1081,7 +1081,6 @@
                         console.log('Using user auth data as fallback...');
                         profile = {
                             id: user.id,
-                            email: user.email,
                             username: user.user_metadata?.username || user.email.split('@')[0],
                             display_name: user.user_metadata?.username || user.email.split('@')[0],
                             created_at: user.created_at,
@@ -1098,8 +1097,7 @@
                             .upsert({
                                 id: user.id,
                                 username: defaultUsername,
-                                display_name: defaultUsername,
-                                email: user.email
+                                display_name: defaultUsername
                             })
                             .select()
                             .single();
@@ -1111,7 +1109,6 @@
                             // Fall back to auth data
                             profile = {
                                 id: user.id,
-                                email: user.email,
                                 username: defaultUsername,
                                 display_name: defaultUsername,
                                 created_at: user.created_at
