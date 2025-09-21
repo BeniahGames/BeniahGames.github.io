@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting... - Beniah Games</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h2>Redirecting...</h2>
+        <p>Looking for user profile...</p>
+    </div>
+
+    <script>
+        (function() {
+            // Get the path that caused the 404
+            const path = window.location.pathname;
+            const pathParts = path.split('/').filter(part => part);
+            
+            console.log('404 page - Path:', path);
+            console.log('404 page - Path parts:', pathParts);
+            
+            // Check if this looks like a username (single path segment, not a known folder)
+            if (pathParts.length === 1) {
+                const potentialUsername = pathParts[0];
+                const knownPaths = ['games', 'devlogs', 'user', 'assets', 'index.html'];
+                
+                // If it's not a known path, treat it as a username
+                if (!knownPaths.includes(potentialUsername.toLowerCase()) && 
+                    !potentialUsername.includes('.')) {
+                    
+                    console.log('Redirecting to user profile:', potentialUsername);
+                    // Redirect to user profile
+                    window.location.href = `/user/?u=${potentialUsername}`;
+                    return;
+                }
+            }
+            
+            // If we get here, it's a real 404 - redirect to home page
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        })();
+    </script>
+</body>
+</html>
