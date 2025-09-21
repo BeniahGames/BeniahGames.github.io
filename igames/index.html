@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrawGuess - Online Drawing Game | Beniah Games</title>
+    <style>
+        :root {
+            --bg: #0d0e10;
+            --panel: #171a21;
+            --border: #2a2d35;
+            --text: #e8eaed;
+            --muted: #9aa0a6;
+            --accent: #ffcc00;
+            --accent-2: #ffe066;
+            --success: #34a853;
+            --error: #ea4335;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .room-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .room-code {
+            background: var(--bg);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .main-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 1rem;
+            padding: 1rem;
+            max-height: calc(100vh - 80px);
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .game-status {
+            background: var(--panel);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .current-word {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            color: var(--muted);
+        }
+
+        .canvas-container {
+            background: var(--panel);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drawing-tools {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tool-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tool-btn:hover {
+            background: var(--border);
+        }
+
+        .tool-btn.active {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .color-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .color-btn.active {
+            border-color: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .brush-size {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .size-slider {
+            width: 100px;
+        }
+
+        #drawingCanvas {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            cursor: crosshair;
+            max-width: 100%;
+            max-height: 400px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .players-panel {
+            background: var(--panel);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .panel-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .player.current-turn {
+            border-color: var(--accent);
+            background: rgba(255, 204, 0, 0.1);
+        }
+
+        .player-name {
+            font-weight: 500;
+        }
+
+        .player-score {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .chat-panel {
+            background: var(--panel);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            max-height: 300px;
+        }
+
+        .message {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .message.guess {
+            background: var(--bg);
+        }
+
+        .message.correct {
+            background: rgba(52, 168, 83, 0.2);
+            border: 1px solid var(--success);
+        }
+
+        .message.system {
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid var(--accent);
+            font-style: italic;
+        }
+
+        .message-author {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .chat-input button {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .join-room {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .join-form {
+            background: var(--panel);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            background: var(--accent-2);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .sidebar {
+                order: -1;
+            }
+            
+            .drawing-tools {
+                flex-wrap: wrap;
+            }
+            
+            #drawingCanvas {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Join Room Modal -->
+    <div class="join-room" id="joinModal">
+        <div class="join-form">
+            <h2 style="margin-bottom: 1rem; color: var(--accent);">Join DrawGuess</h2>
+            <div class="form-group">
+                <label for="playerName">Your Name</label>
+                <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
+            </div>
+            <div class="form-group">
+                <label for="roomCode">Room Code (optional)</label>
+                <input type="text" id="roomCode" placeholder="Leave empty to create new room" maxlength="6">
+            </div>
+            <button class="btn" onclick="joinGame()">Join Game</button>
+            <button class="btn btn-secondary" onclick="createRoom()">Create New Room</button>
+        </div>
+    </div>
+
+    <!-- Main Game Interface -->
+    <div class="header">
+        <div class="logo">DrawGuess</div>
+        <div class="room-info">
+            <div class="room-code">Room: <span id="currentRoom">-</span></div>
+            <div>Players: <span id="playerCount">0</span>/10</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="game-area">
+            <div class="game-status">
+                <div class="current-word" id="currentWord">Waiting for players...</div>
+                <div class="timer" id="gameTimer">Time: 0s</div>
+                <div id="gamePhase" style="margin-top: 0.5rem; color: var(--muted);">Waiting to start</div>
+            </div>
+
+            <div class="canvas-container">
+                <div class="drawing-tools">
+                    <button class="tool-btn active" data-tool="pen">Pen</button>
+                    <button class="tool-btn" data-tool="eraser">Eraser</button>
+                    <button class="tool-btn" onclick="clearCanvas()">Clear</button>
+                    
+                    <div class="color-picker">
+                        <div class="color-btn active" data-color="#000000" style="background: #000000;"></div>
+                        <div class="color-btn" data-color="#ff0000" style="background: #ff0000;"></div>
+                        <div class="color-btn" data-color="#00ff00" style="background: #00ff00;"></div>
+                        <div class="color-btn" data-color="#0000ff" style="background: #0000ff;"></div>
+                        <div class="color-btn" data-color="#ffff00" style="background: #ffff00;"></div>
+                        <div class="color-btn" data-color="#ff00ff" style="background: #ff00ff;"></div>
+                        <div class="color-btn" data-color="#00ffff" style="background: #00ffff;"></div>
+                        <div class="color-btn" data-color="#ffffff" style="background: #ffffff; border-color: #666;"></div>
+                    </div>
+                    
+                    <div class="brush-size">
+                        <span>Size:</span>
+                        <input type="range" class="size-slider" min="1" max="20" value="3" id="brushSize">
+                        <span id="sizeDisplay">3px</span>
+                    </div>
+                </div>
+                
+                <canvas id="drawingCanvas" width="800" height="400"></canvas>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="players-panel">
+                <div class="panel-title">Players</div>
+                <div class="player-list" id="playerList">
+                    <!-- Players will be populated here -->
+                </div>
+            </div>
+
+            <div class="chat-panel">
+                <div class="panel-title">Chat & Guesses</div>
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will appear here -->
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Type your guess..." maxlength="100">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            room: null,
+            players: [],
+            currentPlayer: null,
+            currentWord: null,
+            isDrawing: false,
+            timeLeft: 0,
+            phase: 'waiting', // waiting, drawing, guessing, results
+            myId: null,
+            myName: null,
+            isMyTurn: false
+        };
+
+        // Drawing state
+        let canvas, ctx;
+        let isDrawingMode = false;
+        let currentTool = 'pen';
+        let currentColor = '#000000';
+        let currentSize = 3;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Sample words for drawing
+        const words = [
+            'cat', 'dog', 'house', 'car', 'tree', 'sun', 'moon', 'star', 'fish', 'bird',
+            'flower', 'book', 'phone', 'computer', 'chair', 'table', 'door', 'window',
+            'apple', 'banana', 'pizza', 'cake', 'ice cream', 'guitar', 'piano', 'ball',
+            'bicycle', 'airplane', 'boat', 'train', 'elephant', 'lion', 'butterfly',
+            'rainbow', 'cloud', 'mountain', 'ocean', 'beach', 'castle', 'robot'
+        ];
+
+        // Initialize game
+        function initGame() {
+            canvas = document.getElementById('drawingCanvas');
+            ctx = canvas.getContext('2d');
+            
+            setupCanvas();
+            setupEventListeners();
+            
+            // Generate player ID
+            gameState.myId = 'player_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function setupCanvas() {
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentSize;
+            
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function setupEventListeners() {
+            // Tool selection
+            document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelector('.tool-btn.active').classList.remove('active');
+                    btn.classList.add('active');
+                    currentTool = btn.dataset.tool;
+                });
+            });
+
+            // Color selection
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelector('.color-btn.active').classList.remove('active');
+                    btn.classList.add('active');
+                    currentColor = btn.dataset.color;
+                    ctx.strokeStyle = currentColor;
+                });
+            });
+
+            // Brush size
+            document.getElementById('brushSize').addEventListener('input', (e) => {
+                currentSize = e.target.value;
+                ctx.lineWidth = currentSize;
+                document.getElementById('sizeDisplay').textContent = currentSize + 'px';
+            });
+
+            // Chat input
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+
+        function startDrawing(e) {
+            if (!gameState.isMyTurn) return;
+            
+            isDrawingMode = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+        }
+
+        function draw(e) {
+            if (!isDrawingMode || !gameState.isMyTurn) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(currentX, currentY);
+            
+            if (currentTool === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = currentSize * 2;
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.lineWidth = currentSize;
+            }
+            
+            ctx.stroke();
+            
+            lastX = currentX;
+            lastY = currentY;
+        }
+
+        function stopDrawing() {
+            isDrawingMode = false;
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                            e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        function clearCanvas() {
+            if (!gameState.isMyTurn) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function joinGame() {
+            const name = document.getElementById('playerName').value.trim();
+            const room = document.getElementById('roomCode').value.trim();
+            
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            gameState.myName = name;
+            gameState.room = room || generateRoomCode();
+            
+            document.getElementById('joinModal').style.display = 'none';
+            document.getElementById('currentRoom').textContent = gameState.room;
+            
+            // Simulate joining room
+            addPlayer(gameState.myId, name, 0);
+            addSystemMessage(`${name} joined the room`);
+            
+            // Add some demo players
+            setTimeout(() => {
+                addPlayer('player_demo1', 'Alice', 150);
+                addPlayer('player_demo2', 'Bob', 200);
+                addSystemMessage('Waiting for more players to start...');
+            }, 1000);
+        }
+
+        function createRoom() {
+            document.getElementById('roomCode').value = '';
+            joinGame();
+        }
+
+        function generateRoomCode() {
+            return Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        function addPlayer(id, name, score) {
+            gameState.players.push({ id, name, score });
+            updatePlayerList();
+            updatePlayerCount();
+        }
+
+        function updatePlayerList() {
+            const list = document.getElementById('playerList');
+            list.innerHTML = '';
+            
+            gameState.players.forEach(player => {
+                const div = document.createElement('div');
+                div.className = 'player';
+                if (player.id === gameState.currentPlayer) {
+                    div.classList.add('current-turn');
+                }
+                
+                div.innerHTML = `
+                    <span class="player-name">${player.name}</span>
+                    <span class="player-score">${player.score}</span>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updatePlayerCount() {
+            document.getElementById('playerCount').textContent = gameState.players.length;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Check if it's a correct guess
+            if (gameState.currentWord && message.toLowerCase() === gameState.currentWord.toLowerCase() && !gameState.isMyTurn) {
+                addMessage(gameState.myName, message, 'correct');
+                addSystemMessage(`${gameState.myName} guessed correctly! +${calculatePoints()}pts`);
+                
+                // Update score
+                const player = gameState.players.find(p => p.id === gameState.myId);
+                if (player) {
+                    player.score += calculatePoints();
+                    updatePlayerList();
+                }
+            } else {
+                addMessage(gameState.myName, message, 'guess');
+            }
+            
+            input.value = '';
+        }
+
+        function addMessage(author, text, type = 'guess') {
+            const messages = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            
+            div.innerHTML = `
+                <span class="message-author">${author}:</span> ${text}
+            `;
+            
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function addSystemMessage(text) {
+            const messages = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = 'message system';
+            div.textContent = text;
+            
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function calculatePoints() {
+            // Points based on time left (more points for faster guesses)
+            return Math.max(10, Math.floor(gameState.timeLeft / 2));
+        }
+
+        function startNewRound() {
+            // Select random word
+            gameState.currentWord = words[Math.floor(Math.random() * words.length)];
+            
+            // Select next player
+            const currentIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer);
+            const nextIndex = (currentIndex + 1) % gameState.players.length;
+            gameState.currentPlayer = gameState.players[nextIndex].id;
+            gameState.isMyTurn = gameState.currentPlayer === gameState.myId;
+            
+            // Update UI
+            if (gameState.isMyTurn) {
+                document.getElementById('currentWord').textContent = `Draw: ${gameState.currentWord}`;
+                document.getElementById('gamePhase').textContent = 'Your turn to draw!';
+            } else {
+                document.getElementById('currentWord').textContent = '_ '.repeat(gameState.currentWord.length);
+                document.getElementById('gamePhase').textContent = `${gameState.players.find(p => p.id === gameState.currentPlayer).name} is drawing`;
+            }
+            
+            updatePlayerList();
+            clearCanvas();
+            
+            // Start timer
+            gameState.timeLeft = 60;
+            const timer = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('gameTimer').textContent = `Time: ${gameState.timeLeft}s`;
+                
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(timer);
+                    endRound();
+                }
+            }, 1000);
+        }
+
+        function endRound() {
+            addSystemMessage(`Time's up! The word was: ${gameState.currentWord}`);
+            setTimeout(startNewRound, 3000);
+        }
+
+        // Demo: Start game after a few seconds
+        setTimeout(() => {
+            if (gameState.players.length >= 2) {
+                gameState.currentPlayer = gameState.players[0].id;
+                gameState.isMyTurn = gameState.currentPlayer === gameState.myId;
+                addSystemMessage('Game starting!');
+                setTimeout(startNewRound, 2000);
+            }
+        }, 5000);
+
+        // Initialize when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
