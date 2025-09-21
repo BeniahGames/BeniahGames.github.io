@@ -2931,6 +2931,45 @@
         return data === true; 
       }
 
+      async function signUpWithUsername({ email, password, username }) { 
+        // 1) Sign up 
+        const { data, error } = await supabase.auth.signUp({ email, password }); 
+        if (error) throw error; 
+      
+        // Depending on your project settings, session may be null (email confirmation required) 
+        const user = data.user; 
+        const session = data.session; 
+      
+        // 2) If no session yet, sign in to get auth so RLS permits the write 
+        if (!session) { 
+          const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password }); 
+          if (signInErr) { 
+            // Fall back: show your "Account created successfully, but username could not be saved" message 
+            return { partial: true, reason: 'no_session_yet' }; 
+          } 
+        } 
+      
+        // 3) Upsert profile row with correct PK = auth user id 
+        const { data: userData } = await supabase.auth.getUser(); 
+        const uid = userData?.user?.id; 
+        if (!uid) return { partial: true, reason: 'no_uid' }; 
+      
+        const { error: upsertErr } = await supabase 
+          .from('profiles') 
+          .upsert({ id: uid, username, display_name: username }, { onConflict: 'id' }); 
+      
+        if (upsertErr) { 
+          // Handle duplicate username gracefully 
+          if (upsertErr.code === '23505') { 
+            return { partial: true, reason: 'username_taken' }; 
+          } 
+          // Other errors: RLS or network 
+          return { partial: true, reason: upsertErr.message }; 
+        } 
+      
+        return { partial: false }; 
+      }
+
       async function saveUsername(username) {
         // Must be signed in
         const { data: { user }, error: authErr } = await supabase.auth.getUser();
@@ -3229,41 +3268,41 @@
         console.log('Captcha validation passed');
 
         try {
-          // Sign up user with Supabase Auth
-          const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-              data: {
-                username: username
-              }
-            }
-          });
+          // Use the new signUpWithUsername function
+          const result = await signUpWithUsername({ email, password, username });
 
-          if (error) {
-            throw error;
+          if (result.partial) {
+            // Handle partial signup scenarios
+            let message = '';
+            let messageType = 'warning';
+            
+            switch (result.reason) {
+              case 'no_session_yet':
+                message = 'Account created successfully, but username could not be saved due to email verification requirement. You can set it later in your profile.';
+                break;
+              case 'no_uid':
+                message = 'Account created successfully, but username could not be saved due to authentication issue. You can set it later in your profile.';
+                break;
+              case 'username_taken':
+                message = 'Account created successfully, but the username was taken by another user. Please choose a different username in your profile.';
+                break;
+              default:
+                message = `Account created successfully, but username could not be saved: ${result.reason}. You can set it later in your profile.`;
+                break;
+            }
+            
+            showMessage(message, messageType);
+            signupForm.reset();
+            hcaptcha.reset();
+            
+            setTimeout(() => {
+              modal.style.display = 'none';
+              document.body.style.overflow = 'auto';
+            }, 4000);
+            return;
           }
 
-          // If user was created successfully, save username to profiles table
-          if (data.user) {
-            try {
-              await saveUsername(username);
-              console.log('Username saved to profile');
-            } catch (profileError) {
-              console.error('Failed to save username to profile:', profileError);
-              // Show warning but don't fail registration
-              showMessage('Account created successfully, but username could not be saved. You can set it later in your profile.', 'warning');
-              signupForm.reset();
-              hcaptcha.reset();
-              
-              setTimeout(() => {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-              }, 4000);
-              return;
-            }
-          }
-
+          // Full success
           showMessage('Registration successful! Please check your email to verify your account.', 'success');
           signupForm.reset();
           hcaptcha.reset();
