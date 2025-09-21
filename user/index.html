@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - Beniah Games</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
     <style>
         .profile-container {
             max-width: 800px;
@@ -211,49 +211,114 @@
 
         async function loadProfile() {
             try {
+                // Get username from URL path (e.g., /user/leyno or /leyno)
+                const pathParts = window.location.pathname.split('/').filter(part => part);
+                let requestedUsername = pathParts[pathParts.length - 1]; // Get the last part of the path
+                
+                // Handle different URL patterns
+                if (pathParts.length >= 2 && pathParts[pathParts.length - 2] === 'user') {
+                    // URL like /user/leyno
+                    requestedUsername = pathParts[pathParts.length - 1];
+                } else if (pathParts.length === 1 && pathParts[0] !== 'user') {
+                    // URL like /leyno (direct username)
+                    requestedUsername = pathParts[0];
+                } else {
+                    // URL like /user/ or /user/index.html
+                    requestedUsername = null;
+                }
+                
                 // Check if user is authenticated
                 const { data: { user }, error: authError } = await supabase.auth.getUser();
                 
-                if (authError || !user) {
-                    showError('Please log in to view your profile.');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 2000);
+                // Debug information
+                console.log('Path parts:', pathParts);
+                console.log('Requested username:', requestedUsername);
+                
+                // If no specific username is requested, redirect to current user's profile
+                if (!requestedUsername || requestedUsername === 'user' || requestedUsername === 'index.html') {
+                    if (authError || !user) {
+                        showError('Please log in to view your profile.');
+                        setTimeout(() => {
+                            window.location.href = '../index.html';
+                        }, 2000);
+                        return;
+                    }
+                    
+                    // Get current user's username and redirect
+                    const currentUsername = user.user_metadata?.username || user.email.split('@')[0];
+                    // Use relative path for better compatibility
+                    window.location.href = `/user/${currentUsername}`;
+                    return;
+                }
+                
+                // We're viewing a specific user's profile
+                let isOwnProfile = false;
+                if (user && (user.user_metadata?.username === requestedUsername || user.email.split('@')[0] === requestedUsername)) {
+                    isOwnProfile = true;
+                }
+
+                // Try to fetch comprehensive profile data
+                let profile, currentRole, userProgress, targetUserId;
+                
+                try {
+                    // Fetch profile data by username
+                    const { data: profileData, error: pErr } = await supabase
+                        .from('profiles')
+                        .select('id, display_name, avatar_url, bio, username, email, created_at, games_played, high_score, total_playtime, achievements')
+                        .eq('username', requestedUsername)
+                        .single();
+                    
+                    if (pErr && (pErr.code === 'PGRST116' || pErr.code === 'PGRST205')) {
+                        // Profile table doesn't exist, use fallback only for own profile
+                        if (isOwnProfile && user) {
+                            console.log('Using user auth data as fallback...');
+                            profile = {
+                                id: user.id,
+                                email: user.email,
+                                username: user.user_metadata?.username || user.email.split('@')[0],
+                                display_name: user.user_metadata?.username || user.email.split('@')[0],
+                                created_at: user.created_at,
+                                ...user.user_metadata
+                            };
+                            targetUserId = user.id;
+                        } else {
+                            showError(`User "${requestedUsername}" not found.`);
+                            return;
+                        }
+                    } else if (pErr) {
+                        showError(`User "${requestedUsername}" not found.`);
+                        return;
+                    } else {
+                        profile = profileData;
+                        targetUserId = profileData.id;
+                    }
+                    
+                    // Try to fetch role and progress data (optional)
+                    try {
+                        const [roleResult, progressResult] = await Promise.all([
+                            supabase.from('user_current_role').select('role_id, role_tiers:role_id(code,name,color)').eq('user_id', targetUserId).single(),
+                            supabase.from('user_progress').select('xp, level').eq('user_id', targetUserId).single()
+                        ]);
+                        
+                        currentRole = roleResult.data;
+                        userProgress = progressResult.data;
+                    } catch (roleProgressError) {
+                        console.log('Role/progress tables not available, using defaults');
+                        currentRole = null;
+                        userProgress = null;
+                    }
+                    
+                } catch (error) {
+                    console.error('Profile loading error:', error);
+                    showError('Failed to load profile data. Please try again.');
                     return;
                 }
 
-                // Try to get user profile data from profiles table
-                let { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .single();
-
-                // If profiles table doesn't exist or profile doesn't exist, use user auth data
-                if (profileError) {
-                    console.log('Profile error:', profileError);
-                    
-                    // Check if it's a table not found error or profile not found
-                    if (profileError.code === 'PGRST116' || profileError.code === 'PGRST205' || profileError.message?.includes('relation "public.profiles" does not exist')) {
-                        console.log('Using user auth data as fallback...');
-                        // Create a profile object from user auth data
-                        profile = {
-                            id: user.id,
-                            email: user.email,
-                            username: user.user_metadata?.username || user.email.split('@')[0],
-                            created_at: user.created_at,
-                            // Add any other fields from user metadata
-                            ...user.user_metadata
-                        };
-                    } else {
-                        console.error('Unexpected profile error:', profileError);
-                        showError('Failed to load profile data. Please try again.');
-                        return;
-                    }
-                }
-
+                // Update page title
+                document.title = `${profile.display_name || profile.username || requestedUsername} - Beniah Games`;
+                
                 // Display profile data
-                displayProfile(user, profile);
+                displayProfile(user, profile, currentRole, userProgress, isOwnProfile);
                 
             } catch (error) {
                 console.error('Error loading profile:', error);
@@ -261,30 +326,50 @@
             }
         }
 
-        function displayProfile(user, profile) {
+        function displayProfile(user, profile, currentRole, userProgress, isOwnProfile = false) {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('profile-content').style.display = 'block';
 
-            // Set avatar initial
-            const avatarInitial = profile.username ? profile.username.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+            // Set avatar initial - use display_name or username
+            const displayName = profile.display_name || profile.username || user.email.split('@')[0];
+            const avatarInitial = displayName.charAt(0).toUpperCase();
             document.getElementById('profile-avatar').textContent = avatarInitial;
 
             // Set header info
-            document.getElementById('profile-username').textContent = profile.username || 'User';
+            document.getElementById('profile-username').textContent = displayName;
             document.getElementById('profile-email').textContent = user.email;
 
             // Set account info
             document.getElementById('info-username').textContent = profile.username || 'Not set';
             document.getElementById('info-email').textContent = user.email;
-            document.getElementById('info-created').textContent = new Date(user.created_at).toLocaleDateString();
+            document.getElementById('info-created').textContent = new Date(user.created_at || profile.created_at).toLocaleDateString();
             document.getElementById('info-last-login').textContent = user.last_sign_in_at ? 
                 new Date(user.last_sign_in_at).toLocaleDateString() : 'Never';
 
-            // Set gaming stats (placeholder data for now)
+            // Set gaming stats using progress data or fallback
             document.getElementById('info-games-played').textContent = profile.games_played || '0';
             document.getElementById('info-high-score').textContent = profile.high_score || '0';
             document.getElementById('info-playtime').textContent = (profile.total_playtime || 0) + ' minutes';
             document.getElementById('info-achievements').textContent = profile.achievements || '0';
+            
+            // Display role information if available
+            if (currentRole && currentRole.role_tiers) {
+                const roleElement = document.getElementById('info-role');
+                if (roleElement) {
+                    roleElement.textContent = currentRole.role_tiers.name || 'No role';
+                    if (currentRole.role_tiers.color) {
+                        roleElement.style.color = currentRole.role_tiers.color;
+                    }
+                }
+            }
+            
+            // Display level and XP if available
+            if (userProgress) {
+                const levelElement = document.getElementById('info-level');
+                const xpElement = document.getElementById('info-xp');
+                if (levelElement) levelElement.textContent = userProgress.level || '1';
+                if (xpElement) xpElement.textContent = userProgress.xp || '0';
+            }
         }
 
         function showError(message) {

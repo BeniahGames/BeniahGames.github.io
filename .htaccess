@@ -1,0 +1,17 @@
+RewriteEngine On
+
+# Redirect /profile to /user (for backward compatibility)
+RewriteRule ^profile/?$ /user/ [R=301,L]
+
+# Handle username-based profile routing
+# If the request is for a username (not an existing file/directory), serve the user profile page
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/(user|games|devlogs|assets)/
+RewriteCond %{REQUEST_URI} !^/(index\.html|CNAME|\.nojekyll)$
+RewriteRule ^([a-zA-Z0-9_-]+)/?$ /user/index.html [L]
+
+# Handle /user/username routing
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^user/([a-zA-Z0-9_-]+)/?$ /user/index.html [L]

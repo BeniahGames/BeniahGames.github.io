@@ -880,9 +880,9 @@
         <!-- Auth Button - transforms from signup to user menu when logged in -->
         <div class="user-menu" id="auth-button">
           <a href="#signup" id="signup-link" data-translate="nav.signup">Sign Up</a>
-          <a href="profile.html" class="user-link" id="user-link" data-translate="nav.profile" style="display: none;">Profile</a>
-          <div class="user-dropdown">
-            <a href="profile.html" data-translate="nav.profile">Profile</a>
+          <a href="/user/" class="user-link" id="user-link" data-translate="nav.profile" style="display: none;">Profile</a>
+                <div class="user-dropdown">
+                    <a href="/user/" data-translate="nav.profile">Profile</a>
             <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
           </div>
         </div>
@@ -3029,7 +3029,7 @@
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
             // Redirect to profile page
-            window.location.href = 'profile.html';
+            window.location.href = '/user/';
           }, 2000);
 
         } catch (error) {
