@@ -577,6 +577,8 @@
             currentDrawer: null,
             currentWord: null,
             timeLeft: 60,
+            roundEndTime: null,
+            timer: null,
             currentRound: 0,
             maxRounds: 3,
             isDrawing: false,
@@ -584,7 +586,9 @@
             roundStarted: false,
             subscriptions: [],
             eventListenersSetup: false,
-            joiningGame: false
+            joiningGame: false,
+            isGameHost: false,
+            gameHostId: null
         };
 
         // Drawing state
@@ -838,6 +842,12 @@
             }
             
             try {
+                console.log('Saving stroke to database:', {
+                    roomId: gameState.roomId,
+                    userId: gameState.myId,
+                    round: gameState.currentRound + 1
+                });
+                
                 const { error } = await supabase
                     .from('drawing_strokes')
                     .insert({
@@ -849,6 +859,7 @@
                     });
                 
                 if (error) throw error;
+                console.log('Stroke saved successfully');
                 
             } catch (error) {
                 console.error('Error saving stroke:', error);
@@ -1101,6 +1112,68 @@
             // Add current player locally immediately to ensure they show up in the count
             // The realtime subscription will handle updates from other players
             addPlayer(gameState.myId, gameState.myName, 0);
+            
+            // Check if this player should be the game host (first player in the room)
+            checkGameHostStatus();
+        }
+
+        async function checkGameHostStatus() {
+            if (!isSupabaseConfigured || !gameState.roomId) return;
+            
+            try {
+                // Get all players in the room ordered by join time
+                const { data: players, error } = await supabase
+                    .from('game_players')
+                    .select('user_id, created_at')
+                    .eq('room_id', gameState.roomId)
+                    .order('created_at', { ascending: true });
+                
+                if (error) throw error;
+                
+                if (players && players.length > 0) {
+                    // First player is the host
+                    gameState.gameHostId = players[0].user_id;
+                    gameState.isGameHost = (gameState.gameHostId === gameState.myId);
+                    
+                    console.log('Game host status:', {
+                        hostId: gameState.gameHostId,
+                        isHost: gameState.isGameHost,
+                        myId: gameState.myId
+                    });
+                    
+                    // Update UI based on host status
+                    updateHostUI();
+                }
+            } catch (error) {
+                console.error('Error checking game host status:', error);
+            }
+        }
+
+        function updateHostUI() {
+            const startBtn = document.getElementById('startGameBtn');
+            const gamePhase = document.getElementById('gamePhase');
+            
+            if (gameState.isGameHost) {
+                // Show host indicator
+                if (gamePhase) {
+                    gamePhase.textContent = '👑 Host - ' + (gameState.gameStarted ? 'Game in progress' : 'Waiting for players');
+                }
+                
+                // Show start button if game hasn't started and we have enough players
+                if (startBtn && !gameState.gameStarted && gameState.players.size >= 2) {
+                    startBtn.style.display = 'inline-block';
+                }
+            } else {
+                // Hide host indicator
+                if (gamePhase) {
+                    gamePhase.textContent = gameState.gameStarted ? 'Game in progress' : 'Waiting for host to start';
+                }
+                
+                // Hide start button for non-hosts
+                if (startBtn) {
+                    startBtn.style.display = 'none';
+                }
+            }
         }
 
         function createRoom() {
@@ -1371,6 +1444,51 @@
                             addSystemMessage(`Round ${gameStateData.round}: ${gameState.players.get(gameStateData.drawer)?.name} is drawing!`);
                             startTimer();
                         }
+                    } else if (gameStateData.type === 'timer_start') {
+                        // Synchronize timer across all players
+                        if (senderId !== gameState.myId) {
+                            console.log('Syncing timer from host:', {
+                                timeLeft: gameStateData.timeLeft,
+                                roundEndTime: gameStateData.roundEndTime,
+                                currentTime: Date.now()
+                            });
+                            gameState.timeLeft = gameStateData.timeLeft;
+                            startTimer(gameStateData.roundEndTime);
+                        }
+                    } else if (gameStateData.type === 'round_end') {
+                        // Synchronize round end across all players
+                        if (senderId !== gameState.myId) {
+                            gameState.roundStarted = false;
+                            gameState.timeLeft = 0;
+                            if (gameState.timer) {
+                                clearInterval(gameState.timer);
+                            }
+                            addSystemMessage(`Round ended! The word was: ${gameStateData.word}`);
+                        }
+                    } else if (gameStateData.type === 'game_end') {
+                        // Synchronize game end across all players
+                        if (senderId !== gameState.myId) {
+                            gameState.gameStarted = false;
+                            gameState.roundStarted = false;
+                            if (gameState.timer) {
+                                clearInterval(gameState.timer);
+                            }
+                            
+                            if (gameStateData.winner) {
+                                addSystemMessage(`🎉 Game Over! Winner: ${gameStateData.winner.name} with ${gameStateData.winner.score} points!`);
+                            }
+                            
+                            if (gameStateData.finalScores) {
+                                 let scoreText = 'Final Scores:\n';
+                                 gameStateData.finalScores.forEach((player, index) => {
+                                     scoreText += `${index + 1}. ${player.name}: ${player.score} points\n`;
+                                 });
+                                 addSystemMessage(scoreText);
+                             }
+                             
+                             // Reset UI for new game
+                             resetGameUI();
+                         }
                     }
                 } catch (error) {
                     console.error('Error parsing game state message:', error);
@@ -1445,6 +1563,12 @@
 
         function handleDrawingStroke(payload) {
             const stroke = payload.new;
+            console.log('Received drawing stroke:', {
+                from: stroke.user_id,
+                myId: gameState.myId,
+                willDraw: stroke.user_id !== gameState.myId
+            });
+            
             // Only draw strokes from other players
             if (stroke.user_id !== gameState.myId) {
                 drawStrokeFromData(stroke.stroke_data);
@@ -1619,18 +1743,36 @@
             const playerCount = gameState.players.size;
             const maxPlayers = 10; // Default max players
             document.getElementById('playerCount').textContent = `${playerCount}/${maxPlayers}`;
+            
+            // Update host UI when player list changes
+            updateHostUI();
         }
 
         async function startGame() {
+            // Only the game host should start games in multiplayer mode
+            if (isSupabaseConfigured && !gameState.isGameHost) {
+                console.log('Not game host, cannot start game');
+                return;
+            }
+            
             gameState.gameStarted = true;
             addSystemMessage('Game started! Get ready to draw and guess!');
             
             // Hide join modal if still open
             document.getElementById('joinModal').style.display = 'none';
             
+            // Hide start button
+            const startBtn = document.getElementById('startGameBtn');
+            if (startBtn) {
+                startBtn.style.display = 'none';
+            }
+            
             // Update game phase
             document.getElementById('gamePhase').textContent = 'Game in progress';
             document.getElementById('currentWord').textContent = 'Game starting...';
+            
+            // Update host UI
+            updateHostUI();
             
             // Update room status in database and broadcast game start
             if (isSupabaseConfigured && gameState.roomId) {
@@ -1691,6 +1833,12 @@
 
         // Game state management functions
         async function startNewRound() {
+            // Only the game host should manage rounds in multiplayer mode
+            if (isSupabaseConfigured && !gameState.isGameHost) {
+                console.log('Not game host, skipping round management');
+                return;
+            }
+            
             if (!isSupabaseConfigured) {
                 // Demo mode
                 const players = Array.from(gameState.players.keys());
@@ -1801,6 +1949,12 @@
         }
         
         async function endRound() {
+            // Only the game host should end rounds in multiplayer mode
+            if (isSupabaseConfigured && !gameState.isGameHost) {
+                console.log('Not game host, skipping round end');
+                return;
+            }
+            
             gameState.roundStarted = false;
             gameState.timeLeft = 0;
             
@@ -1820,6 +1974,15 @@
             
             addSystemMessage(`Round ended! The word was: ${gameState.currentWord}`);
             
+            // Broadcast round end to all players
+            if (isSupabaseConfigured) {
+                broadcastGameState({
+                    type: 'round_end',
+                    word: gameState.currentWord,
+                    currentRound: gameState.currentRound
+                });
+            }
+            
             // Move to next round after delay
             setTimeout(() => {
                 gameState.currentRound++;
@@ -1832,6 +1995,12 @@
         }
         
         function endGame() {
+            // Only the game host should end games in multiplayer mode
+            if (isSupabaseConfigured && !gameState.isGameHost) {
+                console.log('Not game host, skipping game end');
+                return;
+            }
+            
             gameState.gameStarted = false;
             gameState.roundStarted = false;
             
@@ -1849,28 +2018,126 @@
                 scoreText += `${index + 1}. ${player.name}: ${player.score} points\n`;
             });
             addSystemMessage(scoreText);
+            
+            // Broadcast game end to all players
+            if (isSupabaseConfigured) {
+                broadcastGameState({
+                    type: 'game_end',
+                    winner: players[0],
+                    finalScores: players
+                });
+            }
+            
+            // Reset UI for new game
+            resetGameUI();
         }
         
-        function startTimer() {
+        function resetGameUI() {
+            // Reset game state
+            gameState.currentRound = 0;
+            gameState.currentDrawer = null;
+            gameState.currentWord = '';
+            gameState.timeLeft = 60;
+            
+            // Clear canvas
+            clearCanvas();
+            
+            // Update UI elements
+            const gamePhaseElement = document.getElementById('gamePhase');
+            if (gamePhaseElement) {
+                gamePhaseElement.textContent = 'Waiting for game to start...';
+            }
+            
+            const timerElement = document.getElementById('timer');
+            if (timerElement) {
+                timerElement.textContent = '60';
+            }
+            
+            const currentWordElement = document.getElementById('currentWord');
+            if (currentWordElement) {
+                currentWordElement.textContent = '';
+            }
+            
+            // Show start button for host
+            if (gameState.isGameHost) {
+                const startGameBtn = document.getElementById('startGameBtn');
+                if (startGameBtn) {
+                    startGameBtn.style.display = 'block';
+                }
+            }
+            
+            updateHostUI();
+        }
+        
+        function startTimer(roundEndTime = null) {
             if (gameState.timer) {
                 clearInterval(gameState.timer);
             }
             
+            // If no end time provided, calculate it (only for the drawer/host)
+            if (!roundEndTime) {
+                roundEndTime = Date.now() + (gameState.timeLeft * 1000);
+                
+                // Only the game host should broadcast the timer start
+                if (isSupabaseConfigured && gameState.isGameHost) {
+                    console.log('Host broadcasting timer start:', {
+                        timeLeft: gameState.timeLeft,
+                        roundEndTime: roundEndTime,
+                        currentTime: Date.now()
+                    });
+                    broadcastGameState({
+                        type: 'timer_start',
+                        roundEndTime: roundEndTime,
+                        timeLeft: gameState.timeLeft
+                    });
+                }
+            } else {
+                console.log('Starting timer with provided end time:', {
+                    roundEndTime: roundEndTime,
+                    currentTime: Date.now(),
+                    calculatedTimeLeft: Math.ceil((roundEndTime - Date.now()) / 1000)
+                });
+            }
+            
+            gameState.roundEndTime = roundEndTime;
+            
             gameState.timer = setInterval(() => {
-                gameState.timeLeft--;
+                const now = Date.now();
+                gameState.timeLeft = Math.max(0, Math.ceil((gameState.roundEndTime - now) / 1000));
                 updateTimerDisplay();
                 
                 if (gameState.timeLeft <= 0) {
                     clearInterval(gameState.timer);
-                    endRound();
+                    // Only the game host should end the round to prevent duplicates
+                    if (gameState.isGameHost) {
+                        endRound();
+                    }
                 }
-            }, 1000);
+            }, 100); // Update more frequently for better sync
         }
         
         function updateTimerDisplay() {
             const timerElement = document.getElementById('timer');
             if (timerElement) {
                 timerElement.textContent = `${gameState.timeLeft}s`;
+            }
+        }
+        
+        async function broadcastGameState(gameStateData) {
+            if (!isSupabaseConfigured || !gameState.roomId || !gameState.myId) return;
+            
+            try {
+                await supabase
+                    .from('game_messages')
+                    .insert({
+                        room_id: gameState.roomId,
+                        user_id: gameState.myId,
+                        username: 'System',
+                        message: JSON.stringify(gameStateData),
+                        message_type: 'game_state'
+                    });
+            } catch (error) {
+                console.error('Error broadcasting game state:', error);
             }
         }
         
