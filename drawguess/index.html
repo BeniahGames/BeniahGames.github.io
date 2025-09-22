@@ -174,6 +174,11 @@
             cursor: crosshair;
             max-width: 100%;
             max-height: 400px;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .sidebar {
@@ -708,10 +713,14 @@
             canvas.addEventListener('mouseup', stopDrawing);
             canvas.addEventListener('mouseout', stopDrawing);
             
-            // Touch events for mobile
-            canvas.addEventListener('touchstart', handleTouch);
-            canvas.addEventListener('touchmove', handleTouch);
-            canvas.addEventListener('touchend', stopDrawing);
+            // Touch events for mobile with proper options
+            canvas.addEventListener('touchstart', handleTouch, { passive: false });
+            canvas.addEventListener('touchmove', handleTouch, { passive: false });
+            canvas.addEventListener('touchend', handleTouch, { passive: false });
+            canvas.addEventListener('touchcancel', stopDrawing, { passive: false });
+            
+            // Prevent default touch behaviors on canvas
+            canvas.style.touchAction = 'none';
         }
 
         function setupEventListeners() {
@@ -819,7 +828,14 @@
                 return;
             }
             
-            if (!gameState.roomId) return;
+            // Validate required data before database operation
+            if (!gameState.roomId || !gameState.myId) {
+                console.error('Missing required game state data for stroke:', {
+                    roomId: gameState.roomId,
+                    myId: gameState.myId
+                });
+                return;
+            }
             
             try {
                 const { error } = await supabase
@@ -866,12 +882,31 @@
         function handleTouch(e) {
             e.preventDefault();
             const touch = e.touches[0];
-            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
-                                            e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            canvas.dispatchEvent(mouseEvent);
+            
+            // Get canvas bounding rect and calculate proper coordinates
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            
+            // Calculate touch coordinates relative to canvas
+            const x = (touch.clientX - rect.left) * scaleX;
+            const y = (touch.clientY - rect.top) * scaleY;
+            
+            // Create a synthetic event with proper coordinates
+            const syntheticEvent = {
+                clientX: rect.left + x / scaleX,
+                clientY: rect.top + y / scaleY,
+                preventDefault: () => {}
+            };
+            
+            // Handle touch events directly
+            if (e.type === 'touchstart') {
+                startDrawing(syntheticEvent);
+            } else if (e.type === 'touchmove') {
+                draw(syntheticEvent);
+            } else if (e.type === 'touchend') {
+                stopDrawing();
+            }
         }
 
         function clearCanvas() {
@@ -1043,6 +1078,11 @@
         }
 
         async function addPlayerToRoom(roomId) {
+            // Validate required data before database operation
+            if (!roomId || !gameState.myId || !gameState.myName) {
+                throw new Error('Missing required data for adding player to room');
+            }
+            
             const { error } = await supabase
                 .from('game_players')
                 .upsert({
@@ -1075,15 +1115,21 @@
         }
 
         function setupRealtimeSubscriptions() {
-            if (!isSupabaseConfigured || !gameState.roomId) return;
+            if (!isSupabaseConfigured || !gameState.roomId) {
+                console.log('Skipping subscriptions - Supabase not configured or no room ID');
+                return;
+            }
             
             // Prevent duplicate subscriptions
             if (gameState.subscriptions.length) {
+                console.log('Cleaning up existing subscriptions');
                 gameState.subscriptions.forEach(ch => supabase.removeChannel(ch));
                 gameState.subscriptions = [];
             }
             
             try {
+                console.log('Setting up real-time subscriptions for room:', gameState.roomId);
+                
                 // Subscribe to players in the room
                 const playersSubscription = supabase
                     .channel(`room-${gameState.roomId}-players`)
@@ -1092,8 +1138,13 @@
                         schema: 'public',
                         table: 'game_players',
                         filter: `room_id=eq.${gameState.roomId}`
-                    }, handlePlayerUpdate)
-                    .subscribe();
+                    }, (payload) => {
+                        console.log('Player update received:', payload);
+                        handlePlayerUpdate(payload);
+                    })
+                    .subscribe((status) => {
+                        console.log('Players subscription status:', status);
+                    });
 
                 // Subscribe to messages in the room
                 const messagesSubscription = supabase
@@ -1103,8 +1154,13 @@
                         schema: 'public',
                         table: 'game_messages',
                         filter: `room_id=eq.${gameState.roomId}`
-                    }, handleNewMessage)
-                    .subscribe();
+                    }, (payload) => {
+                        console.log('New message received:', payload);
+                        handleNewMessage(payload);
+                    })
+                    .subscribe((status) => {
+                        console.log('Messages subscription status:', status);
+                    });
 
                 // Subscribe to drawing strokes
                 const drawingSubscription = supabase
@@ -1114,8 +1170,13 @@
                         schema: 'public',
                         table: 'drawing_strokes',
                         filter: `room_id=eq.${gameState.roomId}`
-                    }, handleDrawingStroke)
-                    .subscribe();
+                    }, (payload) => {
+                        console.log('Drawing stroke received:', payload);
+                        handleDrawingStroke(payload);
+                    })
+                    .subscribe((status) => {
+                        console.log('Drawing subscription status:', status);
+                    });
 
                 // Subscribe to room updates
                 const roomSubscription = supabase
@@ -1125,8 +1186,13 @@
                         schema: 'public',
                         table: 'game_rooms',
                         filter: `id=eq.${gameState.roomId}`
-                    }, handleRoomUpdate)
-                    .subscribe();
+                    }, (payload) => {
+                        console.log('Room update received:', payload);
+                        handleRoomUpdate(payload);
+                    })
+                    .subscribe((status) => {
+                        console.log('Room subscription status:', status);
+                    });
 
                 gameState.subscriptions = [
                     playersSubscription,
@@ -1135,7 +1201,7 @@
                     roomSubscription
                 ];
 
-                console.log('Real-time subscriptions established');
+                console.log('Real-time subscriptions established for room:', gameState.roomId);
                 
                 // Load initial data
                 loadInitialGameData();
@@ -1259,6 +1325,11 @@
         function handleNewMessage(payload) {
             const message = payload.new;
             
+            // Skip messages from the current user to avoid duplicates
+            if (message.user_id === gameState.myId) {
+                return;
+            }
+            
             if (message.message_type === 'system') {
                 addSystemMessage(message.message);
             } else if (message.message_type === 'game_state') {
@@ -1304,7 +1375,8 @@
                 } catch (error) {
                     console.error('Error parsing game state message:', error);
                 }
-            } else {
+            } else if (message.message_type === 'chat' || message.message_type === 'guess') {
+                // Display regular chat messages and guesses from other players
                 addChatMessage(message.username, message.message, message.is_correct_guess ? 'correct-guess' : 'normal');
                 
                 // Check if it's a correct guess
@@ -1865,13 +1937,26 @@
                 return;
             }
             
-            if (!gameState.roomId) return;
+            // Validate required data before database operation
+            if (!gameState.roomId || !gameState.myId || !gameState.myName) {
+                console.error('Missing required game state data:', {
+                    roomId: gameState.roomId,
+                    myId: gameState.myId,
+                    myName: gameState.myName
+                });
+                addSystemMessage('Error: Unable to send message. Please rejoin the room.');
+                input.value = '';
+                return;
+            }
             
             try {
                 // Check if it's a correct guess using enhanced detection
                 const isCorrectGuess = checkGuess(message, gameState.myId);
                 
-                // Save message to database (will be received via subscription for display)
+                // Display message locally immediately for better UX
+                addChatMessage(gameState.myName, message, isCorrectGuess ? 'correct-guess' : 'normal');
+                
+                // Save message to database (will be received via subscription for other players)
                 const { error } = await supabase
                     .from('game_messages')
                     .insert({
