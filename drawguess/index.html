@@ -1233,21 +1233,9 @@
                 throw new Error('Room not found');
             }
             
-            // If room is playing, check if this player was already in the room
+            // Allow joining rooms regardless of status - players can join mid-game
             if (room.status === 'playing') {
-                const { data: existingPlayer, error: playerError } = await supabase
-                    .from('game_players')
-                    .select('*')
-                    .eq('room_id', room.id)
-                    .eq('user_id', gameState.myId)
-                    .single();
-                
-                if (playerError || !existingPlayer) {
-                    throw new Error('Room already started and you are not a participant');
-                }
-                
-                // Player was in the room, allow rejoin
-                console.log('Rejoining existing game room');
+                console.log('Joining game in progress - player will be added to rotation');
             }
             
             // Check if room is full
@@ -1277,7 +1265,17 @@
             // Load initial game data (including players)
             await loadInitialGameData();
             
-            addSystemMessage(`Joined room ${roomCode.toUpperCase()}`);
+            // If joining a game in progress, load current drawing
+            if (room.status === 'playing' && gameState.roundStarted) {
+                await loadExistingStrokes();
+            }
+            
+            // Add appropriate join message based on game status
+            if (room.status === 'playing') {
+                addSystemMessage(`Joined room ${roomCode.toUpperCase()} - Game in progress! You'll be added to the rotation.`);
+            } else {
+                addSystemMessage(`Joined room ${roomCode.toUpperCase()}`);
+            }
         }
 
         async function addPlayerToRoom(roomId) {
@@ -1304,6 +1302,16 @@
             // Add current player locally immediately to ensure they show up in the count
             // The realtime subscription will handle updates from other players
             addPlayer(gameState.myId, gameState.myName, 0);
+            
+            // Broadcast player join to notify other players
+            if (isSupabaseConfigured && gameState.roomId) {
+                broadcastGameState({
+                    type: 'player_join',
+                    playerId: gameState.myId,
+                    playerName: gameState.myName,
+                    playerScore: 0
+                });
+            }
             
             // Check if this player should be the game host (first player in the room)
             checkGameHostStatus();
@@ -1752,6 +1760,7 @@
                                 
                                 // Update UI
                                 updateDrawingPermissions();
+                                updateRoundDisplay();
                                 const gamePhaseElement = document.getElementById('gamePhase');
                                 if (gamePhaseElement) {
                                     if (gameState.currentDrawer === gameState.myId) {
@@ -1896,6 +1905,36 @@
                             gameState.timeLeft = gameStateData.timeLeft;
                             startTimer(gameStateData.roundEndTime);
                         }
+                    } else if (gameStateData.type === 'score_update') {
+                        // Synchronize score updates across all players
+                        if (senderId !== gameState.myId) {
+                            const player = gameState.players.get(gameStateData.playerId);
+                            if (player) {
+                                // Add to correct guessers set
+                                gameState.correctGuessers.add(gameStateData.playerId);
+                                
+                                // Update score
+                                player.score = gameStateData.newScore;
+                                updatePlayerList();
+                                
+                                // Show messages
+                                addSystemMessage(`🎉 ${gameStateData.playerName} guessed correctly!`);
+                                addSystemMessage(`+${gameStateData.points} points for ${gameStateData.playerName}!`);
+                            }
+                        }
+                    } else if (gameStateData.type === 'canvas_clear') {
+                        // Synchronize canvas clearing across all players
+                        if (senderId !== gameState.myId) {
+                            console.log('Received canvas clear from another player for round', gameStateData.round);
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        }
+                    } else if (gameStateData.type === 'player_join') {
+                        // Synchronize new player joins across all players
+                        if (senderId !== gameState.myId) {
+                            console.log('New player joined:', gameStateData.playerName);
+                            addPlayer(gameStateData.playerId, gameStateData.playerName, gameStateData.playerScore);
+                            addSystemMessage(`🎮 ${gameStateData.playerName} joined the game!`);
+                        }
                     } else if (gameStateData.type === 'round_end') {
                         // Synchronize round end across all players
                         if (senderId !== gameState.myId) {
@@ -1955,6 +1994,18 @@
                         guesser.score += points;
                         updatePlayerList();
                         addSystemMessage(`+${points} points for ${message.username}!`);
+                        
+                        // Broadcast the score update to all players
+                        if (isSupabaseConfigured) {
+                            broadcastGameState({
+                                type: 'score_update',
+                                playerId: message.user_id,
+                                playerName: message.username,
+                                points: points,
+                                newScore: guesser.score,
+                                timeLeft: gameState.timeLeft
+                            });
+                        }
                     }
                 }
             }
@@ -2690,13 +2741,22 @@
         function clearCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Clear strokes from database if configured
+            // Clear strokes from database if configured (only current round)
             if (isSupabaseConfigured && gameState.roomId) {
                 supabase
                     .from('drawing_strokes')
                     .delete()
                     .eq('room_id', gameState.roomId)
-                    .then(() => console.log('Canvas cleared'))
+                    .eq('round_number', gameState.currentRound + 1)
+                    .then(() => {
+                        console.log('Canvas cleared for round', gameState.currentRound + 1);
+                        
+                        // Broadcast canvas clear to other players
+                        broadcastGameState({
+                            type: 'canvas_clear',
+                            round: gameState.currentRound + 1
+                        });
+                    })
                     .catch(error => console.error('Error clearing canvas:', error));
             }
         }
