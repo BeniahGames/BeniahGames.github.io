@@ -934,7 +934,13 @@
                 
             } catch (error) {
                 console.error('Error joining game:', error);
-                alert('Failed to join game. Please try again.');
+                let errorMessage = 'Failed to join game. Please try again.';
+                
+                if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                alert(errorMessage);
                 gameState.joiningGame = false;
             }
         }
@@ -952,7 +958,8 @@
                 .insert({
                     room_code: roomCode,
                     host_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
-                    status: 'waiting'
+                    status: 'waiting',
+                    max_players: 10
                 })
                 .select()
                 .single();
@@ -973,6 +980,8 @@
         }
 
         async function joinExistingRoom(roomCode) {
+            console.log('Attempting to join room:', roomCode.toUpperCase());
+            
             // Find room by code
             const { data: room, error: roomError } = await supabase
                 .from('game_rooms')
@@ -980,6 +989,8 @@
                 .eq('room_code', roomCode.toUpperCase())
                 .eq('status', 'waiting')
                 .single();
+            
+            console.log('Room query result:', { room, roomError });
             
             if (roomError || !room) {
                 throw new Error('Room not found or already started');
@@ -991,9 +1002,14 @@
                 .select('*', { count: 'exact', head: true })
                 .eq('room_id', room.id);
             
+            console.log('Player count check:', { count, countError, roomId: room.id });
+            
             if (countError) throw countError;
             
-            if (count >= room.max_players) {
+            const maxPlayers = room.max_players || 10; // Default to 10 if not set
+            console.log('Room capacity:', { count, maxPlayers });
+            
+            if (count >= maxPlayers) {
                 throw new Error('Room is full');
             }
             
