@@ -1023,6 +1023,10 @@
             if (error && error.code !== '23505') { // Ignore duplicate key error
                 throw error;
             }
+            
+            // Add current player locally immediately to ensure they show up in the count
+            // The realtime subscription will handle updates from other players
+            addPlayer(gameState.myId, gameState.myName, 0);
         }
 
         function createRoom() {
@@ -1121,12 +1125,12 @@
 
                 if (playersError) throw playersError;
 
-                // Clear and reload players
-                gameState.players.clear();
-                document.getElementById('playersList').innerHTML = '';
-                
+                // Add players that aren't already in the local state
+                // Don't clear existing players to avoid removing the current player we just added
                 players.forEach(player => {
-                    addPlayer(player.user_id, player.username, player.score);
+                    if (!gameState.players.has(player.user_id)) {
+                        addPlayer(player.user_id, player.username, player.score);
+                    }
                 });
 
                 // Load recent messages
