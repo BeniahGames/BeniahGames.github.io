@@ -936,7 +936,10 @@
                 console.error('Error joining game:', error);
                 let errorMessage = 'Failed to join game. Please try again.';
                 
-                if (error.message) {
+                // Handle specific database errors
+                if (error.code === '42P17') {
+                    errorMessage = 'Database configuration error (infinite recursion in security policy). Please contact support.';
+                } else if (error.message) {
                     errorMessage = error.message;
                 }
                 
@@ -1295,12 +1298,23 @@
                 drawingTools.style.pointerEvents = canDraw ? 'auto' : 'none';
             }
             
-            // Show word to drawer
-            if (canDraw && gameState.currentWord) {
-                document.getElementById('currentWord').textContent = gameState.currentWord;
-                document.getElementById('currentWord').style.display = 'block';
-            } else {
-                document.getElementById('currentWord').style.display = 'none';
+            // Update canvas interaction
+            const canvas = document.getElementById('drawingCanvas');
+            if (canvas) {
+                canvas.style.pointerEvents = canDraw ? 'auto' : 'none';
+                canvas.style.cursor = canDraw ? 'crosshair' : 'default';
+            }
+            
+            // Show appropriate text to drawer vs guessers
+            const currentWordElement = document.getElementById('currentWord');
+            if (currentWordElement) {
+                if (canDraw && gameState.currentWord) {
+                    currentWordElement.textContent = `Draw: ${gameState.currentWord}`;
+                } else if (gameState.roundStarted) {
+                    currentWordElement.textContent = 'Guess the drawing!';
+                } else {
+                    currentWordElement.textContent = 'Waiting for players...';
+                }
             }
         }
 
@@ -1426,21 +1440,33 @@
             document.getElementById('playerCount').textContent = `${playerCount}/${maxPlayers}`;
         }
 
-        function startGame() {
+        async function startGame() {
             gameState.gameStarted = true;
             addSystemMessage('Game started! Get ready to draw and guess!');
             
             // Hide join modal if still open
             document.getElementById('joinModal').style.display = 'none';
             
-            // Show start game button for host or in demo mode
-            const startBtn = document.getElementById('startGameBtn');
-            if (startBtn && (gameState.players.size >= 2 || !isSupabaseConfigured)) {
-                startBtn.style.display = 'inline-block';
+            // Update game phase
+            document.getElementById('gamePhase').textContent = 'Game in progress';
+            document.getElementById('currentWord').textContent = 'Game starting...';
+            
+            // Update room status in database
+            if (isSupabaseConfigured && gameState.roomId) {
+                try {
+                    await supabase
+                        .from('game_rooms')
+                        .update({ status: 'playing' })
+                        .eq('id', gameState.roomId);
+                } catch (error) {
+                    console.error('Error updating room status:', error);
+                }
             }
             
-            // Update game phase
-            document.getElementById('gamePhase').textContent = 'Ready to start';
+            // Start the first round after a short delay
+            setTimeout(() => {
+                startNewRound();
+            }, 2000);
         }
 
         function generateRoomCode() {
@@ -1483,15 +1509,26 @@
                 
                 updateDrawingPermissions();
                 clearCanvas();
+                
+                // Update game phase for demo mode
+                const gamePhaseElement = document.getElementById('gamePhase');
+                if (gamePhaseElement) {
+                    if (gameState.currentDrawer === gameState.myId) {
+                        gamePhaseElement.textContent = 'Your turn to draw!';
+                    } else {
+                        const drawerName = gameState.players.get(gameState.currentDrawer)?.name || 'Someone';
+                        gamePhaseElement.textContent = `${drawerName} is drawing`;
+                    }
+                }
+                
                 addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
                 startTimer();
                 return;
             }
             
             try {
-                // Get random word from database
-                const { data: wordData } = await supabase.rpc('get_random_word');
-                const word = wordData || 'house';
+                // Get random word (fallback to local words array)
+                const word = getRandomWord();
                 
                 // Update room with new round info
                 const players = Array.from(gameState.players.keys());
@@ -1500,20 +1537,67 @@
                 const { error } = await supabase
                     .from('game_rooms')
                     .update({
-                        current_drawer: currentDrawer,
+                        current_drawer_id: currentDrawer,
                         current_word: word,
                         round_number: gameState.currentRound + 1,
                         time_left: 60,
                         round_started: true
                     })
-                    .eq('room_code', gameState.roomId);
+                    .eq('id', gameState.roomId);
                 
                 if (error) throw error;
                 
+                // Update local state
+                gameState.currentDrawer = currentDrawer;
+                gameState.currentWord = word;
+                gameState.timeLeft = 60;
+                gameState.roundStarted = true;
+                
+                // Update UI and permissions
+                updateDrawingPermissions();
+                clearCanvas();
+                
+                // Update game phase
+                const gamePhaseElement = document.getElementById('gamePhase');
+                if (gamePhaseElement) {
+                    if (currentDrawer === gameState.myId) {
+                        gamePhaseElement.textContent = 'Your turn to draw!';
+                    } else {
+                        const drawerName = gameState.players.get(currentDrawer)?.name || 'Someone';
+                        gamePhaseElement.textContent = `${drawerName} is drawing`;
+                    }
+                }
+                
+                addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(currentDrawer)?.name} is drawing!`);
+                startTimer();
+                
             } catch (error) {
                 console.error('Error starting new round:', error);
-                // Fallback to local state
-                startNewRound();
+                // Fallback to demo mode logic
+                const players = Array.from(gameState.players.keys());
+                if (players.length === 0) return;
+                
+                gameState.currentDrawer = players[gameState.currentRound % players.length];
+                gameState.currentWord = getRandomWord();
+                gameState.timeLeft = 60;
+                gameState.roundStarted = true;
+                
+                updateDrawingPermissions();
+                clearCanvas();
+                
+                // Update game phase for fallback
+                const gamePhaseElement = document.getElementById('gamePhase');
+                if (gamePhaseElement) {
+                    if (gameState.currentDrawer === gameState.myId) {
+                        gamePhaseElement.textContent = 'Your turn to draw!';
+                    } else {
+                        const drawerName = gameState.players.get(gameState.currentDrawer)?.name || 'Someone';
+                        gamePhaseElement.textContent = `${drawerName} is drawing`;
+                    }
+                }
+                
+                addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                startTimer();
             }
         }
         
@@ -1616,6 +1700,15 @@
         function addPlayer(id, name, score) {
             gameState.players.set(id, { id, name, score });
             updatePlayerList();
+            
+            // Auto-start game when we have 2 or more players
+            if (gameState.players.size >= 2 && !gameState.gameStarted) {
+                setTimeout(() => {
+                    if (gameState.players.size >= 2 && !gameState.gameStarted) {
+                        startGame();
+                    }
+                }, 2000); // Wait 2 seconds to allow other players to join
+            }
         }
 
         async function sendMessage() {
