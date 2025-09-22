@@ -985,18 +985,34 @@
         async function joinExistingRoom(roomCode) {
             console.log('Attempting to join room:', roomCode.toUpperCase());
             
-            // Find room by code
+            // Find room by code (allow both waiting and playing rooms)
             const { data: room, error: roomError } = await supabase
                 .from('game_rooms')
                 .select('*')
                 .eq('room_code', roomCode.toUpperCase())
-                .eq('status', 'waiting')
                 .single();
             
             console.log('Room query result:', { room, roomError });
             
             if (roomError || !room) {
-                throw new Error('Room not found or already started');
+                throw new Error('Room not found');
+            }
+            
+            // If room is playing, check if this player was already in the room
+            if (room.status === 'playing') {
+                const { data: existingPlayer, error: playerError } = await supabase
+                    .from('game_players')
+                    .select('*')
+                    .eq('room_id', room.id)
+                    .eq('user_id', gameState.myId)
+                    .single();
+                
+                if (playerError || !existingPlayer) {
+                    throw new Error('Room already started and you are not a participant');
+                }
+                
+                // Player was in the room, allow rejoin
+                console.log('Rejoining existing game room');
             }
             
             // Check if room is full
@@ -1032,14 +1048,16 @@
         async function addPlayerToRoom(roomId) {
             const { error } = await supabase
                 .from('game_players')
-                .insert({
+                .upsert({
                     room_id: roomId,
                     user_id: gameState.myId, // Store the full user ID including guest IDs
                     username: gameState.myName,
                     score: 0
+                }, {
+                    onConflict: 'room_id,user_id'
                 });
             
-            if (error && error.code !== '23505') { // Ignore duplicate key error
+            if (error) {
                 throw error;
             }
             
@@ -1165,6 +1183,35 @@
                 messages.forEach(msg => {
                     if (msg.message_type === 'system') {
                         addSystemMessage(msg.message);
+                    } else if (msg.message_type === 'game_state') {
+                        // Check for the most recent game state message
+                        try {
+                            const gameStateData = JSON.parse(msg.message);
+                            if (gameStateData.type === 'game_start') {
+                                gameState.gameStarted = true;
+                                document.getElementById('gamePhase').textContent = 'Game in progress';
+                            } else if (gameStateData.type === 'round_start') {
+                                gameState.gameStarted = true;
+                                gameState.currentDrawer = gameStateData.drawer;
+                                gameState.currentRound = gameStateData.round - 1;
+                                gameState.timeLeft = gameStateData.timeLeft;
+                                gameState.roundStarted = true;
+                                
+                                // Update UI
+                                updateDrawingPermissions();
+                                const gamePhaseElement = document.getElementById('gamePhase');
+                                if (gamePhaseElement) {
+                                    if (gameState.currentDrawer === gameState.myId) {
+                                        gamePhaseElement.textContent = 'Your turn to draw!';
+                                    } else {
+                                        const drawerName = gameState.players.get(gameState.currentDrawer)?.name || 'Someone';
+                                        gamePhaseElement.textContent = `${drawerName} is drawing`;
+                                    }
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Error parsing game state message:', error);
+                        }
                     } else {
                         addChatMessage(msg.username, msg.message);
                     }
@@ -1175,12 +1222,34 @@
             }
         }
 
-        function handlePlayerUpdate(payload) {
+        async function handlePlayerUpdate(payload) {
             const player = payload.new;
             if (payload.eventType === 'INSERT') {
                 addPlayer(player.user_id, player.username, player.score);
                 if (player.username !== gameState.myName) {
                     addSystemMessage(`${player.username} joined the room`);
+                    
+                    // If game is in progress and this is the current drawer, broadcast current state
+                    if (gameState.gameStarted && gameState.roundStarted && gameState.currentDrawer === gameState.myId) {
+                        try {
+                            await supabase
+                                .from('game_messages')
+                                .insert({
+                                    room_id: gameState.roomId,
+                                    user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
+                                    username: 'System',
+                                    message: JSON.stringify({
+                                        type: 'round_start',
+                                        drawer: gameState.currentDrawer,
+                                        round: gameState.currentRound + 1,
+                                        timeLeft: gameState.timeLeft
+                                    }),
+                                    message_type: 'game_state'
+                                });
+                        } catch (error) {
+                            console.error('Error broadcasting game state to new player:', error);
+                        }
+                    }
                 }
             } else if (payload.eventType === 'UPDATE') {
                 updatePlayerScore(player.user_id, player.score);
@@ -1195,6 +1264,49 @@
             
             if (message.message_type === 'system') {
                 addSystemMessage(message.message);
+            } else if (message.message_type === 'game_state') {
+                // Handle game state synchronization
+                try {
+                    const gameStateData = JSON.parse(message.message);
+                    const senderId = message.user_id;
+                    
+                    if (gameStateData.type === 'game_start' && senderId !== gameState.myId) {
+                        // Synchronize game start for other players
+                        gameState.gameStarted = true;
+                        document.getElementById('joinModal').style.display = 'none';
+                        document.getElementById('gamePhase').textContent = 'Game in progress';
+                        document.getElementById('currentWord').textContent = 'Game starting...';
+                        addSystemMessage('Game started! Get ready to draw and guess!');
+                    } else if (gameStateData.type === 'round_start') {
+                        // Only update if this message is not from the current player
+                        if (senderId !== gameState.myId) {
+                            gameState.currentDrawer = gameStateData.drawer;
+                            gameState.currentRound = gameStateData.round - 1; // Adjust for 0-based indexing
+                            gameState.timeLeft = gameStateData.timeLeft;
+                            gameState.roundStarted = true;
+                            
+                            // Update UI and permissions
+                            updateDrawingPermissions();
+                            clearCanvas();
+                            
+                            // Update game phase
+                            const gamePhaseElement = document.getElementById('gamePhase');
+                            if (gamePhaseElement) {
+                                if (gameState.currentDrawer === gameState.myId) {
+                                    gamePhaseElement.textContent = 'Your turn to draw!';
+                                } else {
+                                    const drawerName = gameState.players.get(gameState.currentDrawer)?.name || 'Someone';
+                                    gamePhaseElement.textContent = `${drawerName} is drawing`;
+                                }
+                            }
+                            
+                            addSystemMessage(`Round ${gameStateData.round}: ${gameState.players.get(gameStateData.drawer)?.name} is drawing!`);
+                            startTimer();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error parsing game state message:', error);
+                }
             } else {
                 addChatMessage(message.username, message.message, message.is_correct_guess ? 'correct-guess' : 'normal');
                 
@@ -1451,13 +1563,26 @@
             document.getElementById('gamePhase').textContent = 'Game in progress';
             document.getElementById('currentWord').textContent = 'Game starting...';
             
-            // Update room status in database
+            // Update room status in database and broadcast game start
             if (isSupabaseConfigured && gameState.roomId) {
                 try {
                     await supabase
                         .from('game_rooms')
                         .update({ status: 'playing' })
                         .eq('id', gameState.roomId);
+                    
+                    // Broadcast game start to other players
+                    await supabase
+                        .from('game_messages')
+                        .insert({
+                            room_id: gameState.roomId,
+                            user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
+                            username: 'System',
+                            message: JSON.stringify({
+                                type: 'game_start'
+                            }),
+                            message_type: 'game_state'
+                        });
                 } catch (error) {
                     console.error('Error updating room status:', error);
                 }
@@ -1530,22 +1655,9 @@
                 // Get random word (fallback to local words array)
                 const word = getRandomWord();
                 
-                // Update room with new round info
+                // Select next drawer
                 const players = Array.from(gameState.players.keys());
                 const currentDrawer = players[gameState.currentRound % players.length];
-                
-                const { error } = await supabase
-                    .from('game_rooms')
-                    .update({
-                        current_drawer_id: currentDrawer,
-                        current_word: word,
-                        round_number: gameState.currentRound + 1,
-                        time_left: 60,
-                        round_started: true
-                    })
-                    .eq('id', gameState.roomId);
-                
-                if (error) throw error;
                 
                 // Update local state
                 gameState.currentDrawer = currentDrawer;
@@ -1556,6 +1668,24 @@
                 // Update UI and permissions
                 updateDrawingPermissions();
                 clearCanvas();
+                
+                // Broadcast game state to other players via system message
+                if (isSupabaseConfigured && gameState.roomId) {
+                    await supabase
+                        .from('game_messages')
+                        .insert({
+                            room_id: gameState.roomId,
+                            user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
+                            username: 'System',
+                            message: JSON.stringify({
+                                type: 'round_start',
+                                drawer: currentDrawer,
+                                round: gameState.currentRound + 1,
+                                timeLeft: 60
+                            }),
+                            message_type: 'game_state'
+                        });
+                }
                 
                 // Update game phase
                 const gamePhaseElement = document.getElementById('gamePhase');
