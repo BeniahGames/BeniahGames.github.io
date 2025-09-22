@@ -335,7 +335,16 @@
             color: var(--muted);
         }
 
-        .form-group input {
+        .form-group input, .form-group select {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .form-control {
             width: 100%;
             background: var(--bg);
             border: 1px solid var(--border);
@@ -461,8 +470,31 @@
             </div>
             <div class="form-group">
                 <label for="roomCode">Room Code (optional)</label>
-                <input type="text" id="roomCode" placeholder="Leave empty to create new room" maxlength="6">
+                <input type="text" id="roomCode" placeholder="Leave empty to create new room" maxlength="6" oninput="toggleRoomSettings()">
             </div>
+            
+            <!-- Room Settings (only shown when creating new room) -->
+            <div id="roomSettings" style="display: none;">
+                <div class="form-group">
+                    <label for="timerSetting">Timer per Round</label>
+                    <select id="timerSetting" class="form-control">
+                        <option value="30">Fast (30 seconds)</option>
+                        <option value="60" selected>Normal (60 seconds)</option>
+                        <option value="180">Slow (3 minutes)</option>
+                        <option value="0">No Time Limit</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="roundsSetting">Number of Rounds</label>
+                    <select id="roundsSetting" class="form-control">
+                        <option value="5">Short (5 rounds)</option>
+                        <option value="10" selected>Normal (10 rounds)</option>
+                        <option value="25">Long (25 rounds)</option>
+                        <option value="0">No Round Limit</option>
+                    </select>
+                </div>
+            </div>
+            
             <button class="btn" onclick="joinGame()">Join Game</button>
             <button class="btn btn-secondary" onclick="createRoom()">Create New Room</button>
         </div>
@@ -482,6 +514,7 @@
             <div class="game-status">
                 <div class="current-word" id="currentWord">Waiting for players...</div>
                 <div class="timer" id="gameTimer">Time: <span id="timer">0</span>s</div>
+                <div class="round-display" id="roundDisplay" style="margin-top: 0.5rem; color: var(--muted);">Round: 0/0</div>
                 <div id="gamePhase" style="margin-top: 0.5rem; color: var(--muted);">Waiting to start</div>
                 <div class="game-controls" style="margin-top: 0.5rem;">
                     <button id="startGameBtn" onclick="startNewRound()" style="display: none; margin-right: 0.5rem;">Start Game</button>
@@ -611,7 +644,12 @@
             correctGuessers: new Set(), // Track who has guessed correctly this round
             strokeSaveTimeout: null,
             isGameHost: false,
-            gameHostId: null
+            gameHostId: null,
+            // Room settings
+            roomSettings: {
+                timerDuration: 60, // seconds per round
+                maxRounds: 10 // total rounds
+            }
         };
 
         // Drawing state
@@ -1331,12 +1369,36 @@
             }
         }
 
+        function toggleRoomSettings() {
+            const roomCode = document.getElementById('roomCode').value.trim();
+            const roomSettings = document.getElementById('roomSettings');
+            
+            // Show room settings only when room code is empty (creating new room)
+            if (roomCode === '') {
+                roomSettings.style.display = 'block';
+            } else {
+                roomSettings.style.display = 'none';
+            }
+        }
+
         function createRoom() {
             // Name is already set by getUserName()
             if (!gameState.myName) {
                 alert('Unable to get player name. Please refresh and try again.');
                 return;
             }
+            
+            // Capture room settings
+            const timerSetting = parseInt(document.getElementById('timerSetting').value);
+            const roundsSetting = parseInt(document.getElementById('roundsSetting').value);
+            
+            gameState.roomSettings.timerDuration = timerSetting;
+            gameState.roomSettings.maxRounds = roundsSetting;
+            
+            console.log('🎮 Creating room with settings:', {
+                timerDuration: timerSetting,
+                maxRounds: roundsSetting
+            });
             
             document.getElementById('roomCode').value = '';
             joinGame();
@@ -1515,6 +1577,7 @@
                         }
                         
                         addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                        updateRoundDisplay();
                     }
                 } else if (gameStateData.type === 'round_start') {
                     // Synchronize round start
@@ -1555,6 +1618,7 @@
                     // Only show message if this is a new round start, not a sync
                     if (!gameStateData.gameStarted || gameStateData.roundStarted) {
                         addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                        updateRoundDisplay();
                     }
                 } else if (gameStateData.type === 'timer_start') {
                     // Synchronize timer across all players
@@ -2281,7 +2345,7 @@
                 
                 gameState.currentDrawer = players[gameState.currentRound % players.length];
                 gameState.currentWord = getRandomWord();
-                gameState.timeLeft = 60;
+                gameState.timeLeft = gameState.roomSettings.timerDuration;
                 gameState.roundStarted = true;
                 
                 updateDrawingPermissions();
@@ -2299,6 +2363,7 @@
                 }
                 
                 addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                updateRoundDisplay();
                 startTimer();
                 return;
             }
@@ -2323,7 +2388,7 @@
                 // Update local state
                 gameState.currentDrawer = currentDrawer;
                 gameState.currentWord = word;
-                gameState.timeLeft = 60;
+                gameState.timeLeft = gameState.roomSettings.timerDuration;
                 gameState.roundStarted = true;
                 
                 // Clear correct guessers for new round
@@ -2345,7 +2410,7 @@
                                 type: 'round_start',
                                 drawer: currentDrawer,
                                 round: gameState.currentRound + 1,
-                                timeLeft: 60
+                                timeLeft: gameState.roomSettings.timerDuration
                             }),
                             message_type: 'game_state'
                         });
@@ -2363,6 +2428,7 @@
                 }
                 
                 addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(currentDrawer)?.name} is drawing!`);
+                updateRoundDisplay();
                 startTimer();
                 
             } catch (error) {
@@ -2376,7 +2442,7 @@
                 
                 gameState.currentDrawer = players[gameState.currentRound % players.length];
                 gameState.currentWord = getRandomWord();
-                gameState.timeLeft = 60;
+                gameState.timeLeft = gameState.roomSettings.timerDuration;
                 gameState.roundStarted = true;
                 
                 updateDrawingPermissions();
@@ -2394,6 +2460,7 @@
                 }
                 
                 addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                updateRoundDisplay();
                 startTimer();
             }
         }
@@ -2424,7 +2491,11 @@
             // Move to next round after delay
             setTimeout(() => {
                 gameState.currentRound++;
-                if (gameState.currentRound < 3) { // 3 rounds per game
+                // Check if we should continue or end the game
+                const shouldContinue = gameState.roomSettings.maxRounds === 0 || 
+                                     gameState.currentRound < gameState.roomSettings.maxRounds;
+                
+                if (shouldContinue) {
                     startNewRound();
                 } else {
                     endGame();
@@ -2475,7 +2546,7 @@
             gameState.currentRound = 0;
             gameState.currentDrawer = null;
             gameState.currentWord = '';
-            gameState.timeLeft = 60;
+            gameState.timeLeft = gameState.roomSettings.timerDuration;
             
             // Clear canvas
             clearCanvas();
@@ -2485,6 +2556,8 @@
             if (gamePhaseElement) {
                 gamePhaseElement.textContent = 'Waiting for game to start...';
             }
+            
+            updateRoundDisplay();
             
             const timerElement = document.getElementById('timer');
             if (timerElement) {
@@ -2540,6 +2613,12 @@
             gameState.roundEndTime = roundEndTime;
             
             gameState.timer = setInterval(() => {
+                // Skip timer countdown if no time limit is set
+                if (gameState.roomSettings.timerDuration === 0) {
+                    updateTimerDisplay();
+                    return;
+                }
+                
                 const now = Date.now();
                 gameState.timeLeft = Math.max(0, Math.ceil((gameState.roundEndTime - now) / 1000));
                 updateTimerDisplay();
@@ -2557,7 +2636,25 @@
         function updateTimerDisplay() {
             const timerElement = document.getElementById('timer');
             if (timerElement) {
-                timerElement.textContent = `${gameState.timeLeft}s`;
+                if (gameState.roomSettings.timerDuration === 0) {
+                    timerElement.textContent = '∞';
+                } else {
+                    timerElement.textContent = `${gameState.timeLeft}s`;
+                }
+            }
+        }
+
+        function updateRoundDisplay() {
+            const roundElement = document.getElementById('roundDisplay');
+            if (roundElement) {
+                const currentRound = gameState.currentRound + 1;
+                const maxRounds = gameState.roomSettings.maxRounds;
+                
+                if (maxRounds === 0) {
+                    roundElement.textContent = `Round: ${currentRound}`;
+                } else {
+                    roundElement.textContent = `Round: ${currentRound}/${maxRounds}`;
+                }
             }
         }
         
