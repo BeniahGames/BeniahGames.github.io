@@ -1790,10 +1790,11 @@
                 }
             } else if (message.message_type === 'chat' || message.message_type === 'guess') {
                 // Display regular chat messages and guesses from other players
-                addChatMessage(message.username, message.message, message.is_correct_guess ? 'correct-guess' : 'normal');
+                const isCorrectGuess = message.message_type === 'guess';
+                addChatMessage(message.username, message.message, isCorrectGuess ? 'correct-guess' : 'normal');
                 
                 // Check if it's a correct guess
-                if (message.is_correct_guess) {
+                if (isCorrectGuess) {
                     addSystemMessage(`🎉 ${message.username} guessed correctly!`);
                 }
             }
@@ -2253,19 +2254,7 @@
             gameState.roundStarted = false;
             gameState.timeLeft = 0;
             
-            if (isSupabaseConfigured) {
-                try {
-                    await supabase
-                        .from('game_rooms')
-                        .update({
-                            round_started: false,
-                            time_left: 0
-                        })
-                        .eq('room_code', gameState.room);
-                } catch (error) {
-                    console.error('Error ending round:', error);
-                }
-            }
+            // Game state is managed via real-time broadcasting, no need to update database
             
             addSystemMessage(`Round ended! The word was: ${gameState.currentWord}`);
             
@@ -2547,8 +2536,7 @@
                         user_id: gameState.myId, // Store the full user ID including guest IDs
                         username: gameState.myName,
                         message: message,
-                        message_type: isCorrectGuess ? 'guess' : 'chat',
-                        is_correct_guess: isCorrectGuess
+                        message_type: isCorrectGuess ? 'guess' : 'chat'
                     });
                 
                 if (error) throw error;
