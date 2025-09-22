@@ -2176,7 +2176,7 @@
                             round_started: false,
                             time_left: 0
                         })
-                        .eq('room_code', gameState.roomId);
+                        .eq('room_code', gameState.room);
                 } catch (error) {
                     console.error('Error ending round:', error);
                 }
@@ -2432,6 +2432,13 @@
                 return;
             }
             
+            // Additional validation for message content
+            if (message.length > 500) {
+                addSystemMessage('Message too long. Please keep messages under 500 characters.');
+                input.value = '';
+                return;
+            }
+            
             try {
                 // Check if it's a correct guess using enhanced detection
                 const isCorrectGuess = checkGuess(message, gameState.myId);
@@ -2464,8 +2471,14 @@
                 
             } catch (error) {
                 console.error('Error sending message:', error);
-                // Fallback to local display
-                addChatMessage(gameState.myName, message, 'guess');
+                console.error('Message data:', {
+                    room_id: gameState.roomId,
+                    user_id: gameState.myId,
+                    username: gameState.myName,
+                    message: message,
+                    message_length: message.length
+                });
+                addSystemMessage('Failed to send message. Please try again.');
                 input.value = '';
             }
         }
