@@ -452,10 +452,7 @@
         <div class="join-form">
             <h2 style="margin-bottom: 1rem; color: var(--accent);">Join DrawGuess</h2>
             <div class="form-group">
-                <label>Playing as: <span id="currentUserName" style="color: var(--accent); font-weight: bold;">Guest</span></label>
-                <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem;">
-                    <a href="../user/" style="color: var(--accent);">Sign in</a> to use your profile name
-                </p>
+                <label>Playing as: <span id="currentUserName" style="color: var(--accent); font-weight: bold;">Loading...</span></label>
             </div>
             <div class="form-group">
                 <label for="roomCode">Room Code (optional)</label>
@@ -575,10 +572,11 @@
             currentDrawer: null,
             currentWord: null,
             timeLeft: 60,
-            round: 1,
+            currentRound: 0,
             maxRounds: 3,
             isDrawing: false,
             gameStarted: false,
+            roundStarted: false,
             subscriptions: [],
             eventListenersSetup: false,
             joiningGame: false
@@ -611,7 +609,10 @@
             setupEventListeners();
             
             // Get user's name and ID from authentication
-            await getUserName();
+            const isAuthenticated = await getUserName();
+            if (!isAuthenticated) {
+                return; // Stop initialization if not authenticated
+            }
             
             // Start periodic room cleanup (every 30 minutes)
             if (isSupabaseConfigured) {
@@ -624,21 +625,17 @@
         async function getUserName() {
             // Check if user is authenticated
             const user = await getCurrentUser();
-            const signInMessage = document.querySelector('.join-form p');
             
             if (user && user.username) {
                 gameState.myId = user.id;
                 gameState.myName = user.username;
                 document.getElementById('currentUserName').textContent = user.username;
-                // Hide sign-in message for authenticated users
-                if (signInMessage) signInMessage.style.display = 'none';
+                return true; // User is authenticated
             } else {
-                // Generate a guest name and ID
-                gameState.myId = 'guest_' + Math.random().toString(36).substr(2, 9);
-                gameState.myName = 'Guest' + Math.floor(Math.random() * 1000);
-                document.getElementById('currentUserName').textContent = gameState.myName;
-                // Show sign-in message for guests
-                if (signInMessage) signInMessage.style.display = 'block';
+                // User is not authenticated - redirect to main page
+                alert('You must be logged in to play. Redirecting to login page...');
+                window.location.href = '/';
+                return false;
             }
         }
 
@@ -829,8 +826,8 @@
                     .from('drawing_strokes')
                     .insert({
                         room_id: gameState.roomId,
-                        user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
-                        round_number: gameState.round,
+                        user_id: gameState.myId,
+                        round_number: gameState.currentRound + 1,
                         stroke_data: strokeData,
                         stroke_order: Date.now()
                     });
@@ -1236,7 +1233,7 @@
                                 .from('game_messages')
                                 .insert({
                                     room_id: gameState.roomId,
-                                    user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
+                                    user_id: gameState.myId,
                                     username: 'System',
                                     message: JSON.stringify({
                                         type: 'round_start',
@@ -1576,7 +1573,7 @@
                         .from('game_messages')
                         .insert({
                             room_id: gameState.roomId,
-                            user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
+                            user_id: gameState.myId,
                             username: 'System',
                             message: JSON.stringify({
                                 type: 'game_start'
@@ -1675,7 +1672,7 @@
                         .from('game_messages')
                         .insert({
                             room_id: gameState.roomId,
-                            user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
+                            user_id: gameState.myId,
                             username: 'System',
                             message: JSON.stringify({
                                 type: 'round_start',
@@ -1916,7 +1913,7 @@
                     .from('game_players')
                     .update({ score: newScore })
                     .eq('room_id', gameState.roomId)
-                    .eq(gameState.myId.startsWith('guest_') ? 'id' : 'user_id', playerId);
+                    .eq('user_id', playerId);
                 
                 if (error) throw error;
                 
