@@ -1121,17 +1121,18 @@
             if (!isSupabaseConfigured || !gameState.roomId) return;
             
             try {
-                // Get all players in the room ordered by join time
+                // Get all players in the room
                 const { data: players, error } = await supabase
                     .from('game_players')
-                    .select('user_id, created_at')
-                    .eq('room_id', gameState.roomId)
-                    .order('created_at', { ascending: true });
+                    .select('user_id')
+                    .eq('room_id', gameState.roomId);
                 
                 if (error) throw error;
                 
                 if (players && players.length > 0) {
-                    // First player is the host
+                    // Sort players by user_id to get consistent host selection
+                    players.sort((a, b) => a.user_id.localeCompare(b.user_id));
+                    // First player (lexicographically) is the host
                     gameState.gameHostId = players[0].user_id;
                     gameState.isGameHost = (gameState.gameHostId === gameState.myId);
                     
