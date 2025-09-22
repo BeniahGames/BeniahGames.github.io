@@ -854,7 +854,7 @@
                         room_id: gameState.roomId,
                         user_id: gameState.myId,
                         round_number: gameState.currentRound + 1,
-                        stroke_data: strokeData,
+                        stroke_data: stroke,
                         stroke_order: Date.now()
                     });
                 
@@ -1268,11 +1268,24 @@
                         console.log('Room subscription status:', status);
                     });
 
+                // Create game state broadcast channel
+                const gameStateChannel = supabase
+                    .channel(`room-${gameState.roomId}-gamestate`)
+                    .on('broadcast', { event: 'game_state_update' }, (payload) => {
+                        console.log('Game state broadcast received:', payload);
+                        handleGameStateBroadcast(payload);
+                    })
+                    .subscribe((status) => {
+                        console.log('Game state channel status:', status);
+                    });
+
+                gameState.gameStateChannel = gameStateChannel;
                 gameState.subscriptions = [
                     playersSubscription,
                     messagesSubscription,
                     drawingSubscription,
-                    roomSubscription
+                    roomSubscription,
+                    gameStateChannel
                 ];
 
                 console.log('Real-time subscriptions established for room:', gameState.roomId);
@@ -1281,6 +1294,107 @@
                 loadInitialGameData();
             } catch (error) {
                 console.error('Error setting up subscriptions:', error);
+            }
+        }
+
+        function handleGameStateBroadcast(payload) {
+            try {
+                const { senderId, ...gameStateData } = payload.payload;
+                
+                // Don't process our own broadcasts
+                if (senderId === gameState.myId) {
+                    return;
+                }
+                
+                console.log('Processing game state broadcast:', gameStateData);
+                
+                // Handle different types of game state updates
+                if (gameStateData.type === 'game_start') {
+                    // Synchronize game start across all players
+                    if (!gameState.gameStarted) {
+                        gameState.gameStarted = true;
+                        gameState.currentRound = gameStateData.currentRound || 0;
+                        gameState.currentDrawer = gameStateData.currentDrawer;
+                        gameState.currentWord = gameStateData.currentWord;
+                        
+                        updateDrawingPermissions();
+                        clearCanvas();
+                        
+                        const gamePhaseElement = document.getElementById('gamePhase');
+                        if (gamePhaseElement) {
+                            if (gameState.currentDrawer === gameState.myId) {
+                                gamePhaseElement.textContent = 'Your turn to draw!';
+                            } else {
+                                const drawerName = gameState.players.get(gameState.currentDrawer)?.name || 'Someone';
+                                gamePhaseElement.textContent = `${drawerName} is drawing`;
+                            }
+                        }
+                        
+                        addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                    }
+                } else if (gameStateData.type === 'round_start') {
+                    // Synchronize round start
+                    gameState.currentRound = gameStateData.currentRound;
+                    gameState.currentDrawer = gameStateData.currentDrawer;
+                    gameState.currentWord = gameStateData.currentWord;
+                    gameState.roundStarted = true;
+                    
+                    updateDrawingPermissions();
+                    clearCanvas();
+                    
+                    const gamePhaseElement = document.getElementById('gamePhase');
+                    if (gamePhaseElement) {
+                        if (gameState.currentDrawer === gameState.myId) {
+                            gamePhaseElement.textContent = 'Your turn to draw!';
+                        } else {
+                            const drawerName = gameState.players.get(gameState.currentDrawer)?.name || 'Someone';
+                            gamePhaseElement.textContent = `${drawerName} is drawing`;
+                        }
+                    }
+                    
+                    addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                } else if (gameStateData.type === 'timer_start') {
+                    // Synchronize timer across all players
+                    console.log('Syncing timer from host:', {
+                        timeLeft: gameStateData.timeLeft,
+                        roundEndTime: gameStateData.roundEndTime,
+                        currentTime: Date.now()
+                    });
+                    gameState.timeLeft = gameStateData.timeLeft;
+                    startTimer(gameStateData.roundEndTime);
+                } else if (gameStateData.type === 'round_end') {
+                    // Synchronize round end across all players
+                    gameState.roundStarted = false;
+                    gameState.timeLeft = 0;
+                    if (gameState.timer) {
+                        clearInterval(gameState.timer);
+                    }
+                    addSystemMessage(`Round ended! The word was: ${gameStateData.word}`);
+                } else if (gameStateData.type === 'game_end') {
+                    // Synchronize game end across all players
+                    gameState.gameStarted = false;
+                    gameState.roundStarted = false;
+                    if (gameState.timer) {
+                        clearInterval(gameState.timer);
+                    }
+                    
+                    if (gameStateData.winner) {
+                        addSystemMessage(`🎉 Game Over! Winner: ${gameStateData.winner.name} with ${gameStateData.winner.score} points!`);
+                    }
+                    
+                    if (gameStateData.finalScores) {
+                        let scoreText = 'Final Scores:\n';
+                        gameStateData.finalScores.forEach((player, index) => {
+                            scoreText += `${index + 1}. ${player.name}: ${player.score} points\n`;
+                        });
+                        addSystemMessage(scoreText);
+                    }
+                    
+                    // Reset UI for new game
+                    resetGameUI();
+                }
+            } catch (error) {
+                console.error('Error handling game state broadcast:', error);
             }
         }
 
@@ -2128,15 +2242,21 @@
             if (!isSupabaseConfigured || !gameState.roomId || !gameState.myId) return;
             
             try {
-                await supabase
-                    .from('game_messages')
-                    .insert({
-                        room_id: gameState.roomId,
-                        user_id: gameState.myId,
-                        username: 'System',
-                        message: JSON.stringify(gameStateData),
-                        message_type: 'game_state'
+                // Use real-time channel broadcasting instead of database insert
+                if (gameState.gameStateChannel) {
+                    console.log('Broadcasting game state via channel:', gameStateData);
+                    await gameState.gameStateChannel.send({
+                        type: 'broadcast',
+                        event: 'game_state_update',
+                        payload: {
+                            ...gameStateData,
+                            senderId: gameState.myId,
+                            timestamp: Date.now()
+                        }
                     });
+                } else {
+                    console.log('No game state channel available for broadcast');
+                }
             } catch (error) {
                 console.error('Error broadcasting game state:', error);
             }
