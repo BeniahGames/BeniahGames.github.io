@@ -367,18 +367,55 @@
 
         @media (max-width: 768px) {
             .main-container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
+                display: flex;
+                flex-direction: column;
                 padding: 0.5rem;
+                gap: 0.5rem;
+                height: 100vh;
+            }
+            
+            .game-area {
+                order: 1;
+                flex: 0 0 auto;
                 gap: 0.5rem;
             }
             
             .sidebar {
-                order: -1;
+                order: 2;
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                min-height: 0;
             }
             
-            .game-area {
-                gap: 0.5rem;
+            .players-panel {
+                order: 1;
+                flex: 0 0 auto;
+                margin: 0;
+                padding: 0.75rem;
+                max-height: 150px;
+                overflow-y: auto;
+            }
+            
+            .chat-panel {
+                order: 2;
+                flex: 1;
+                margin: 0;
+                padding: 0.75rem;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+            
+            .chat-messages {
+                flex: 1;
+                overflow-y: auto;
+                min-height: 200px;
+            }
+            
+            .chat-input {
+                flex: 0 0 auto;
+                margin-top: 0.5rem;
             }
             
             .drawing-tools {
@@ -395,16 +432,11 @@
             }
             
             #drawingCanvas {
-                max-height: 60vh;
+                max-height: 40vh;
                 width: 95vw;
                 max-width: 95vw;
                 height: auto;
                 margin: 0 auto;
-            }
-            
-            .players-panel, .chat-panel {
-                margin: 0;
-                padding: 0.75rem;
             }
             
             .game-status {
@@ -488,7 +520,7 @@
         <div class="sidebar">
             <div class="players-panel">
                 <div class="panel-title">Players</div>
-                <div class="player-list" id="playerList">
+                <div class="player-list" id="playersList">
                     <!-- Players will be populated here -->
                 </div>
             </div>
@@ -719,7 +751,8 @@
         }
 
         async function startDrawing(e) {
-            if (gameState.currentDrawer !== gameState.myId) return;
+            // Allow drawing in demo mode or if user is the current drawer
+            if (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId) return;
             
             isDrawingMode = true;
             const rect = canvas.getBoundingClientRect();
@@ -740,7 +773,7 @@
         }
 
         async function draw(e) {
-            if (!isDrawingMode || gameState.currentDrawer !== gameState.myId) return;
+            if (!isDrawingMode || (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId)) return;
             
             const rect = canvas.getBoundingClientRect();
             const currentX = e.clientX - rect.left;
@@ -1118,9 +1151,6 @@
 
         function handleNewMessage(payload) {
             const message = payload.new;
-            
-            // Don't show our own messages (they're already displayed locally)
-            if (message.user_id === gameState.myId) return;
             
             if (message.message_type === 'system') {
                 addSystemMessage(message.message);
@@ -1583,10 +1613,7 @@
                 // Check if it's a correct guess using enhanced detection
                 const isCorrectGuess = checkGuess(message, gameState.myId);
                 
-                // Add message locally first for immediate feedback
-                addChatMessage(gameState.myName, message, isCorrectGuess ? 'correct-guess' : 'normal');
-                
-                // Save message to database
+                // Save message to database (will be received via subscription for display)
                 const { error } = await supabase
                     .from('game_messages')
                     .insert({
