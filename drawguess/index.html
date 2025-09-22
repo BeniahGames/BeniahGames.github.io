@@ -530,10 +530,10 @@
                 <div class="chat-messages" id="chatMessages">
                     <!-- Messages will appear here -->
                 </div>
-                <div class="chat-input">
+                <form id="chatForm" class="chat-input">
                     <input type="text" id="chatInput" placeholder="Type your guess..." maxlength="100">
-                    <button onclick="sendMessage()">Send</button>
-                </div>
+                    <button type="submit">Send</button>
+                </form>
             </div>
         </div>
     </div>
@@ -579,7 +579,9 @@
             maxRounds: 3,
             isDrawing: false,
             gameStarted: false,
-            subscriptions: []
+            subscriptions: [],
+            eventListenersSetup: false,
+            joiningGame: false
         };
 
         // Drawing state
@@ -716,6 +718,10 @@
         }
 
         function setupEventListeners() {
+            // Prevent duplicate event listeners
+            if (gameState.eventListenersSetup) return;
+            gameState.eventListenersSetup = true;
+            
             // Tool selection
             document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -742,11 +748,10 @@
                 document.getElementById('sizeDisplay').textContent = currentSize + 'px';
             });
 
-            // Chat input
-            document.getElementById('chatInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
+            // Chat form submit
+            document.getElementById('chatForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                sendMessage();
             });
         }
 
@@ -878,11 +883,16 @@
         }
 
         async function joinGame() {
+            // Prevent duplicate calls
+            if (gameState.joiningGame) return;
+            gameState.joiningGame = true;
+            
             const roomCode = document.getElementById('roomCode').value.trim();
             
             // Name is already set by getUserName()
             if (!gameState.myName) {
                 alert('Unable to get player name. Please refresh and try again.');
+                gameState.joiningGame = false;
                 return;
             }
             
@@ -920,10 +930,12 @@
                 
                 document.getElementById('joinModal').style.display = 'none';
                 setupRealtimeSubscriptions();
+                gameState.joiningGame = false;
                 
             } catch (error) {
                 console.error('Error joining game:', error);
                 alert('Failed to join game. Please try again.');
+                gameState.joiningGame = false;
             }
         }
 
@@ -1026,6 +1038,12 @@
 
         function setupRealtimeSubscriptions() {
             if (!isSupabaseConfigured || !gameState.roomId) return;
+            
+            // Prevent duplicate subscriptions
+            if (gameState.subscriptions.length) {
+                gameState.subscriptions.forEach(ch => supabase.removeChannel(ch));
+                gameState.subscriptions = [];
+            }
             
             try {
                 // Subscribe to players in the room
