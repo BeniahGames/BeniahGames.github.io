@@ -588,6 +588,8 @@
             eventListenersSetup: false,
             canvasSetup: false,
             joiningGame: false,
+            currentStrokeBatch: [],
+            strokeSaveTimeout: null,
             isGameHost: false,
             gameHostId: null
         };
@@ -779,15 +781,20 @@
             lastX = e.clientX - rect.left;
             lastY = e.clientY - rect.top;
             
-            // Save start stroke (only if Supabase is configured)
+            // Clear any existing stroke batch and timeout when starting a new stroke
             if (isSupabaseConfigured) {
-                await saveStroke({
+                clearTimeout(gameState.strokeSaveTimeout);
+                gameState.currentStrokeBatch = [];
+                
+                // Add start stroke to batch
+                gameState.currentStrokeBatch.push({
                     x: lastX,
                     y: lastY,
                     color: currentColor,
                     size: currentSize,
                     tool: currentTool,
-                    type: 'start'
+                    type: 'start',
+                    timestamp: Date.now()
                 });
             }
         }
@@ -813,9 +820,14 @@
             
             ctx.stroke();
             
-            // Save stroke to database for real-time sync (only if Supabase is configured)
+            // Batch stroke data for less frequent database saves
             if (isSupabaseConfigured) {
-                await saveStroke({
+                // Add to current stroke batch
+                if (!gameState.currentStrokeBatch) {
+                    gameState.currentStrokeBatch = [];
+                }
+                
+                gameState.currentStrokeBatch.push({
                     fromX: lastX,
                     fromY: lastY,
                     toX: currentX,
@@ -823,8 +835,18 @@
                     color: currentColor,
                     size: currentSize,
                     tool: currentTool,
-                    type: 'draw'
+                    type: 'draw',
+                    timestamp: Date.now()
                 });
+                
+                // Save batch every 5 points or after 100ms delay
+                if (gameState.currentStrokeBatch.length >= 5) {
+                    await saveBatchedStrokes();
+                } else {
+                    // Debounce individual saves
+                    clearTimeout(gameState.strokeSaveTimeout);
+                    gameState.strokeSaveTimeout = setTimeout(saveBatchedStrokes, 100);
+                }
             }
             
             lastX = currentX;
@@ -871,7 +893,63 @@
             }
         }
 
+        async function saveBatchedStrokes() {
+            if (!isSupabaseConfigured || !gameState.currentStrokeBatch || gameState.currentStrokeBatch.length === 0) {
+                return;
+            }
+            
+            // Clear the timeout if it exists
+            clearTimeout(gameState.strokeSaveTimeout);
+            
+            // Get the batch and clear it immediately to prevent duplicate saves
+            const batch = [...gameState.currentStrokeBatch];
+            gameState.currentStrokeBatch = [];
+            
+            // Validate required data before database operation
+            if (!gameState.roomId || !gameState.myId) {
+                console.error('Missing required game state data for stroke batch');
+                return;
+            }
+            
+            try {
+                console.log('Saving stroke batch to database:', batch.length, 'strokes');
+                
+                // Create a single stroke entry with all the batch data
+                const { error } = await supabase
+                    .from('drawing_strokes')
+                    .insert({
+                        room_id: gameState.roomId,
+                        user_id: gameState.myId,
+                        round_number: gameState.currentRound + 1,
+                        stroke_data: {
+                            type: 'batch',
+                            strokes: batch
+                        },
+                        stroke_order: Date.now()
+                    });
+                
+                if (error) throw error;
+                console.log('Stroke batch saved successfully');
+                
+            } catch (error) {
+                console.error('Error saving stroke batch:', error);
+            }
+        }
+
         function drawStrokeFromData(strokeData) {
+            // Handle batched strokes
+            if (strokeData.type === 'batch' && strokeData.strokes) {
+                strokeData.strokes.forEach(stroke => {
+                    drawSingleStroke(stroke);
+                });
+                return;
+            }
+            
+            // Handle single stroke
+            drawSingleStroke(strokeData);
+        }
+        
+        function drawSingleStroke(strokeData) {
             const { fromX, fromY, toX, toY, color, size, tool, type } = strokeData;
             
             ctx.strokeStyle = color;
@@ -891,8 +969,13 @@
             ctx.stroke();
         }
 
-        function stopDrawing() {
+        async function stopDrawing() {
             isDrawingMode = false;
+            
+            // Save any remaining batched strokes when drawing stops
+            if (isSupabaseConfigured && gameState.currentStrokeBatch && gameState.currentStrokeBatch.length > 0) {
+                await saveBatchedStrokes();
+            }
         }
 
         function handleTouch(e) {
