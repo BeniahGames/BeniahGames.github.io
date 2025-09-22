@@ -586,6 +586,7 @@
             roundStarted: false,
             subscriptions: [],
             eventListenersSetup: false,
+            canvasSetup: false,
             joiningGame: false,
             isGameHost: false,
             gameHostId: null
@@ -706,6 +707,10 @@
         }
 
         function setupCanvas() {
+            // Prevent duplicate canvas setup
+            if (gameState.canvasSetup) return;
+            gameState.canvasSetup = true;
+            
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.strokeStyle = currentColor;
@@ -855,7 +860,7 @@
                         user_id: gameState.myId,
                         round_number: gameState.currentRound + 1,
                         stroke_data: strokeData,
-                        stroke_order: Date.now()
+                        stroke_order: Date.now() // Timestamp in milliseconds for precise ordering
                     });
                 
                 if (error) throw error;
