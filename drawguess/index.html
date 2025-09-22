@@ -999,38 +999,35 @@
 
         function handleTouch(e) {
             e.preventDefault();
+            
+            // Handle touchend/touchcancel without touch coordinates
+            if (e.type === 'touchend' || e.type === 'touchcancel') {
+                stopDrawing();
+                return;
+            }
+            
             const touch = e.touches[0];
+            if (!touch) return;
             
-            // Get canvas bounding rect and calculate proper coordinates
+            // Get canvas bounding rect
             const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
             
-            // Calculate touch coordinates relative to canvas
-            const x = (touch.clientX - rect.left) * scaleX;
-            const y = (touch.clientY - rect.top) * scaleY;
-            
-            // Create a synthetic event with proper coordinates
+            // Create a synthetic mouse event with correct coordinates
             const syntheticEvent = {
-                clientX: rect.left + x / scaleX,
-                clientY: rect.top + y / scaleY,
+                clientX: touch.clientX,
+                clientY: touch.clientY,
                 preventDefault: () => {}
             };
             
-            // Handle touch events directly
+            // Handle touch events
             if (e.type === 'touchstart') {
                 startDrawing(syntheticEvent);
             } else if (e.type === 'touchmove') {
                 draw(syntheticEvent);
-            } else if (e.type === 'touchend') {
-                stopDrawing();
             }
         }
 
-        function clearCanvas() {
-            if (!gameState.isMyTurn) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
+        // clearCanvas function moved to bottom of file to avoid conflicts
 
         async function joinGame() {
             // Prevent duplicate calls
@@ -1484,6 +1481,7 @@
                     }
                     
                     updateDrawingPermissions();
+                    clearCanvas(); // Clear canvas for new round
                     
                     // Hide join modal if still visible
                     const joinModal = document.getElementById('joinModal');
@@ -1823,33 +1821,69 @@
                     console.error('Error parsing game state message:', error);
                 }
             } else if (message.message_type === 'chat' || message.message_type === 'guess') {
-                // Display regular chat messages and guesses from other players
-                const isCorrectGuess = message.message_type === 'guess';
+                // Check if this message is a correct guess
+                const isCorrectGuess = checkGuess(message.message, message.user_id);
+                
+                // Display the message with appropriate styling
                 addChatMessage(message.username, message.message, isCorrectGuess ? 'correct-guess' : 'normal');
                 
-                // Check if it's a correct guess
+                // Handle correct guess
                 if (isCorrectGuess) {
                     addSystemMessage(`🎉 ${message.username} guessed correctly!`);
+                    
+                    // Award points to the guesser (if we have their player data)
+                    const guesser = gameState.players.get(message.user_id);
+                    if (guesser) {
+                        const points = Math.max(10, Math.floor(gameState.timeLeft / 2));
+                        guesser.score += points;
+                        updatePlayerList();
+                        addSystemMessage(`+${points} points for ${message.username}!`);
+                    }
                 }
             }
         }
         
         function checkGuess(message, playerId) {
-            if (!gameState.currentWord || !gameState.roundStarted) return false;
-            if (playerId === gameState.currentDrawer) return false; // Drawer can't guess
+            console.log('🔍 Checking guess:', {
+                message,
+                playerId,
+                currentWord: gameState.currentWord,
+                roundStarted: gameState.roundStarted,
+                currentDrawer: gameState.currentDrawer,
+                isDrawer: playerId === gameState.currentDrawer
+            });
+            
+            if (!gameState.currentWord || !gameState.roundStarted) {
+                console.log('❌ No current word or round not started');
+                return false;
+            }
+            if (playerId === gameState.currentDrawer) {
+                console.log('❌ Drawer cannot guess');
+                return false; // Drawer can't guess
+            }
             
             const guess = message.toLowerCase().trim();
             const word = gameState.currentWord.toLowerCase().trim();
             
+            console.log('🔤 Comparing:', { guess, word });
+            
             // Exact match
-            if (guess === word) return true;
+            if (guess === word) {
+                console.log('✅ Exact match found!');
+                return true;
+            }
             
             // Close match (for typos) - only for longer words
             if (guess.length > 3 && word.length > 3) {
                 const similarity = calculateSimilarity(guess, word);
-                return similarity > 0.85; // 85% similarity threshold
+                console.log('📊 Similarity:', similarity);
+                if (similarity > 0.85) {
+                    console.log('✅ Close match found!');
+                    return true;
+                }
             }
             
+            console.log('❌ No match found');
             return false;
         }
         
