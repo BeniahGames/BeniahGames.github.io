@@ -4,3 +4,4 @@ user_current_role_rows.json
 user_progress_rows.json
 user_roles_unlocked_rows.json
 fix_database_schema.sql
+drawguess/supabase-setup.sql

@@ -552,9 +552,27 @@
         
         try {
             if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                    realtime: {
+                        params: {
+                            eventsPerSecond: 10
+                        }
+                    }
+                });
                 isSupabaseConfigured = true;
-                console.log('Supabase configured - Real-time multiplayer enabled');
+                console.log('✅ Supabase configured - Real-time multiplayer enabled');
+                console.log('📡 Supabase URL:', SUPABASE_URL);
+                console.log('🔑 Anon Key configured:', SUPABASE_ANON_KEY ? 'Yes' : 'No');
+                
+                // Test connection
+                supabase.from('game_rooms').select('count').limit(1).then(result => {
+                    if (result.error) {
+                        console.error('❌ Supabase connection test failed:', result.error);
+                        console.log('💡 Check if tables exist and RLS policies are configured');
+                    } else {
+                        console.log('✅ Supabase connection test successful');
+                    }
+                });
             } else {
                 console.log('Supabase not configured - Running in demo mode');
                 // Show configuration message
@@ -563,7 +581,8 @@
                 }, 2000);
             }
         } catch (error) {
-            console.error('Error initializing Supabase:', error);
+            console.error('❌ Error initializing Supabase:', error);
+            console.log('💡 Make sure Supabase client library is loaded');
             isSupabaseConfigured = false;
         }
         
@@ -1305,7 +1324,13 @@
                         handlePlayerUpdate(payload);
                     })
                     .subscribe((status) => {
-                        console.log('Players subscription status:', status);
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ Players subscription: CONNECTED');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('❌ Players subscription: ERROR - Check if game_players table exists and has RLS enabled');
+                        } else {
+                            console.log('🔄 Players subscription status:', status);
+                        }
                     });
 
                 // Subscribe to messages in the room
@@ -1317,11 +1342,17 @@
                         table: 'game_messages',
                         filter: `room_id=eq.${gameState.roomId}`
                     }, (payload) => {
-                        console.log('New message received:', payload);
+                        console.log('📨 New message received:', payload);
                         handleNewMessage(payload);
                     })
                     .subscribe((status) => {
-                        console.log('Messages subscription status:', status);
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ Messages subscription: CONNECTED');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('❌ Messages subscription: ERROR - Check if game_messages table exists and has RLS enabled');
+                        } else {
+                            console.log('🔄 Messages subscription status:', status);
+                        }
                     });
 
                 // Subscribe to drawing strokes
@@ -1333,11 +1364,17 @@
                         table: 'drawing_strokes',
                         filter: `room_id=eq.${gameState.roomId}`
                     }, (payload) => {
-                        console.log('Drawing stroke received:', payload);
+                        console.log('🎨 Drawing stroke received:', payload);
                         handleDrawingStroke(payload);
                     })
                     .subscribe((status) => {
-                        console.log('Drawing subscription status:', status);
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ Drawing subscription: CONNECTED');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('❌ Drawing subscription: ERROR - Check if drawing_strokes table exists and has RLS enabled');
+                        } else {
+                            console.log('🔄 Drawing subscription status:', status);
+                        }
                     });
 
                 // Subscribe to room updates
@@ -1349,22 +1386,34 @@
                         table: 'game_rooms',
                         filter: `id=eq.${gameState.roomId}`
                     }, (payload) => {
-                        console.log('Room update received:', payload);
+                        console.log('🏠 Room update received:', payload);
                         handleRoomUpdate(payload);
                     })
                     .subscribe((status) => {
-                        console.log('Room subscription status:', status);
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ Room subscription: CONNECTED');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('❌ Room subscription: ERROR - Check if game_rooms table exists and has RLS enabled');
+                        } else {
+                            console.log('🔄 Room subscription status:', status);
+                        }
                     });
 
                 // Create game state broadcast channel
                 const gameStateChannel = supabase
                     .channel(`room-${gameState.roomId}-gamestate`)
                     .on('broadcast', { event: 'game_state_update' }, (payload) => {
-                        console.log('Game state broadcast received:', payload);
+                        console.log('📡 Game state broadcast received:', payload);
                         handleGameStateBroadcast(payload);
                     })
                     .subscribe((status) => {
-                        console.log('Game state channel status:', status);
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ Game state broadcast: CONNECTED');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('❌ Game state broadcast: ERROR - Check Realtime configuration');
+                        } else {
+                            console.log('🔄 Game state broadcast status:', status);
+                        }
                     });
 
                 gameState.gameStateChannel = gameStateChannel;
