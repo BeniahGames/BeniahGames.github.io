@@ -1829,56 +1829,6 @@
             return Math.max(10, Math.floor(gameState.timeLeft / 2));
         }
 
-        function startNewRound() {
-            // Select random word
-            gameState.currentWord = words[Math.floor(Math.random() * words.length)];
-            
-            // Select next player
-            const currentIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer);
-            const nextIndex = (currentIndex + 1) % gameState.players.length;
-            gameState.currentPlayer = gameState.players[nextIndex].id;
-            gameState.isMyTurn = gameState.currentPlayer === gameState.myId;
-            
-            // Update UI
-            if (gameState.isMyTurn) {
-                document.getElementById('currentWord').textContent = `Draw: ${gameState.currentWord}`;
-                document.getElementById('gamePhase').textContent = 'Your turn to draw!';
-            } else {
-                document.getElementById('currentWord').textContent = '_ '.repeat(gameState.currentWord.length);
-                document.getElementById('gamePhase').textContent = `${gameState.players.find(p => p.id === gameState.currentPlayer).name} is drawing`;
-            }
-            
-            updatePlayerList();
-            clearCanvas();
-            
-            // Start timer
-            gameState.timeLeft = 60;
-            const timer = setInterval(() => {
-                gameState.timeLeft--;
-                document.getElementById('gameTimer').textContent = `Time: ${gameState.timeLeft}s`;
-                
-                if (gameState.timeLeft <= 0) {
-                    clearInterval(timer);
-                    endRound();
-                }
-            }, 1000);
-        }
-
-        function endRound() {
-            addSystemMessage(`Time's up! The word was: ${gameState.currentWord}`);
-            setTimeout(startNewRound, 3000);
-        }
-
-        // Demo: Start game after a few seconds
-        setTimeout(() => {
-            if (gameState.players.length >= 2) {
-                gameState.currentPlayer = gameState.players[0].id;
-                gameState.isMyTurn = gameState.currentPlayer === gameState.myId;
-                addSystemMessage('Game starting!');
-                setTimeout(startNewRound, 2000);
-            }
-        }, 5000);
-
         // Initialize when page loads
         window.addEventListener('load', initGame);
     </script>
