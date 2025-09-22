@@ -1589,8 +1589,8 @@
                     }
                 } else if (gameStateData.type === 'round_start') {
                     // Synchronize round start
-                    gameState.currentRound = gameStateData.currentRound;
-                    gameState.currentDrawer = gameStateData.currentDrawer;
+                    gameState.currentRound = gameStateData.round - 1; // Convert from 1-based to 0-based
+                    gameState.currentDrawer = gameStateData.drawer;
                     gameState.currentWord = gameStateData.currentWord;
                     gameState.roundStarted = gameStateData.roundStarted !== undefined ? gameStateData.roundStarted : true;
                     gameState.gameStarted = gameStateData.gameStarted !== undefined ? gameStateData.gameStarted : true;
@@ -1871,6 +1871,14 @@
                     } else if (gameStateData.type === 'round_start') {
                         // Only update if this message is not from the current player
                         if (senderId !== gameState.myId) {
+                            console.log('📨 Received round_start message:', {
+                                from: senderId,
+                                drawer: gameStateData.drawer,
+                                round: gameStateData.round,
+                                myId: gameState.myId,
+                                isMyTurn: gameStateData.drawer === gameState.myId
+                            });
+                            
                             gameState.currentDrawer = gameStateData.drawer;
                             gameState.currentRound = gameStateData.round - 1; // Adjust for 0-based indexing
                             gameState.timeLeft = gameStateData.timeLeft;
@@ -1892,7 +1900,7 @@
                             }
                             
                             addSystemMessage(`Round ${gameStateData.round}: ${gameState.players.get(gameStateData.drawer)?.name} is drawing!`);
-                            startTimer();
+                            // Timer will be started by timer_start message
                         }
                     } else if (gameStateData.type === 'timer_start') {
                         // Synchronize timer across all players
@@ -2425,13 +2433,16 @@
                 
                 // Select next drawer - use sorted array for consistent ordering across clients
                 const players = Array.from(gameState.players.keys()).sort();
-                const currentDrawer = players[gameState.currentRound % players.length];
+                const selectedIndex = gameState.currentRound % players.length;
+                const currentDrawer = players[selectedIndex];
                 
                 console.log('🎯 Drawer selection:', {
                     currentRound: gameState.currentRound,
                     players: players,
-                    selectedIndex: gameState.currentRound % players.length,
+                    playersWithNames: players.map(id => ({id, name: gameState.players.get(id)?.name})),
+                    selectedIndex: selectedIndex,
                     currentDrawer: currentDrawer,
+                    currentDrawerName: gameState.players.get(currentDrawer)?.name,
                     myId: gameState.myId,
                     isMyTurn: currentDrawer === gameState.myId
                 });
@@ -2451,18 +2462,22 @@
                 
                 // Broadcast game state to other players via system message
                 if (isSupabaseConfigured && gameState.roomId) {
+                    const roundStartMessage = {
+                        type: 'round_start',
+                        drawer: currentDrawer,
+                        round: gameState.currentRound + 1,
+                        timeLeft: gameState.roomSettings.timerDuration
+                    };
+                    
+                    console.log('📡 Broadcasting round_start message:', roundStartMessage);
+                    
                     await supabase
                         .from('game_messages')
                         .insert({
                             room_id: gameState.roomId,
                             user_id: gameState.myId,
                             username: 'System',
-                            message: JSON.stringify({
-                                type: 'round_start',
-                                drawer: currentDrawer,
-                                round: gameState.currentRound + 1,
-                                timeLeft: gameState.roomSettings.timerDuration
-                            }),
+                            message: JSON.stringify(roundStartMessage),
                             message_type: 'game_state'
                         });
                 }
