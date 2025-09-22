@@ -1613,7 +1613,7 @@
                 const { data: roomData, error: roomError } = await supabase
                     .from('game_rooms')
                     .select('*')
-                    .eq('room_id', gameState.roomId)
+                    .eq('id', gameState.roomId)
                     .single();
 
                 if (roomError) {
@@ -1622,28 +1622,13 @@
                     console.log('Loaded room data:', roomData);
                     
                     // Update game state with current room information
-                    if (roomData.game_started) {
+                    if (roomData.status === 'playing') {
                         gameState.gameStarted = true;
                         document.getElementById('gamePhase').textContent = 'Game in progress';
                     }
                     
-                    if (roomData.current_drawer) {
-                        gameState.currentDrawer = roomData.current_drawer;
-                        gameState.currentRound = roomData.current_round || 0;
-                        gameState.roundStarted = true;
-                        
-                        // Update drawing permissions and UI
-                        updateDrawingPermissions();
-                        const gamePhaseElement = document.getElementById('gamePhase');
-                        if (gamePhaseElement) {
-                            if (gameState.currentDrawer === gameState.myId) {
-                                gamePhaseElement.textContent = 'Your turn to draw!';
-                            } else {
-                                const drawerName = gameState.players.get(gameState.currentDrawer)?.name || 'Someone';
-                                gamePhaseElement.textContent = `${drawerName} is drawing`;
-                            }
-                        }
-                    }
+                    // Note: current_drawer and current_round are not stored in game_rooms table
+                    // Game state is managed through real-time messages and broadcasting
                 }
 
                 // Load existing drawing strokes for current round
