@@ -1425,10 +1425,22 @@
                     gameState.currentRound = gameStateData.currentRound;
                     gameState.currentDrawer = gameStateData.currentDrawer;
                     gameState.currentWord = gameStateData.currentWord;
-                    gameState.roundStarted = true;
+                    gameState.roundStarted = gameStateData.roundStarted !== undefined ? gameStateData.roundStarted : true;
+                    gameState.gameStarted = gameStateData.gameStarted !== undefined ? gameStateData.gameStarted : true;
+                    
+                    // Update timer if provided
+                    if (gameStateData.timeLeft !== undefined) {
+                        gameState.timeLeft = gameStateData.timeLeft;
+                        updateTimerDisplay();
+                    }
                     
                     updateDrawingPermissions();
-                    clearCanvas();
+                    
+                    // Hide join modal if still visible
+                    const joinModal = document.getElementById('joinModal');
+                    if (joinModal) {
+                        joinModal.style.display = 'none';
+                    }
                     
                     const gamePhaseElement = document.getElementById('gamePhase');
                     if (gamePhaseElement) {
@@ -1440,7 +1452,10 @@
                         }
                     }
                     
-                    addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                    // Only show message if this is a new round start, not a sync
+                    if (!gameStateData.gameStarted || gameStateData.roundStarted) {
+                        addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
+                    }
                 } else if (gameStateData.type === 'timer_start') {
                     // Synchronize timer across all players
                     console.log('Syncing timer from host:', {
@@ -1568,26 +1583,18 @@
                 if (player.username !== gameState.myName) {
                     addSystemMessage(`${player.username} joined the room`);
                     
-                    // If game is in progress and this is the current drawer, broadcast current state
-                    if (gameState.gameStarted && gameState.roundStarted && gameState.currentDrawer === gameState.myId) {
-                        try {
-                            await supabase
-                                .from('game_messages')
-                                .insert({
-                                    room_id: gameState.roomId,
-                                    user_id: gameState.myId,
-                                    username: 'System',
-                                    message: JSON.stringify({
-                                        type: 'round_start',
-                                        drawer: gameState.currentDrawer,
-                                        round: gameState.currentRound + 1,
-                                        timeLeft: gameState.timeLeft
-                                    }),
-                                    message_type: 'game_state'
-                                });
-                        } catch (error) {
-                            console.error('Error broadcasting game state to new player:', error);
-                        }
+                    // If game is in progress, broadcast current state to sync new player
+                    if (gameState.gameStarted) {
+                        // Broadcast current game state to sync the new player
+                        broadcastGameState({
+                            type: gameState.roundStarted ? 'round_start' : 'game_start',
+                            currentDrawer: gameState.currentDrawer,
+                            currentWord: gameState.currentWord,
+                            currentRound: gameState.currentRound,
+                            timeLeft: gameState.timeLeft,
+                            roundStarted: gameState.roundStarted,
+                            gameStarted: gameState.gameStarted
+                        });
                     }
                 }
             } else if (payload.eventType === 'UPDATE') {
