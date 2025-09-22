@@ -1452,6 +1452,9 @@
                         }
                     }
                     
+                    // Load existing strokes for this round
+                    loadExistingStrokes();
+                    
                     // Only show message if this is a new round start, not a sync
                     if (!gameStateData.gameStarted || gameStateData.roundStarted) {
                         addSystemMessage(`Round ${gameState.currentRound + 1}: ${gameState.players.get(gameState.currentDrawer)?.name} is drawing!`);
@@ -1501,12 +1504,47 @@
             }
         }
 
+        async function loadExistingStrokes() {
+            if (!isSupabaseConfigured || !gameState.roomId) {
+                return;
+            }
+
+            try {
+                console.log('Loading existing strokes for room:', gameState.roomId);
+                
+                // Load strokes from current round
+                const { data: strokes, error } = await supabase
+                    .from('drawing_strokes')
+                    .select('*')
+                    .eq('room_id', gameState.roomId)
+                    .eq('round_number', gameState.currentRound + 1)
+                    .order('stroke_order', { ascending: true });
+
+                if (error) throw error;
+
+                console.log('Found existing strokes:', strokes.length);
+                
+                // Clear canvas first
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw all existing strokes
+                strokes.forEach(stroke => {
+                    if (stroke.stroke_data) {
+                        drawStrokeFromData(stroke.stroke_data);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading existing strokes:', error);
+            }
+        }
+
         async function loadInitialGameData() {
             if (!isSupabaseConfigured) {
                 // Demo mode - no initial data to load
                 return;
             }
-            
+
             try {
                 // Load existing players
                 const { data: players, error: playersError } = await supabase
@@ -1571,6 +1609,46 @@
                     }
                 });
 
+                // Load current game state from game_rooms table
+                const { data: roomData, error: roomError } = await supabase
+                    .from('game_rooms')
+                    .select('*')
+                    .eq('room_id', gameState.roomId)
+                    .single();
+
+                if (roomError) {
+                    console.error('Error loading room data:', roomError);
+                } else if (roomData) {
+                    console.log('Loaded room data:', roomData);
+                    
+                    // Update game state with current room information
+                    if (roomData.game_started) {
+                        gameState.gameStarted = true;
+                        document.getElementById('gamePhase').textContent = 'Game in progress';
+                    }
+                    
+                    if (roomData.current_drawer) {
+                        gameState.currentDrawer = roomData.current_drawer;
+                        gameState.currentRound = roomData.current_round || 0;
+                        gameState.roundStarted = true;
+                        
+                        // Update drawing permissions and UI
+                        updateDrawingPermissions();
+                        const gamePhaseElement = document.getElementById('gamePhase');
+                        if (gamePhaseElement) {
+                            if (gameState.currentDrawer === gameState.myId) {
+                                gamePhaseElement.textContent = 'Your turn to draw!';
+                            } else {
+                                const drawerName = gameState.players.get(gameState.currentDrawer)?.name || 'Someone';
+                                gamePhaseElement.textContent = `${drawerName} is drawing`;
+                            }
+                        }
+                    }
+                }
+
+                // Load existing drawing strokes for current round
+                await loadExistingStrokes();
+
             } catch (error) {
                 console.error('Error loading initial data:', error);
             }
@@ -1608,8 +1686,15 @@
         function handleNewMessage(payload) {
             const message = payload.new;
             
+            console.log('Received message:', {
+                message,
+                myId: gameState.myId,
+                willSkip: message.user_id === gameState.myId
+            });
+            
             // Skip messages from the current user to avoid duplicates
             if (message.user_id === gameState.myId) {
+                console.log('Skipping own message to avoid duplicate');
                 return;
             }
             
@@ -2443,6 +2528,14 @@
                 // Check if it's a correct guess using enhanced detection
                 const isCorrectGuess = checkGuess(message, gameState.myId);
                 
+                console.log('Sending message:', {
+                    message,
+                    isCorrectGuess,
+                    roomId: gameState.roomId,
+                    myId: gameState.myId,
+                    myName: gameState.myName
+                });
+                
                 // Display message locally immediately for better UX
                 addChatMessage(gameState.myName, message, isCorrectGuess ? 'correct-guess' : 'normal');
                 
@@ -2510,6 +2603,8 @@
         }
 
         function addChatMessage(author, text, type = 'guess') {
+            console.log('Adding chat message:', { author, text, type });
+            
             const messages = document.getElementById('chatMessages');
             const div = document.createElement('div');
             div.className = `message ${type}`;
