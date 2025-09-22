@@ -792,8 +792,19 @@
         }
 
         async function startDrawing(e) {
+            console.log('🖊️ startDrawing called:', {
+                isSupabaseConfigured,
+                currentDrawer: gameState.currentDrawer,
+                myId: gameState.myId,
+                isCurrentDrawer: gameState.currentDrawer === gameState.myId,
+                willBlock: isSupabaseConfigured && gameState.currentDrawer !== gameState.myId
+            });
+            
             // Allow drawing in demo mode or if user is the current drawer
-            if (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId) return;
+            if (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId) {
+                console.log('❌ Drawing blocked - not current drawer');
+                return;
+            }
             
             isDrawingMode = true;
             const rect = canvas.getBoundingClientRect();
@@ -819,7 +830,14 @@
         }
 
         async function draw(e) {
-            if (!isDrawingMode || (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId)) return;
+            if (!isDrawingMode || (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId)) {
+                if (!isDrawingMode) {
+                    console.log('❌ Drawing blocked - not in drawing mode');
+                } else {
+                    console.log('❌ Drawing blocked - not current drawer in draw()');
+                }
+                return;
+            }
             
             const rect = canvas.getBoundingClientRect();
             const currentX = e.clientX - rect.left;
@@ -1000,7 +1018,6 @@
         function handleTouch(e) {
             e.preventDefault();
             
-            // Handle touchend/touchcancel without touch coordinates
             if (e.type === 'touchend' || e.type === 'touchcancel') {
                 stopDrawing();
                 return;
@@ -1009,21 +1026,53 @@
             const touch = e.touches[0];
             if (!touch) return;
             
-            // Get canvas bounding rect
             const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
             
-            // Create a synthetic mouse event with correct coordinates
-            const syntheticEvent = {
-                clientX: touch.clientX,
-                clientY: touch.clientY,
-                preventDefault: () => {}
-            };
-            
-            // Handle touch events
             if (e.type === 'touchstart') {
-                startDrawing(syntheticEvent);
-            } else if (e.type === 'touchmove') {
-                draw(syntheticEvent);
+                if (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId) {
+                    console.log('🚫 Drawing blocked: Not current drawer');
+                    return;
+                }
+                
+                isDrawingMode = true;
+                lastX = x;
+                lastY = y;
+                
+                if (isSupabaseConfigured) {
+                    gameState.currentStrokeBatch = gameState.currentStrokeBatch || [];
+                    gameState.currentStrokeBatch.push({
+                        type: 'start',
+                        x: x,
+                        y: y,
+                        tool: currentTool,
+                        size: currentSize,
+                        color: currentColor
+                    });
+                }
+            } else if (e.type === 'touchmove' && isDrawingMode) {
+                if (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId) {
+                    console.log('🚫 Drawing blocked: Not current drawer');
+                    return;
+                }
+                
+                drawLine(lastX, lastY, x, y, currentTool, currentSize, currentColor);
+                
+                if (isSupabaseConfigured) {
+                    gameState.currentStrokeBatch = gameState.currentStrokeBatch || [];
+                    gameState.currentStrokeBatch.push({
+                        type: 'draw',
+                        x: x,
+                        y: y,
+                        tool: currentTool,
+                        size: currentSize,
+                        color: currentColor
+                    });
+                }
+                
+                lastX = x;
+                lastY = y;
             }
         }
 
@@ -1960,11 +2009,20 @@
             const canDraw = gameState.currentDrawer === gameState.myId;
             gameState.isDrawing = canDraw;
             
+            console.log('🎨 Drawing Permissions Update:', {
+                currentDrawer: gameState.currentDrawer,
+                myId: gameState.myId,
+                canDraw: canDraw,
+                roundStarted: gameState.roundStarted,
+                gameStarted: gameState.gameStarted
+            });
+            
             // Update UI to show drawing status
             const drawingTools = document.querySelector('.drawing-tools');
             if (drawingTools) {
                 drawingTools.style.opacity = canDraw ? '1' : '0.5';
                 drawingTools.style.pointerEvents = canDraw ? 'auto' : 'none';
+                console.log('🔧 Drawing tools updated:', { opacity: drawingTools.style.opacity, pointerEvents: drawingTools.style.pointerEvents });
             }
             
             // Update canvas interaction
@@ -1972,6 +2030,7 @@
             if (canvas) {
                 canvas.style.pointerEvents = canDraw ? 'auto' : 'none';
                 canvas.style.cursor = canDraw ? 'crosshair' : 'default';
+                console.log('🖼️ Canvas updated:', { pointerEvents: canvas.style.pointerEvents, cursor: canvas.style.cursor });
             }
             
             // Show appropriate text to drawer vs guessers
@@ -2205,7 +2264,7 @@
             
             if (!isSupabaseConfigured) {
                 // Demo mode
-                const players = Array.from(gameState.players.keys());
+                const players = Array.from(gameState.players.keys()).sort();
                 if (players.length === 0) return;
                 
                 gameState.currentDrawer = players[gameState.currentRound % players.length];
@@ -2236,9 +2295,18 @@
                 // Get random word (fallback to local words array)
                 const word = getRandomWord();
                 
-                // Select next drawer
-                const players = Array.from(gameState.players.keys());
+                // Select next drawer - use sorted array for consistent ordering across clients
+                const players = Array.from(gameState.players.keys()).sort();
                 const currentDrawer = players[gameState.currentRound % players.length];
+                
+                console.log('🎯 Drawer selection:', {
+                    currentRound: gameState.currentRound,
+                    players: players,
+                    selectedIndex: gameState.currentRound % players.length,
+                    currentDrawer: currentDrawer,
+                    myId: gameState.myId,
+                    isMyTurn: currentDrawer === gameState.myId
+                });
                 
                 // Update local state
                 gameState.currentDrawer = currentDrawer;
@@ -2285,7 +2353,7 @@
             } catch (error) {
                 console.error('Error starting new round:', error);
                 // Fallback to demo mode logic
-                const players = Array.from(gameState.players.keys());
+                const players = Array.from(gameState.players.keys()).sort();
                 if (players.length === 0) return;
                 
                 gameState.currentDrawer = players[gameState.currentRound % players.length];
@@ -2523,6 +2591,14 @@
 
         function addPlayer(id, name, score) {
             gameState.players.set(id, { id, name, score });
+            console.log('👥 Player added:', {
+                id,
+                name,
+                score,
+                totalPlayers: gameState.players.size,
+                playerIds: Array.from(gameState.players.keys()).sort(),
+                myId: gameState.myId
+            });
             updatePlayerList();
             
             // Auto-start game when we have 2 or more players
