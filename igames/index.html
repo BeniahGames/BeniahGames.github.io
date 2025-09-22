@@ -369,18 +369,47 @@
             .main-container {
                 grid-template-columns: 1fr;
                 grid-template-rows: auto 1fr;
+                padding: 0.5rem;
+                gap: 0.5rem;
             }
             
             .sidebar {
                 order: -1;
             }
             
+            .game-area {
+                gap: 0.5rem;
+            }
+            
             .drawing-tools {
                 flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: center;
+            }
+            
+            .drawing-section {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
             }
             
             #drawingCanvas {
-                max-height: 300px;
+                max-height: 60vh;
+                width: 95vw;
+                max-width: 95vw;
+                height: auto;
+                margin: 0 auto;
+            }
+            
+            .players-panel, .chat-panel {
+                margin: 0;
+                padding: 0.75rem;
+            }
+            
+            .game-status {
+                padding: 0.75rem;
+                margin: 0;
             }
         }
     </style>
@@ -427,30 +456,32 @@
             </div>
 
             <div class="canvas-container">
-                <div class="drawing-tools">
-                    <button class="tool-btn active" data-tool="pen">Pen</button>
-                    <button class="tool-btn" data-tool="eraser">Eraser</button>
-                    <button class="tool-btn" onclick="clearCanvas()">Clear</button>
-                    
-                    <div class="color-picker">
-                        <div class="color-btn active" data-color="#000000" style="background: #000000;"></div>
-                        <div class="color-btn" data-color="#ff0000" style="background: #ff0000;"></div>
-                        <div class="color-btn" data-color="#00ff00" style="background: #00ff00;"></div>
-                        <div class="color-btn" data-color="#0000ff" style="background: #0000ff;"></div>
-                        <div class="color-btn" data-color="#ffff00" style="background: #ffff00;"></div>
-                        <div class="color-btn" data-color="#ff00ff" style="background: #ff00ff;"></div>
-                        <div class="color-btn" data-color="#00ffff" style="background: #00ffff;"></div>
-                        <div class="color-btn" data-color="#ffffff" style="background: #ffffff; border-color: #666;"></div>
+                <div class="drawing-section">
+                    <div class="drawing-tools">
+                        <button class="tool-btn active" data-tool="pen">Pen</button>
+                        <button class="tool-btn" data-tool="eraser">Eraser</button>
+                        <button class="tool-btn" onclick="clearCanvas()">Clear</button>
+                        
+                        <div class="color-picker">
+                            <div class="color-btn active" data-color="#000000" style="background: #000000;"></div>
+                            <div class="color-btn" data-color="#ff0000" style="background: #ff0000;"></div>
+                            <div class="color-btn" data-color="#00ff00" style="background: #00ff00;"></div>
+                            <div class="color-btn" data-color="#0000ff" style="background: #0000ff;"></div>
+                            <div class="color-btn" data-color="#ffff00" style="background: #ffff00;"></div>
+                            <div class="color-btn" data-color="#ff00ff" style="background: #ff00ff;"></div>
+                            <div class="color-btn" data-color="#00ffff" style="background: #00ffff;"></div>
+                            <div class="color-btn" data-color="#ffffff" style="background: #ffffff; border-color: #666;"></div>
+                        </div>
+                        
+                        <div class="brush-size">
+                            <span>Size:</span>
+                            <input type="range" class="size-slider" min="1" max="20" value="3" id="brushSize">
+                            <span id="sizeDisplay">3px</span>
+                        </div>
                     </div>
                     
-                    <div class="brush-size">
-                        <span>Size:</span>
-                        <input type="range" class="size-slider" min="1" max="20" value="3" id="brushSize">
-                        <span id="sizeDisplay">3px</span>
-                    </div>
+                    <canvas id="drawingCanvas" width="800" height="400"></canvas>
                 </div>
-                
-                <canvas id="drawingCanvas" width="800" height="400"></canvas>
             </div>
         </div>
 
@@ -547,6 +578,13 @@
             
             // Get user's name and ID from authentication
             await getUserName();
+            
+            // Start periodic room cleanup (every 30 minutes)
+            if (isSupabaseConfigured) {
+                setInterval(periodicRoomCleanup, 30 * 60 * 1000);
+                // Run initial cleanup after 5 seconds
+                setTimeout(periodicRoomCleanup, 5000);
+            }
         }
 
         async function getUserName() {
@@ -932,7 +970,7 @@
                 .from('game_players')
                 .insert({
                     room_id: roomId,
-                    user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
+                    user_id: gameState.myId, // Store the full user ID including guest IDs
                     username: gameState.myName,
                     score: 0
                 });
@@ -1037,7 +1075,7 @@
                 document.getElementById('playersList').innerHTML = '';
                 
                 players.forEach(player => {
-                    addPlayer(player.user_id || player.id, player.username, player.score);
+                    addPlayer(player.user_id, player.username, player.score);
                 });
 
                 // Load recent messages
@@ -1066,14 +1104,14 @@
         function handlePlayerUpdate(payload) {
             const player = payload.new;
             if (payload.eventType === 'INSERT') {
-                addPlayer(player.user_id || player.id, player.username, player.score);
+                addPlayer(player.user_id, player.username, player.score);
                 if (player.username !== gameState.myName) {
                     addSystemMessage(`${player.username} joined the room`);
                 }
             } else if (payload.eventType === 'UPDATE') {
-                updatePlayerScore(player.user_id || player.id, player.score);
+                updatePlayerScore(player.user_id, player.score);
             } else if (payload.eventType === 'DELETE') {
-                removePlayer(player.user_id || player.id);
+                removePlayer(player.user_id);
                 addSystemMessage(`${player.username} left the room`);
             }
         }
@@ -1209,6 +1247,86 @@
         function removePlayer(playerId) {
             gameState.players.delete(playerId);
             updatePlayerList();
+            
+            // Check if room is empty and delete it
+            checkAndDeleteEmptyRoom();
+        }
+
+        async function checkAndDeleteEmptyRoom() {
+            if (!isSupabaseConfigured || !gameState.roomId) return;
+            
+            try {
+                // Check if there are any players left in the room
+                const { data: players, error: playersError } = await supabase
+                    .from('game_players')
+                    .select('id')
+                    .eq('room_id', gameState.roomId);
+
+                if (playersError) throw playersError;
+
+                // If no players left, delete the room and related data
+                if (players.length === 0) {
+                    console.log('Room is empty, cleaning up...');
+                    
+                    // Delete all messages for this room
+                    await supabase
+                        .from('game_messages')
+                        .delete()
+                        .eq('room_id', gameState.roomId);
+                    
+                    // Delete the room itself
+                    await supabase
+                        .from('game_rooms')
+                        .delete()
+                        .eq('id', gameState.roomId);
+                    
+                    console.log('Empty room deleted successfully');
+                }
+            } catch (error) {
+                console.error('Error checking/deleting empty room:', error);
+            }
+        }
+
+        // Periodic cleanup of old empty rooms
+        async function periodicRoomCleanup() {
+            if (!isSupabaseConfigured) return;
+            
+            try {
+                // Find rooms that are older than 1 hour and have no players
+                const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+                
+                const { data: emptyRooms, error: roomsError } = await supabase
+                    .from('game_rooms')
+                    .select(`
+                        id,
+                        created_at,
+                        game_players(id)
+                    `)
+                    .lt('created_at', oneHourAgo);
+
+                if (roomsError) throw roomsError;
+
+                // Delete rooms that have no players
+                for (const room of emptyRooms) {
+                    if (room.game_players.length === 0) {
+                        // Delete messages first
+                        await supabase
+                            .from('game_messages')
+                            .delete()
+                            .eq('room_id', room.id);
+                        
+                        // Delete the room
+                        await supabase
+                            .from('game_rooms')
+                            .delete()
+                            .eq('id', room.id);
+                        
+                        console.log(`Cleaned up old empty room: ${room.id}`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in periodic room cleanup:', error);
+            }
         }
 
         function updatePlayerList() {
@@ -1262,7 +1380,20 @@
         }
 
         // Cleanup function for when leaving the game
-        function cleanup() {
+        async function cleanup() {
+            // Remove player from database when leaving
+            if (isSupabaseConfigured && gameState.roomId && gameState.myId) {
+                try {
+                    await supabase
+                        .from('game_players')
+                        .delete()
+                        .eq('room_id', gameState.roomId)
+                        .eq('user_id', gameState.myId);
+                } catch (error) {
+                    console.error('Error removing player on cleanup:', error);
+                }
+            }
+            
             // Unsubscribe from all channels
             gameState.subscriptions.forEach(subscription => {
                 supabase.removeChannel(subscription);
@@ -1460,7 +1591,7 @@
                     .from('game_messages')
                     .insert({
                         room_id: gameState.roomId,
-                        user_id: gameState.myId.startsWith('guest_') ? null : gameState.myId,
+                        user_id: gameState.myId, // Store the full user ID including guest IDs
                         username: gameState.myName,
                         message: message,
                         message_type: isCorrectGuess ? 'guess' : 'chat',
