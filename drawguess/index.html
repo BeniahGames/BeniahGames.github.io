@@ -608,6 +608,7 @@
             canvasSetup: false,
             joiningGame: false,
             currentStrokeBatch: [],
+            correctGuessers: new Set(), // Track who has guessed correctly this round
             strokeSaveTimeout: null,
             isGameHost: false,
             gameHostId: null
@@ -1878,6 +1879,9 @@
                 
                 // Handle correct guess
                 if (isCorrectGuess) {
+                    // Add player to correct guessers set
+                    gameState.correctGuessers.add(message.user_id);
+                    
                     addSystemMessage(`🎉 ${message.username} guessed correctly!`);
                     
                     // Award points to the guesser (if we have their player data)
@@ -1899,7 +1903,8 @@
                 currentWord: gameState.currentWord,
                 roundStarted: gameState.roundStarted,
                 currentDrawer: gameState.currentDrawer,
-                isDrawer: playerId === gameState.currentDrawer
+                isDrawer: playerId === gameState.currentDrawer,
+                alreadyGuessed: gameState.correctGuessers.has(playerId)
             });
             
             if (!gameState.currentWord || !gameState.roundStarted) {
@@ -1909,6 +1914,10 @@
             if (playerId === gameState.currentDrawer) {
                 console.log('❌ Drawer cannot guess');
                 return false; // Drawer can't guess
+            }
+            if (gameState.correctGuessers.has(playerId)) {
+                console.log('❌ Player already guessed correctly this round');
+                return false; // Player already guessed correctly this round
             }
             
             const guess = message.toLowerCase().trim();
@@ -2267,6 +2276,9 @@
                 const players = Array.from(gameState.players.keys()).sort();
                 if (players.length === 0) return;
                 
+                // Clear correct guessers for new round
+                gameState.correctGuessers.clear();
+                
                 gameState.currentDrawer = players[gameState.currentRound % players.length];
                 gameState.currentWord = getRandomWord();
                 gameState.timeLeft = 60;
@@ -2314,6 +2326,9 @@
                 gameState.timeLeft = 60;
                 gameState.roundStarted = true;
                 
+                // Clear correct guessers for new round
+                gameState.correctGuessers.clear();
+                
                 // Update UI and permissions
                 updateDrawingPermissions();
                 clearCanvas();
@@ -2355,6 +2370,9 @@
                 // Fallback to demo mode logic
                 const players = Array.from(gameState.players.keys()).sort();
                 if (players.length === 0) return;
+                
+                // Clear correct guessers for new round
+                gameState.correctGuessers.clear();
                 
                 gameState.currentDrawer = players[gameState.currentRound % players.length];
                 gameState.currentWord = getRandomWord();
@@ -2624,6 +2642,9 @@
                 
                 // Handle correct guess in demo mode
                 if (isCorrectGuess) {
+                    // Add player to correct guessers set
+                    gameState.correctGuessers.add(gameState.myId);
+                    
                     const points = Math.max(10, Math.floor(gameState.timeLeft / 2));
                     const player = gameState.players.get(gameState.myId);
                     if (player) {
@@ -2687,6 +2708,9 @@
                 
                 // Handle correct guess
                 if (isCorrectGuess) {
+                    // Add player to correct guessers set
+                    gameState.correctGuessers.add(gameState.myId);
+                    
                     const points = Math.max(10, Math.floor(gameState.timeLeft / 2));
                     await updatePlayerScore(gameState.myId, points);
                     addSystemMessage(`🎉 ${gameState.myName} guessed correctly! +${points} points`);
