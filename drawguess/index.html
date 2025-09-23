@@ -66,7 +66,7 @@
         .main-container {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr 400px;
             gap: 1rem;
             padding: 1rem;
             max-height: calc(100vh - 80px);
@@ -76,6 +76,7 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            align-items: center;
         }
 
         .game-status {
@@ -111,8 +112,11 @@
         .drawing-tools {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 1rem;
+            margin-top: 1rem;
             flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            max-width: 400px;
         }
 
         .tool-btn {
@@ -167,13 +171,47 @@
             width: 100px;
         }
 
+        .time-bar-container {
+            width: 400px;
+            height: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .time-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, var(--accent) 50%, var(--error) 100%);
+            transition: width 1s linear;
+            width: 100%;
+        }
+
+        .time-bar.warning {
+            background: linear-gradient(90deg, var(--error) 0%, #ff6b35 100%);
+        }
+
+        .time-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--text);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            z-index: 1;
+        }
+
         #drawingCanvas {
             border: 2px solid var(--border);
             border-radius: 8px;
             background: white;
             cursor: crosshair;
-            max-width: 100%;
-            max-height: 400px;
+            width: 400px;
+            height: 566px; /* A4 aspect ratio: 400 * 1.414 ≈ 566 */
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
@@ -182,16 +220,19 @@
         }
 
         .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .players-panel {
             background: var(--panel);
             border-radius: 12px;
             border: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
             padding: 1rem;
+            height: fit-content;
+        }
+
+        .players-panel {
+            flex: 0 0 180px;
+            display: flex;
+            flex-direction: column;
         }
 
         .panel-title {
@@ -208,12 +249,13 @@
 
         .player {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            padding: 0.5rem;
+            padding: 0.75rem 0.5rem;
             background: var(--bg);
             border-radius: 8px;
             border: 1px solid var(--border);
+            text-align: center;
         }
 
         .player.current-turn {
@@ -223,28 +265,29 @@
 
         .player-name {
             font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
         }
 
         .player-score {
             color: var(--accent);
             font-weight: bold;
+            font-size: 0.8rem;
         }
 
         .chat-panel {
-            background: var(--panel);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            padding: 1rem;
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             margin-bottom: 1rem;
-            max-height: 300px;
+            height: 400px;
+            min-height: 400px;
         }
 
         .message {
@@ -396,46 +439,45 @@
             
             .sidebar {
                 order: 2;
-                display: flex;
                 flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.75rem;
                 flex: 1;
                 min-height: 0;
             }
             
             .players-panel {
-                order: 1;
                 flex: 0 0 auto;
-                margin: 0;
-                padding: 0.75rem;
-                max-height: 150px;
-                overflow-y: auto;
+            }
+            
+            .player-list {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+            
+            .player {
+                flex: 0 0 auto;
+                min-width: 80px;
             }
             
             .chat-panel {
-                order: 2;
                 flex: 1;
-                margin: 0;
-                padding: 0.75rem;
-                display: flex;
-                flex-direction: column;
-                min-height: 0;
-            }
-            
-            .chat-messages {
-                flex: 1;
-                overflow-y: auto;
                 min-height: 200px;
             }
             
-            .chat-input {
-                flex: 0 0 auto;
-                margin-top: 0.5rem;
+            .chat-messages {
+                height: 200px;
+                min-height: 200px;
             }
             
             .drawing-tools {
                 flex-wrap: wrap;
                 gap: 0.5rem;
                 justify-content: center;
+                max-width: 95vw;
             }
             
             .drawing-section {
@@ -446,11 +488,12 @@
             }
             
             #drawingCanvas {
-                max-height: 40vh;
-                width: 95vw;
-                max-width: 95vw;
-                height: auto;
-                margin: 0 auto;
+                width: 300px;
+                height: 424px; /* A4 ratio: 300 * 1.414 ≈ 424 */
+            }
+            
+            .time-bar-container {
+                width: 300px;
             }
             
             .game-status {
@@ -525,6 +568,16 @@
 
             <div class="canvas-container">
                 <div class="drawing-section">
+                    <!-- Time Bar Above Canvas -->
+                    <div class="time-bar-container">
+                        <div class="time-bar" id="timeBar"></div>
+                        <div class="time-text" id="timeText">Ready</div>
+                    </div>
+                    
+                    <!-- Canvas -->
+                    <canvas id="drawingCanvas" width="400" height="566"></canvas>
+                    
+                    <!-- Drawing Tools Below Canvas -->
                     <div class="drawing-tools">
                         <button class="tool-btn active" data-tool="pen">Pen</button>
                         <button class="tool-btn" data-tool="eraser">Eraser</button>
@@ -547,8 +600,6 @@
                             <span id="sizeDisplay">3px</span>
                         </div>
                     </div>
-                    
-                    <canvas id="drawingCanvas" width="800" height="400"></canvas>
                 </div>
             </div>
         </div>
@@ -679,6 +730,29 @@
             setupCanvas();
             setupEventListeners();
             
+            // Ensure canvas is properly sized after page load
+            setTimeout(() => {
+                if (window.resizeCanvas) {
+                    window.resizeCanvas();
+                }
+            }, 100);
+            
+            // Additional resize triggers for different loading scenarios
+            setTimeout(() => {
+                if (window.resizeCanvas) {
+                    window.resizeCanvas();
+                }
+            }, 500);
+            
+            // Trigger resize when DOM is fully loaded
+            if (document.readyState === 'complete') {
+                setTimeout(() => {
+                    if (window.resizeCanvas) {
+                        window.resizeCanvas();
+                    }
+                }, 50);
+            }
+            
             // Get user's name and ID from authentication
             const isAuthenticated = await getUserName();
             if (!isAuthenticated) {
@@ -774,15 +848,13 @@
             
             // Sync canvas internal dimensions with CSS display size
             function resizeCanvas() {
+                if (!canvas) return;
+                
                 const rect = canvas.getBoundingClientRect();
-                const dpr = window.devicePixelRatio || 1;
                 
-                // Set internal canvas size to match display size
-                canvas.width = rect.width * dpr;
-                canvas.height = rect.height * dpr;
-                
-                // Scale context to match device pixel ratio
-                ctx.scale(dpr, dpr);
+                // Set canvas internal size to match display size exactly
+                canvas.width = rect.width;
+                canvas.height = rect.height;
                 
                 // Reset drawing context properties after resize
                 ctx.lineCap = 'round';
@@ -792,10 +864,12 @@
                 
                 console.log('📐 Canvas resized:', {
                     displaySize: { width: rect.width, height: rect.height },
-                    internalSize: { width: canvas.width, height: canvas.height },
-                    devicePixelRatio: dpr
+                    internalSize: { width: canvas.width, height: canvas.height }
                 });
             }
+            
+            // Make resizeCanvas globally accessible
+            window.resizeCanvas = resizeCanvas;
             
             // Initial resize
             resizeCanvas();
@@ -2850,11 +2924,34 @@
         
         function updateTimerDisplay() {
             const timerElement = document.getElementById('timer');
+            const timeBar = document.getElementById('timeBar');
+            const timeText = document.getElementById('timeText');
+            
             if (timerElement) {
                 if (gameState.roomSettings.timerDuration === 0) {
                     timerElement.textContent = '∞';
                 } else {
                     timerElement.textContent = `${gameState.timeLeft}s`;
+                }
+            }
+            
+            // Update visual time bar
+            if (timeBar && timeText) {
+                if (gameState.roomSettings.timerDuration === 0) {
+                    timeBar.style.width = '100%';
+                    timeText.textContent = 'No Time Limit';
+                    timeBar.classList.remove('warning');
+                } else {
+                    const percentage = (gameState.timeLeft / gameState.roomSettings.timerDuration) * 100;
+                    timeBar.style.width = `${Math.max(0, percentage)}%`;
+                    timeText.textContent = `${gameState.timeLeft}s`;
+                    
+                    // Add warning class when time is running low (less than 25%)
+                    if (percentage < 25) {
+                        timeBar.classList.add('warning');
+                    } else {
+                        timeBar.classList.remove('warning');
+                    }
                 }
             }
         }
