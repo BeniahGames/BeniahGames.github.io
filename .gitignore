@@ -5,3 +5,5 @@ user_progress_rows.json
 user_roles_unlocked_rows.json
 fix_database_schema.sql
 drawguess/supabase-setup.sql
+drawguess/migration-fix-message-types.sql
+drawguess/verify-database.sql
