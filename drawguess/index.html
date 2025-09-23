@@ -852,6 +852,11 @@
                 
                 const rect = canvas.getBoundingClientRect();
                 
+                // Save current canvas content before resize
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const oldWidth = canvas.width;
+                const oldHeight = canvas.height;
+                
                 // Set canvas internal size to match display size exactly
                 canvas.width = rect.width;
                 canvas.height = rect.height;
@@ -862,9 +867,25 @@
                 ctx.strokeStyle = currentColor;
                 ctx.lineWidth = currentSize;
                 
+                // Restore canvas content if there was any
+                if (oldWidth > 0 && oldHeight > 0) {
+                    // Create temporary canvas to scale the image data
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = oldWidth;
+                    tempCanvas.height = oldHeight;
+                    
+                    // Put the saved image data on temp canvas
+                    tempCtx.putImageData(imageData, 0, 0);
+                    
+                    // Draw the temp canvas content onto the resized canvas, scaling as needed
+                    ctx.drawImage(tempCanvas, 0, 0, oldWidth, oldHeight, 0, 0, canvas.width, canvas.height);
+                }
+                
                 console.log('📐 Canvas resized:', {
                     displaySize: { width: rect.width, height: rect.height },
-                    internalSize: { width: canvas.width, height: canvas.height }
+                    internalSize: { width: canvas.width, height: canvas.height },
+                    preserved: oldWidth > 0 && oldHeight > 0
                 });
             }
             
@@ -887,6 +908,7 @@
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
             canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
             
             // Touch events for mobile with proper options
             canvas.addEventListener('touchstart', handleTouch, { passive: false });
@@ -955,6 +977,9 @@
                 return;
             }
             
+            // Prevent default to avoid unwanted behaviors
+            e.preventDefault();
+            
             isDrawingMode = true;
             const rect = canvas.getBoundingClientRect();
             lastX = e.clientX - rect.left;
@@ -974,10 +999,10 @@
                 
                 // Add start stroke to batch
                 gameState.currentStrokeBatch.push({
-                    x: lastX,
-                    y: lastY,
+                    x: lastX / canvas.width,  // Normalize to 0-1 range
+                    y: lastY / canvas.height, // Normalize to 0-1 range
                     color: currentColor,
-                    size: currentSize,
+                    size: currentSize / Math.min(canvas.width, canvas.height), // Normalize size relative to canvas
                     tool: currentTool,
                     type: 'start',
                     timestamp: Date.now()
@@ -1021,12 +1046,12 @@
                 }
                 
                 gameState.currentStrokeBatch.push({
-                    fromX: lastX,
-                    fromY: lastY,
-                    toX: currentX,
-                    toY: currentY,
+                    fromX: lastX / canvas.width,  // Normalize to 0-1 range
+                    fromY: lastY / canvas.height, // Normalize to 0-1 range
+                    toX: currentX / canvas.width,  // Normalize to 0-1 range
+                    toY: currentY / canvas.height, // Normalize to 0-1 range
                     color: currentColor,
-                    size: currentSize,
+                    size: currentSize / Math.min(canvas.width, canvas.height), // Normalize size relative to canvas
                     tool: currentTool,
                     type: 'draw',
                     timestamp: Date.now()
@@ -1145,24 +1170,33 @@
         function drawSingleStroke(strokeData) {
             const { fromX, fromY, toX, toY, color, size, tool, type } = strokeData;
             
+            // Denormalize coordinates from 0-1 range to current canvas size
+            const actualFromX = fromX * canvas.width;
+            const actualFromY = fromY * canvas.height;
+            const actualToX = toX * canvas.width;
+            const actualToY = toY * canvas.height;
+            const actualSize = size * Math.min(canvas.width, canvas.height);
+            
             ctx.strokeStyle = color;
-            ctx.lineWidth = size;
+            ctx.lineWidth = actualSize;
             
             if (tool === 'eraser') {
                 ctx.globalCompositeOperation = 'destination-out';
-                ctx.lineWidth = size * 2;
+                ctx.lineWidth = actualSize * 2;
             } else {
                 ctx.globalCompositeOperation = 'source-over';
-                ctx.lineWidth = size;
+                ctx.lineWidth = actualSize;
             }
             
             ctx.beginPath();
-            ctx.moveTo(fromX, fromY);
-            ctx.lineTo(toX, toY);
+            ctx.moveTo(actualFromX, actualFromY);
+            ctx.lineTo(actualToX, actualToY);
             ctx.stroke();
         }
 
         async function stopDrawing() {
+            if (!isDrawingMode) return; // Already stopped
+            
             isDrawingMode = false;
             
             // Save any remaining batched strokes when drawing stops
@@ -1207,10 +1241,10 @@
                     gameState.currentStrokeBatch = gameState.currentStrokeBatch || [];
                     gameState.currentStrokeBatch.push({
                         type: 'start',
-                        x: x,
-                        y: y,
+                        x: x / canvas.width,  // Normalize to 0-1 range
+                        y: y / canvas.height, // Normalize to 0-1 range
                         tool: currentTool,
-                        size: currentSize,
+                        size: currentSize / Math.min(canvas.width, canvas.height), // Normalize size
                         color: currentColor
                     });
                 }
@@ -1226,10 +1260,12 @@
                     gameState.currentStrokeBatch = gameState.currentStrokeBatch || [];
                     gameState.currentStrokeBatch.push({
                         type: 'draw',
-                        x: x,
-                        y: y,
+                        fromX: lastX / canvas.width,  // Normalize to 0-1 range
+                        fromY: lastY / canvas.height, // Normalize to 0-1 range
+                        toX: x / canvas.width,        // Normalize to 0-1 range
+                        toY: y / canvas.height,       // Normalize to 0-1 range
                         tool: currentTool,
-                        size: currentSize,
+                        size: currentSize / Math.min(canvas.width, canvas.height), // Normalize size
                         color: currentColor
                     });
                 }
@@ -3000,6 +3036,12 @@
         }
         
         function clearCanvas() {
+            // Only allow current drawer to clear canvas in multiplayer mode
+            if (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId) {
+                console.log('❌ Canvas clear blocked - not current drawer');
+                return;
+            }
+            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Clear strokes from database if configured (only current round)
