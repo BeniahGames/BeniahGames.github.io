@@ -15,11 +15,17 @@
       --shadow:0 10px 30px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    html{
+      scroll-behavior:smooth;
+      overflow-x: hidden;
+      scrollbar-gutter: stable;
+    }
     body{
       margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial,sans-serif;
       background:var(--bg);color:var(--text);
       position:relative; z-index:0; /* for parallax layering */
+      overflow-x: hidden;
+      scrollbar-gutter: stable;
     }
 
     /* --- PARALLAX BACKGROUND (scroll-driven + twinkle) --- */
@@ -894,9 +900,10 @@
       }
     }
 
-    /* Custom Scrollbar Styling */
+    /* Custom Scrollbar Styling - WebKit browsers (Chrome, Safari, Edge) */
     ::-webkit-scrollbar {
       width: 8px;
+      height: 8px;
     }
 
     ::-webkit-scrollbar-track {
@@ -908,21 +915,75 @@
       background: linear-gradient(45deg, var(--accent), var(--accent-2));
       border-radius: 10px;
       border: 1px solid var(--panel);
+      transition: all 0.3s ease;
     }
 
     ::-webkit-scrollbar-thumb:hover {
       background: linear-gradient(45deg, var(--accent-2), #ffe066);
       box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+      transform: scale(1.1);
     }
 
     ::-webkit-scrollbar-corner {
       background: var(--panel);
     }
 
+    /* Horizontal scrollbar styling */
+    ::-webkit-scrollbar:horizontal {
+      height: 8px;
+    }
+
     /* Firefox scrollbar styling */
     html {
       scrollbar-width: thin;
       scrollbar-color: var(--accent) var(--panel);
+    }
+
+    /* Enhanced Firefox scrollbar styling for better consistency */
+    @supports (scrollbar-color: red blue) {
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) var(--panel);
+      }
+      
+      /* Specific elements that need custom scrollbars */
+      .chat-messages,
+      .devlog-content,
+      .modal-content,
+      .game-description,
+      textarea,
+      .code-block,
+      pre {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    /* Fallback for older Firefox versions */
+    @-moz-document url-prefix() {
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #ffcc00 #2a2a2a;
+      }
+      
+      /* Force consistent scrollbar width in Firefox */
+      html, body {
+        scrollbar-width: thin;
+        scrollbar-color: #ffcc00 rgba(42, 42, 42, 0.8);
+      }
+    }
+
+    /* Modern Firefox with CSS custom properties support */
+    @supports (scrollbar-width: thin) and (scrollbar-color: var(--accent) var(--panel)) {
+      :root {
+        --firefox-scrollbar-thumb: var(--accent);
+        --firefox-scrollbar-track: var(--panel);
+      }
+      
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--firefox-scrollbar-thumb) var(--firefox-scrollbar-track);
+      }
     }
 
     /* Updated User Controls Layout */
