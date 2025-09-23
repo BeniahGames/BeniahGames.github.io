@@ -2154,6 +2154,7 @@
         function updateDrawingPermissions() {
             const canDraw = gameState.currentDrawer === gameState.myId;
             gameState.isDrawing = canDraw;
+            isDrawingMode = canDraw; // Sync isDrawingMode with gameState.isDrawing
             
             console.log('🎨 Drawing Permissions Update:', {
                 currentDrawer: gameState.currentDrawer,
@@ -2164,7 +2165,8 @@
                 currentWord: gameState.currentWord,
                 playerName: gameState.players.get(gameState.myId)?.name,
                 isSupabaseConfigured: isSupabaseConfigured,
-                gameStateIsDrawing: gameState.isDrawing
+                gameStateIsDrawing: gameState.isDrawing,
+                isDrawingMode: isDrawingMode
             });
             
             // Update UI to show drawing status
