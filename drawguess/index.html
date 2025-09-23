@@ -1830,6 +1830,10 @@
                     
                     // Reset UI for new game
                     resetGameUI();
+                } else if (gameStateData.type === 'canvas_clear') {
+                    // Synchronize canvas clearing across all players
+                    console.log('Received canvas clear from another player for round', gameStateData.round);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
                 }
             } catch (error) {
                 console.error('Error handling game state broadcast:', error);
@@ -2099,12 +2103,6 @@
                                 addSystemMessage(`🎉 ${gameStateData.playerName} guessed correctly!`);
                                 addSystemMessage(`+${gameStateData.points} points for ${gameStateData.playerName}!`);
                             }
-                        }
-                    } else if (gameStateData.type === 'canvas_clear') {
-                        // Synchronize canvas clearing across all players
-                        if (senderId !== gameState.myId) {
-                            console.log('Received canvas clear from another player for round', gameStateData.round);
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
                         }
                     } else if (gameStateData.type === 'player_join') {
                         // Synchronize new player joins across all players
