@@ -61,22 +61,173 @@
       opacity:.8;
     }
 
-    /* Hero title glow (sync-ish with front twinkle at 4s) */
-    h1.glow {
-      animation: glowPulse 4s ease-in-out infinite;
+    /* Epic Hero Title Styling */
+    .hero-title-container {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
     }
-    @keyframes glowPulse {
+    
+    h1.glow {
+      background: linear-gradient(
+        45deg,
+        #ffcc00,
+        #ffd84d,
+        #ff6b35,
+        #ff9500,
+        #ffcc00
+      );
+      background-size: 400% 400%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 3s ease-in-out infinite,
+                 epicGlow 4s ease-in-out infinite,
+                 subtleFloat 6s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    
+    /* Fallback for browsers that don't support background-clip */
+    @supports not (-webkit-background-clip: text) {
+      h1.glow {
+        color: var(--accent);
+        -webkit-text-fill-color: unset;
+      }
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes epicGlow {
       0%, 100% {
-        text-shadow: 0 0 8px rgba(255, 204, 0, 0.2),
-                     0 0 16px rgba(255, 204, 0, 0.1);
-        color: var(--text);
+        filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.3))
+                drop-shadow(0 0 16px rgba(255, 204, 0, 0.2))
+                drop-shadow(0 0 24px rgba(255, 204, 0, 0.1));
       }
       50% {
-        text-shadow: 0 0 12px rgba(255, 204, 0, 0.8),
-                     0 0 24px rgba(255, 204, 0, 0.5),
-                     0 0 36px rgba(255, 220, 100, 0.3);
-        color: var(--accent-2);
+        filter: drop-shadow(0 0 16px rgba(255, 204, 0, 0.8))
+                drop-shadow(0 0 32px rgba(255, 204, 0, 0.6))
+                drop-shadow(0 0 48px rgba(255, 107, 53, 0.4))
+                drop-shadow(0 0 64px rgba(255, 149, 0, 0.3));
       }
+    }
+    
+    @keyframes subtleFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-3px); }
+    }
+    
+    /* Glitch Effect */
+    h1.glow::before,
+    h1.glow::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #ff0080, #00ff80);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      opacity: 0;
+      z-index: -1;
+    }
+    
+    h1.glow::before {
+      animation: glitch1 8s infinite;
+      transform: translateX(-2px);
+    }
+    
+    h1.glow::after {
+      animation: glitch2 8s infinite;
+      transform: translateX(2px);
+    }
+    
+    @keyframes glitch1 {
+      0%, 90%, 100% { opacity: 0; }
+      91%, 99% { opacity: 0.1; }
+    }
+    
+    @keyframes glitch2 {
+      0%, 85%, 100% { opacity: 0; }
+      86%, 94% { opacity: 0.08; }
+    }
+    
+    /* Particle Background */
+    .hero-particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: particleFloat 8s infinite linear;
+    }
+    
+    .particle:nth-child(odd) {
+      background: #ff6b35;
+      animation-duration: 12s;
+    }
+    
+    .particle:nth-child(3n) {
+      background: #ffd84d;
+      animation-duration: 10s;
+    }
+    
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) translateX(100px) scale(1);
+        opacity: 0;
+      }
+    }
+    
+    /* Typing Effect */
+    .typing-text {
+      overflow: hidden;
+      white-space: nowrap;
+      animation: typing 4s steps(40, end) 1s both;
+    }
+    
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    
+    /* Enhanced scanlines for hero */
+    .hero.scanlines::before {
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 204, 0, 0.02),
+        rgba(255, 204, 0, 0.02) 1px,
+        transparent 3px,
+        transparent 6px
+      );
     }
 
     /* Buttons */
@@ -1091,9 +1242,12 @@
 
   <!-- Hero -->
   <header class="hero scanlines">
+    <div class="hero-particles" id="heroParticles"></div>
     <div class="hero-inner">
       <div>
-        <h1 class="glow" data-translate="hero.headline">Games, art, pixels, and a dash of chaos</h1>
+        <div class="hero-title-container">
+          <h1 class="glow typing-text" data-text="Crafting Digital Worlds • Pixel by Pixel" data-translate="hero.headline">Crafting Digital Worlds • Pixel by Pixel</h1>
+        </div>
         <p class="tag" data-translate="hero.tagline">Welcome to my little corner of the internet, this is where I share what I've been making — from quirky game projects and devlogs, to photography, sketches, and the occasional rambling blog post. Basically, whatever I'm tinkering with.</p>
 
       </div>
@@ -1303,7 +1457,7 @@
         'nav.discord': 'Discord',
         
         // Hero section
-        'hero.headline': 'Games, art, pixels, and a dash of chaos',
+        'hero.headline': 'Crafting Digital Worlds • Pixel by Pixel',
         'hero.tagline': 'Welcome to my little corner of the internet, this is where I share what I\'ve been making — from quirky game projects and devlogs, to photography, sketches, and the occasional rambling blog post. Basically, whatever I\'m tinkering with.',
         'hero.cta1': 'Games',
         'hero.cta2': 'Learn more',
@@ -1404,7 +1558,7 @@
         'nav.discord': 'Discord Deelnemen',
         
         // Hero section
-        'hero.headline': 'Games, kunst, pixels, en een vleugje chaos',
+        'hero.headline': 'Digitale Werelden Creëren • Pixel voor Pixel',
         'hero.tagline': 'Welkom in mijn kleine hoekje van het internet, hier deel ik wat ik aan het maken ben — van eigenaardige spelprojecten en devlogs, tot fotografie, schetsen, en de occasionele ramblings blogpost. Eigenlijk, alles waar ik mee aan het klooien ben.',
         'hero.cta1': 'Games',
         'hero.cta2': 'Meer weten',
@@ -1505,7 +1659,7 @@
         'nav.discord': 'Discord Beitreten',
         
         // Hero section
-        'hero.headline': 'Spiele, Kunst, Pixel und eine Prise Chaos',
+        'hero.headline': 'Digitale Welten Erschaffen • Pixel für Pixel',
         'hero.tagline': 'Willkommen in meiner kleinen Ecke des Internets, hier teile ich, was ich mache — von skurrilen Spielprojekten und Devlogs bis hin zu Fotografie, Skizzen und gelegentlichen Blog-Posts. Im Grunde alles, womit ich herumbastle.',
         'hero.cta1': 'Spiele ansehen',
         'hero.cta2': 'Mehr erfahren',
@@ -1597,7 +1751,7 @@
         'nav.discord': 'Unisciti a Discord',
         
         // Hero section
-        'hero.headline': 'Giochi, arte, pixel e un pizzico di caos',
+        'hero.headline': 'Creando Mondi Digitali • Pixel per Pixel',
         'hero.tagline': 'Benvenuto nel mio piccolo angolo di internet, qui condivido quello che sto creando — da progetti di giochi bizzarri e devlog, a fotografia, schizzi e occasionali post di blog. Praticamente, tutto quello con cui sto smanettando.',
         'hero.cta1': 'Vedi i giochi',
         'hero.cta2': 'Scopri di più',
@@ -1691,7 +1845,7 @@
         'nav.discord': 'Únete a Discord',
         
         // Hero section
-        'hero.headline': 'Juegos, arte, píxeles y una pizca de caos',
+        'hero.headline': 'Creando Mundos Digitales • Píxel a Píxel',
         'hero.tagline': 'Bienvenido a mi pequeño rincón de internet, aquí comparto lo que he estado haciendo — desde proyectos de juegos peculiares y devlogs, hasta fotografía, bocetos y ocasionales posts de blog divagantes. Básicamente, cualquier cosa con la que esté trasteando.',
         'hero.cta1': 'Ver juegos',
         'hero.cta2': 'Saber más',
@@ -1782,7 +1936,7 @@
         'nav.discord': 'Discordに参加',
         
         // Hero section
-        'hero.headline': 'ゲーム、アート、ピクセル、そして少しのカオス',
+        'hero.headline': 'デジタル世界を創造 • ピクセルごとに',
         'hero.tagline': 'インターネットの私の小さな片隅へようこそ。ここでは私が作っているものを共有しています — 奇妙なゲームプロジェクトやdevlogから、写真、スケッチ、時々のとりとめのないブログ投稿まで。基本的に、私がいじっているものすべてです。',
         'hero.cta1': 'ゲームを見る',
         'hero.cta2': 'もっと知る',
@@ -3432,6 +3586,83 @@
           document.getElementById('user-icon-dropdown').style.display = 'none';
         }
       });
+    });
+
+    // Epic Hero Particle Animation
+    function createHeroParticles() {
+      const particleContainer = document.getElementById('heroParticles');
+      if (!particleContainer) return;
+
+      const particleCount = 15;
+      
+      function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random starting position
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+        
+        particleContainer.appendChild(particle);
+        
+        // Remove particle after animation completes
+        setTimeout(() => {
+          if (particle.parentNode) {
+            particle.parentNode.removeChild(particle);
+          }
+        }, 12000);
+      }
+      
+      // Create initial particles
+      for (let i = 0; i < particleCount; i++) {
+        setTimeout(() => createParticle(), i * 500);
+      }
+      
+      // Continuously create new particles
+      setInterval(createParticle, 800);
+    }
+
+    // Enhanced typing effect
+    function initTypingEffect() {
+      const titleElement = document.querySelector('h1.typing-text');
+      if (!titleElement) return;
+
+      const text = titleElement.textContent;
+      titleElement.textContent = '';
+      titleElement.style.width = '0';
+      
+      setTimeout(() => {
+        titleElement.textContent = text;
+        titleElement.style.width = '100%';
+      }, 1000);
+    }
+
+    // Initialize hero effects when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      createHeroParticles();
+      initTypingEffect();
+      
+      // Add subtle mouse movement effect to hero
+      const hero = document.querySelector('.hero');
+      const heroTitle = document.querySelector('h1.glow');
+      
+      if (hero && heroTitle) {
+        hero.addEventListener('mousemove', (e) => {
+          const rect = hero.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width;
+          const y = (e.clientY - rect.top) / rect.height;
+          
+          const moveX = (x - 0.5) * 10;
+          const moveY = (y - 0.5) * 10;
+          
+          heroTitle.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+        
+        hero.addEventListener('mouseleave', () => {
+          heroTitle.style.transform = 'translate(0, 0)';
+        });
+      }
     });
   </script>
 
