@@ -772,6 +772,37 @@
             if (gameState.canvasSetup) return;
             gameState.canvasSetup = true;
             
+            // Sync canvas internal dimensions with CSS display size
+            function resizeCanvas() {
+                const rect = canvas.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                
+                // Set internal canvas size to match display size
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                
+                // Scale context to match device pixel ratio
+                ctx.scale(dpr, dpr);
+                
+                // Reset drawing context properties after resize
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = currentSize;
+                
+                console.log('📐 Canvas resized:', {
+                    displaySize: { width: rect.width, height: rect.height },
+                    internalSize: { width: canvas.width, height: canvas.height },
+                    devicePixelRatio: dpr
+                });
+            }
+            
+            // Initial resize
+            resizeCanvas();
+            
+            // Resize on window resize (for mobile orientation changes)
+            window.addEventListener('resize', resizeCanvas);
+            
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.strokeStyle = currentColor;
@@ -854,6 +885,13 @@
             const rect = canvas.getBoundingClientRect();
             lastX = e.clientX - rect.left;
             lastY = e.clientY - rect.top;
+            
+            console.log('🖱️ Mouse coordinates:', {
+                mouse: { clientX: e.clientX, clientY: e.clientY },
+                rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+                calculated: { x: lastX, y: lastY },
+                canvasSize: { width: canvas.width, height: canvas.height }
+            });
             
             // Clear any existing stroke batch and timeout when starting a new stroke
             if (isSupabaseConfigured) {
@@ -1073,6 +1111,13 @@
             const rect = canvas.getBoundingClientRect();
             const x = touch.clientX - rect.left;
             const y = touch.clientY - rect.top;
+            
+            console.log('👆 Touch coordinates:', {
+                touch: { clientX: touch.clientX, clientY: touch.clientY },
+                rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+                calculated: { x, y },
+                canvasSize: { width: canvas.width, height: canvas.height }
+            });
             
             if (e.type === 'touchstart') {
                 if (isSupabaseConfigured && gameState.currentDrawer !== gameState.myId) {
