@@ -837,7 +837,11 @@
                 currentDrawer: gameState.currentDrawer,
                 myId: gameState.myId,
                 isCurrentDrawer: gameState.currentDrawer === gameState.myId,
-                willBlock: isSupabaseConfigured && gameState.currentDrawer !== gameState.myId
+                willBlock: isSupabaseConfigured && gameState.currentDrawer !== gameState.myId,
+                gameStateIsDrawing: gameState.isDrawing,
+                canvasPointerEvents: canvas.style.pointerEvents,
+                eventType: e.type,
+                eventTarget: e.target.id
             });
             
             // Allow drawing in demo mode or if user is the current drawer
@@ -2158,7 +2162,9 @@
                 roundStarted: gameState.roundStarted,
                 gameStarted: gameState.gameStarted,
                 currentWord: gameState.currentWord,
-                playerName: gameState.players.get(gameState.myId)?.name
+                playerName: gameState.players.get(gameState.myId)?.name,
+                isSupabaseConfigured: isSupabaseConfigured,
+                gameStateIsDrawing: gameState.isDrawing
             });
             
             // Update UI to show drawing status
@@ -2174,7 +2180,20 @@
             if (canvas) {
                 canvas.style.pointerEvents = canDraw ? 'auto' : 'none';
                 canvas.style.cursor = canDraw ? 'crosshair' : 'default';
-                console.log('🖼️ Canvas updated:', { pointerEvents: canvas.style.pointerEvents, cursor: canvas.style.cursor });
+                console.log('🖼️ Canvas updated:', { 
+                    pointerEvents: canvas.style.pointerEvents, 
+                    cursor: canvas.style.cursor,
+                    canDraw: canDraw,
+                    currentDrawer: gameState.currentDrawer,
+                    myId: gameState.myId
+                });
+                
+                // Force enable canvas for current drawer (safety check)
+                if (canDraw) {
+                    canvas.style.pointerEvents = 'auto';
+                    canvas.style.cursor = 'crosshair';
+                    console.log('🔧 Force enabled canvas for current drawer');
+                }
             }
             
             // Show appropriate text to drawer vs guessers
@@ -3045,7 +3064,27 @@
             return Math.max(10, Math.floor(gameState.timeLeft / 2));
         }
 
-        // Initialize when page loads
+        // Debug function to check and fix drawing permissions
+        window.debugDrawing = function() {
+            console.log('🔍 Debug Drawing State:', {
+                currentDrawer: gameState.currentDrawer,
+                myId: gameState.myId,
+                canDraw: gameState.currentDrawer === gameState.myId,
+                isDrawing: gameState.isDrawing,
+                canvasPointerEvents: canvas?.style.pointerEvents,
+                canvasCursor: canvas?.style.cursor,
+                isSupabaseConfigured: isSupabaseConfigured,
+                gameStarted: gameState.gameStarted,
+                roundStarted: gameState.roundStarted
+            });
+            
+            // Force update permissions
+            updateDrawingPermissions();
+            
+            return 'Drawing permissions updated';
+        };
+
+        // Initialize game when page loads
         window.addEventListener('load', initGame);
     </script>
 </body>
