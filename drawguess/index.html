@@ -2122,13 +2122,12 @@
             console.log('Received drawing stroke:', {
                 from: stroke.user_id,
                 myId: gameState.myId,
-                willDraw: stroke.user_id !== gameState.myId
+                willRender: true
             });
             
-            // Only draw strokes from other players
-            if (stroke.user_id !== gameState.myId) {
-                drawStrokeFromData(stroke.stroke_data);
-            }
+            // Always draw strokes received from database
+            // This ensures all players see the same drawing state
+            drawStrokeFromData(stroke.stroke_data);
         }
 
         function handleRoomUpdate(payload) {
