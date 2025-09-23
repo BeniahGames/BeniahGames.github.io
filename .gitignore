@@ -7,3 +7,5 @@ fix_database_schema.sql
 drawguess/supabase-setup.sql
 drawguess/migration-fix-message-types.sql
 drawguess/verify-database.sql
+drawguess/check-functions.sql
+drawguess/security-fixes.sql

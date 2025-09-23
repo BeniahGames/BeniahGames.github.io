@@ -506,6 +506,7 @@
         <div class="room-info">
             <div class="room-code">Room: <span id="currentRoom">-</span></div>
             <div>Players: <span id="playerCount">0/10</span></div>
+            <button id="leaveRoomBtn" class="btn btn-secondary" onclick="leaveRoom()" style="display: none; margin-left: 1rem; padding: 0.25rem 0.5rem; font-size: 0.8rem;">Leave Room</button>
         </div>
     </div>
 
@@ -1149,6 +1150,7 @@
                 
                 document.getElementById('joinModal').style.display = 'none';
                 document.getElementById('currentRoom').textContent = gameState.room;
+                document.getElementById('leaveRoomBtn').style.display = 'inline-block';
                 addSystemMessage(`${roomCode ? 'Joined' : 'Created'} room: ${gameState.room} (Demo Mode)`);
                 startGame();
                 return;
@@ -1207,6 +1209,7 @@
             gameState.room = roomCode;
             gameState.roomId = room.id;
             document.getElementById('currentRoom').textContent = roomCode;
+            document.getElementById('leaveRoomBtn').style.display = 'inline-block';
             
             // Add player to room
             await addPlayerToRoom(room.id);
@@ -1258,6 +1261,7 @@
             gameState.room = roomCode.toUpperCase();
             gameState.roomId = room.id;
             document.getElementById('currentRoom').textContent = roomCode.toUpperCase();
+            document.getElementById('leaveRoomBtn').style.display = 'inline-block';
             
             // Add player to room
             await addPlayerToRoom(room.id);
@@ -1810,8 +1814,10 @@
         }
 
         async function handlePlayerUpdate(payload) {
-            const player = payload.new;
+            console.log('Player update payload:', payload);
+            
             if (payload.eventType === 'INSERT') {
+                const player = payload.new;
                 addPlayer(player.user_id, player.username, player.score);
                 if (player.username !== gameState.myName) {
                     addSystemMessage(`${player.username} joined the room`);
@@ -1831,8 +1837,12 @@
                     }
                 }
             } else if (payload.eventType === 'UPDATE') {
+                const player = payload.new;
                 updatePlayerScore(player.user_id, player.score);
             } else if (payload.eventType === 'DELETE') {
+                // For DELETE events, player data is in payload.old, not payload.new
+                const player = payload.old;
+                console.log('Player leaving:', player);
                 removePlayer(player.user_id);
                 addSystemMessage(`${player.username} left the room`);
             }
@@ -1881,6 +1891,7 @@
                             
                             gameState.currentDrawer = gameStateData.drawer;
                             gameState.currentRound = gameStateData.round - 1; // Adjust for 0-based indexing
+                            gameState.currentWord = gameStateData.currentWord;
                             gameState.timeLeft = gameStateData.timeLeft;
                             gameState.roundStarted = true;
                             
@@ -2146,7 +2157,9 @@
                 myId: gameState.myId,
                 canDraw: canDraw,
                 roundStarted: gameState.roundStarted,
-                gameStarted: gameState.gameStarted
+                gameStarted: gameState.gameStarted,
+                currentWord: gameState.currentWord,
+                playerName: gameState.players.get(gameState.myId)?.name
             });
             
             // Update UI to show drawing status
@@ -2168,13 +2181,24 @@
             // Show appropriate text to drawer vs guessers
             const currentWordElement = document.getElementById('currentWord');
             if (currentWordElement) {
+                let newText;
                 if (canDraw && gameState.currentWord) {
-                    currentWordElement.textContent = `Draw: ${gameState.currentWord}`;
+                    newText = `Draw: ${gameState.currentWord}`;
                 } else if (gameState.roundStarted) {
-                    currentWordElement.textContent = 'Guess the drawing!';
+                    newText = 'Guess the drawing!';
                 } else {
-                    currentWordElement.textContent = 'Waiting for players...';
+                    newText = 'Waiting for players...';
                 }
+                
+                console.log('📝 UI Text Update:', {
+                    canDraw: canDraw,
+                    hasCurrentWord: !!gameState.currentWord,
+                    roundStarted: gameState.roundStarted,
+                    oldText: currentWordElement.textContent,
+                    newText: newText
+                });
+                
+                currentWordElement.textContent = newText;
             }
         }
 
@@ -2366,24 +2390,83 @@
 
         // Cleanup function for when leaving the game
         async function cleanup() {
+            console.log('🧹 Cleanup started for player:', gameState.myId);
+            
             // Remove player from database when leaving
             if (isSupabaseConfigured && gameState.roomId && gameState.myId) {
                 try {
-                    await supabase
+                    console.log('Removing player from database:', {
+                        roomId: gameState.roomId,
+                        playerId: gameState.myId
+                    });
+                    
+                    const { error } = await supabase
                         .from('game_players')
                         .delete()
                         .eq('room_id', gameState.roomId)
                         .eq('user_id', gameState.myId);
+                    
+                    if (error) {
+                        console.error('Database deletion error:', error);
+                    } else {
+                        console.log('✅ Player successfully removed from database');
+                    }
                 } catch (error) {
                     console.error('Error removing player on cleanup:', error);
                 }
             }
             
             // Unsubscribe from all channels
-            gameState.subscriptions.forEach(subscription => {
-                supabase.removeChannel(subscription);
-            });
-            gameState.subscriptions = [];
+            if (gameState.subscriptions.length > 0) {
+                console.log('Unsubscribing from channels:', gameState.subscriptions.length);
+                gameState.subscriptions.forEach(subscription => {
+                    supabase.removeChannel(subscription);
+                });
+                gameState.subscriptions = [];
+            }
+            
+            console.log('🧹 Cleanup completed');
+        }
+
+        // Manual leave room function
+        async function leaveRoom() {
+            if (confirm('Are you sure you want to leave the room?')) {
+                console.log('🚪 Player manually leaving room');
+                
+                // Perform cleanup
+                await cleanup();
+                
+                // Reset game state
+                gameState.roomId = null;
+                gameState.room = null;
+                gameState.players.clear();
+                gameState.gameStarted = false;
+                gameState.roundStarted = false;
+                gameState.isGameHost = false;
+                
+                // Reset UI
+                document.getElementById('currentRoom').textContent = '-';
+                document.getElementById('leaveRoomBtn').style.display = 'none';
+                document.getElementById('joinModal').style.display = 'block';
+                document.getElementById('playerCount').textContent = '0/10';
+                document.getElementById('currentWord').textContent = 'Waiting for players...';
+                document.getElementById('gamePhase').textContent = 'Waiting to start';
+                document.getElementById('timer').textContent = '0';
+                
+                // Clear player list
+                updatePlayerList();
+                
+                // Clear chat
+                const chatMessages = document.getElementById('chatMessages');
+                if (chatMessages) {
+                    chatMessages.innerHTML = '';
+                }
+                
+                // Clear canvas
+                clearCanvas();
+                
+                console.log('✅ Successfully left room');
+            }
         }
 
         // Game state management functions
@@ -2466,7 +2549,8 @@
                         type: 'round_start',
                         drawer: currentDrawer,
                         round: gameState.currentRound + 1,
-                        timeLeft: gameState.roomSettings.timerDuration
+                        timeLeft: gameState.roomSettings.timerDuration,
+                        currentWord: word
                     };
                     
                     console.log('📡 Broadcasting round_start message:', roundStartMessage);
@@ -2776,8 +2860,19 @@
             }
         }
         
-        // Handle page unload
+        // Handle page unload - multiple events for better reliability
         window.addEventListener('beforeunload', cleanup);
+        window.addEventListener('unload', cleanup);
+        window.addEventListener('pagehide', cleanup);
+        
+        // Handle visibility change (when tab becomes hidden)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                // Don't cleanup immediately on visibility change as user might come back
+                // But we could implement a timeout-based cleanup here if needed
+                console.log('Page became hidden - player might be leaving');
+            }
+        });
 
         function addPlayer(id, name, score) {
             gameState.players.set(id, { id, name, score });
