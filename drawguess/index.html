@@ -2999,29 +2999,20 @@
             }
         }
 
-        async function updatePlayerScore(playerId, additionalPoints) {
+        async function updatePlayerScore(playerId, newScore) {
             try {
                 const currentPlayer = gameState.players.get(playerId);
                 if (!currentPlayer) return;
                 
-                const newScore = currentPlayer.score + additionalPoints;
+                // Update local state immediately
+                currentPlayer.score = newScore;
+                updatePlayerList();
                 
-                const { error } = await supabase
-                    .from('game_players')
-                    .update({ score: newScore })
-                    .eq('room_id', gameState.roomId)
-                    .eq('user_id', playerId);
-                
-                if (error) throw error;
+                // No need to update database - this is called from realtime updates
+                // The database is already updated by the player who scored
                 
             } catch (error) {
                 console.error('Error updating score:', error);
-                // Fallback to local update
-                const player = gameState.players.find(p => p.id === playerId);
-                if (player) {
-                    player.score += additionalPoints;
-                    updatePlayerList();
-                }
             }
         }
 
