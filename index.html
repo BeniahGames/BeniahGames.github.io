@@ -531,33 +531,6 @@
     .preview figure{margin:0;background:#0e1015;border:1px solid var(--border);border-radius:10px;overflow:hidden}
     .preview img{display:block;width:100%;height:auto}
     
-    /* Floor Game Card Background */
-    #floor-game-card{
-      position:relative;
-      overflow:hidden;
-    }
-    #floor-game-card::before{
-      content:'';
-      position:absolute;
-      top:0;
-      right:0;
-      bottom:0;
-      width:60%;
-      background:url('assets/Elevathor.png') no-repeat center right;
-      background-size:contain;
-      opacity:0.15;
-      z-index:0;
-      pointer-events:none;
-      transition:opacity 0.3s ease;
-    }
-    #floor-game-card:hover::before{
-      opacity:0.25;
-    }
-    #floor-game-card > *{
-      position:relative;
-      z-index:1;
-    }
-
     /* Footer + Back to Top */
     footer{border-top:1px solid var(--accent);color:#98a1b3;text-align:center;padding:2rem 1rem;backdrop-filter:saturate(140%) blur(6px);background:linear-gradient(0deg,rgba(13,14,16,.85),rgba(13,14,16,.65))}
     #back-to-top{position:fixed;bottom:20px;right:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:rgba(20,22,27,.9);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:50}
@@ -1179,42 +1152,32 @@
       </div>
       <div class="grid">
 
-        <!-- Is This My Floor? -->
-        <article id="floor-game-card" class="card reveal" aria-expanded="false" role="button" tabindex="0">
+        <!-- Endless Wave -->
+        <article class="card reveal" aria-expanded="false" role="button" tabindex="0">
           <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
-            <div><span class="pill">Idle • Funny</span><h3>Is This My Floor?</h3></div>
+            <div><span class="pill">Space Shooter • Incremental</span><h3>Endless Wave</h3></div>
             <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="collapsible">
-            <p data-translate="games.floor.desc">An idle elevator adventure about going nowhere—while somehow calling it progress. Strange passengers, lost-and-found upgrades, and prestige rides that push your elevator higher each run.</p>
-            <div class="preview" style="margin-top:.75rem"><figure><img src="/assets/is-this-my-floor-preview.gif" alt="Is This My Floor? preview"></figure></div>
+            <p><strong>Endless Wave</strong><span data-translate="games.endlesswave.desc"> is a space shooter where every run makes the next one stronger. Blast through escalating enemy waves, bank upgrade currency, and spend it on a deep incremental upgrade tree — then pick your poison across multiple game modes, from endless survival runs to focused, high-pressure challenges.</span></p>
             <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.75rem">
               <a class="btn no-toggle" href="#contact" data-translate="games.contact">Contact</a><a class="btn no-toggle" href="#" data-translate="games.steam_soon">Steam (soon)</a>
             </div>
-            <p class="muted"><em data-translate="games.store_soon">Store page coming soon</em></p>
-          </div>
-        </article>
-
-        <!-- C.A.R.T.R.I.D.G.E -->
-        <article class="card reveal" aria-expanded="false" role="button" tabindex="0">
-          <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
-            <div><span class="pill">Roguelike • Deckbuilder</span><h3>C.A.R.T.R.I.D.G.E</h3></div>
-            <span class="chev" aria-hidden="true">⌄</span>
-          </div>
-          <div class="collapsible">
-            <p><strong>C.A.R.T.R.I.D.G.E</strong><span data-translate="games.cartridge.desc"> is a retro sci-fi roguelike card battler where you don't play cards — you load cartridges. Each run takes you deeper into a corrupted facility as QB, a cube-bot fighting glitches, viruses, and rogue machines. Discover synergies between modules, manage heat and power, and survive long enough to rewrite your firmware.</span></p>
             <p class="muted"><em data-translate="games.early_dev">Currently in early development.</em></p>
           </div>
         </article>
 
-        <!-- My Guildies! -->
+        <!-- NihonGO -->
         <article class="card reveal" aria-expanded="false" role="button" tabindex="0">
           <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:.75rem">
-            <div><span class="pill">Fantasy • Management</span><h3>My Guildies!</h3></div>
+            <div><span class="pill">Learning • Japanese</span><h3>NihonGO</h3></div>
             <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="collapsible">
-            <p><strong>My Guildies!</strong><span data-translate="games.guildies.desc"> is a whimsical yet deep guild management sim. Recruit and train heroes, send squads on quests, and watch them grow. Expand halls, unlock facilities like alchemy labs and dojos, craft gear, and balance risk vs. reward to build the most renowned guild in the realm.</span></p>
+            <p><strong>NihonGO</strong><span data-translate="games.nihongo.desc"> is a Japanese learning app built like a game. Drill hiragana, katakana, and kanji in bite-sized lessons, lock words in with spaced-repetition reviews, and build real vocabulary — with streaks, levels, and progress tracking to keep you showing up every day.</span></p>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.75rem">
+              <a class="btn no-toggle" href="#contact" data-translate="games.contact">Contact</a>
+            </div>
             <p class="muted"><em data-translate="games.early_dev">Currently in early development.</em></p>
           </div>
         </article>
@@ -1380,9 +1343,8 @@
         'games.title': 'Games',
         'games.expand_all': 'Expand All',
         'games.collapse_all': 'Collapse All',
-        'games.floor.desc': 'An idle elevator adventure about going nowhere—while somehow calling it progress. Strange passengers, lost-and-found upgrades, and prestige rides that push your elevator higher each run.',
-        'games.cartridge.desc': ' is a retro sci-fi roguelike card battler where you don\'t play cards — you load cartridges. Each run takes you deeper into a corrupted facility as QB, a cube-bot fighting glitches, viruses, and rogue machines. Discover synergies between modules, manage heat and power, and survive long enough to rewrite your firmware.',
-        'games.guildies.desc': ' is a whimsical yet deep guild management sim. Recruit and train heroes, send squads on quests, and watch them grow. Expand halls, unlock facilities like alchemy labs and dojos, craft gear, and balance risk vs. reward to build the most renowned guild in the realm.',
+        'games.endlesswave.desc': ' is a space shooter where every run makes the next one stronger. Blast through escalating enemy waves, bank upgrade currency, and spend it on a deep incremental upgrade tree — then pick your poison across multiple game modes, from endless survival runs to focused, high-pressure challenges.',
+        'games.nihongo.desc': ' is a Japanese learning app built like a game. Drill hiragana, katakana, and kanji in bite-sized lessons, lock words in with spaced-repetition reviews, and build real vocabulary — with streaks, levels, and progress tracking to keep you showing up every day.',
         'games.contact': 'Contact',
         'games.steam_soon': 'Steam (soon)',
         'games.store_soon': 'Store page coming soon',
@@ -1481,9 +1443,8 @@
         'games.title': 'Spellen',
         'games.expand_all': 'Alles Uitklappen',
         'games.collapse_all': 'Alles Inklappen',
-        'games.floor.desc': 'Een idle lift avontuur over nergens naartoe gaan—terwijl je het op de een of andere manier vooruitgang noemt. Vreemde passagiers, verloren-en-gevonden upgrades, en prestige ritten die je lift hoger duwen elke run.',
-        'games.cartridge.desc': ' is een retro sci-fi roguelike kaartgevecht waar je geen kaarten speelt — je laadt cartridges. Elke run brengt je dieper in een gecorrumpeerde faciliteit als QB, een kubus-bot die glitches, virussen en malafide machines bevecht. Ontdek synergieën tussen modules, beheer warmte en kracht, en overleef lang genoeg om je firmware te herschrijven.',
-        'games.guildies.desc': ' is een grillige maar diepe gilde management sim. Rekruteer en train helden, stuur teams op quests, en zie ze groeien. Breid hallen uit, ontgrendel faciliteiten zoals alchemie labs en dojo\'s, maak uitrusting, en balanceer risico vs. beloning om de meest gerenommeerde gilde in het rijk te bouwen.',
+        'games.endlesswave.desc': ' is een space shooter waarin elke run de volgende sterker maakt. Vecht je door steeds zwaardere vijandelijke golven, verzamel upgrade-valuta en besteed die aan een diepe incrementele upgradeboom — en kies daarna uit meerdere spelmodi, van eindeloze survival-runs tot gerichte uitdagingen onder hoge druk.',
+        'games.nihongo.desc': ' is een Japanse leerapp die aanvoelt als een game. Oefen hiragana, katakana en kanji in korte lessen, veranker woorden met spaced-repetition herhalingen en bouw echte woordenschat op — met streaks, levels en voortgangsregistratie die je elke dag terug laten komen.',
         'games.contact': 'Contact',
         'games.steam_soon': 'Steam (binnenkort)',
         'games.store_soon': 'Winkelpagina komt binnenkort',
@@ -1582,9 +1543,8 @@
         'games.title': 'Spiele',
         'games.expand_all': 'Alle Erweitern',
         'games.collapse_all': 'Alle Einklappen',
-        'games.floor.desc': 'Ein Idle-Fahrstuhl-Abenteuer über das Nirgendwo-Hingehen—während man es irgendwie Fortschritt nennt. Seltsame Passagiere, verloren-und-gefundene Upgrades und Prestige-Fahrten, die deinen Fahrstuhl bei jedem Lauf höher treiben.',
-        'games.cartridge.desc': ' ist ein Retro-Sci-Fi-Roguelike-Kartenkampf, bei dem du keine Karten spielst — du lädst Cartridges. Jeder Lauf führt dich tiefer in eine korrumpierte Einrichtung als QB, ein Würfel-Bot, der Glitches, Viren und Schurken-Maschinen bekämpft. Entdecke Synergien zwischen Modulen, verwalte Hitze und Energie und überlebe lange genug, um deine Firmware neu zu schreiben.',
-        'games.guildies.desc': ' ist eine skurrile, aber tiefe Gildenverwaltungssimulation. Rekrutiere und trainiere Helden, schicke Trupps auf Quests und sieh sie wachsen. Erweitere Hallen, schalte Einrichtungen wie Alchemielabore und Dojos frei, fertige Ausrüstung und balanciere Risiko vs. Belohnung, um die renommierteste Gilde im Reich aufzubauen.',
+        'games.endlesswave.desc': ' ist ein Weltraum-Shooter, in dem jeder Lauf den nächsten stärker macht. Kämpfe dich durch immer heftigere Gegnerwellen, sammle Upgrade-Währung und investiere sie in einen tiefen inkrementellen Upgrade-Baum — und wähle dann aus mehreren Spielmodi, von endlosen Survival-Läufen bis zu fokussierten Herausforderungen unter Hochdruck.',
+        'games.nihongo.desc': ' ist eine Japanisch-Lern-App, die sich wie ein Spiel anfühlt. Übe Hiragana, Katakana und Kanji in kurzen Lektionen, festige Wörter mit Spaced-Repetition-Wiederholungen und baue echten Wortschatz auf — mit Streaks, Leveln und Fortschrittsverfolgung, damit du jeden Tag dranbleibst.',
         'games.contact': 'Kontakt',
         'games.steam_soon': 'Steam (bald)',
         'games.store_soon': 'Shop-Seite kommt bald',
@@ -1674,9 +1634,8 @@
         'games.title': 'Giochi',
         'games.expand_all': 'Espandi Tutto',
         'games.collapse_all': 'Comprimi Tutto',
-        'games.floor.desc': 'Un\'avventura idle in ascensore sul non andare da nessuna parte—pur chiamandolo in qualche modo progresso. Passeggeri strani, upgrade persi-e-trovati, e corse di prestigio che spingono il tuo ascensore più in alto ad ogni corsa.',
-        'games.cartridge.desc': ' è un combattimento roguelike retro sci-fi con carte dove non giochi carte — carichi cartucce. Ogni corsa ti porta più in profondità in una struttura corrotta come QB, un cubo-bot che combatte glitch, virus e macchine canaglia. Scopri sinergie tra moduli, gestisci calore e potenza, e sopravvivi abbastanza a lungo per riscrivere il tuo firmware.',
-        'games.guildies.desc': ' è una simulazione di gestione gilda stravagante ma profonda. Recluta e addestra eroi, manda squadre in missioni, e guardali crescere. Espandi sale, sblocca strutture come laboratori di alchimia e dojo, crea equipaggiamento, e bilancia rischio vs. ricompensa per costruire la gilda più rinomata del regno.',
+        'games.endlesswave.desc': ' è uno sparatutto spaziale in cui ogni partita rende la successiva più forte. Affronta ondate di nemici sempre più intense, accumula valuta per i potenziamenti e spendila in un profondo albero di upgrade incrementali — poi scegli tra diverse modalità di gioco, dalle corse survival infinite alle sfide mirate ad alta tensione.',
+        'games.nihongo.desc': ' è un\'app per imparare il giapponese costruita come un gioco. Esercitati con hiragana, katakana e kanji in lezioni brevi, fissa le parole con ripetizioni dilazionate e costruisci un vocabolario reale — con streak, livelli e monitoraggio dei progressi per tornare ogni giorno.',
         'games.contact': 'Contatti',
         'games.steam_soon': 'Steam (presto)',
         'games.store_soon': 'Pagina del negozio in arrivo presto',
@@ -1766,9 +1725,8 @@
         
         // Games section
         'games.title': 'Juegos',
-        'games.floor.desc': 'Una aventura idle de ascensor sobre no ir a ninguna parte—mientras de alguna manera lo llamas progreso. Pasajeros extraños, mejoras perdidas-y-encontradas, y viajes de prestigio que empujan tu ascensor más alto en cada carrera.',
-        'games.cartridge.desc': ' es un juego de cartas roguelike retro sci-fi donde no juegas cartas — cargas cartuchos. Cada carrera te lleva más profundo en una instalación corrupta como QB, un cubo-bot luchando contra glitches, virus y máquinas rebeldes. Descubre sinergias entre módulos, gestiona calor y energía, y sobrevive lo suficiente para reescribir tu firmware.',
-        'games.guildies.desc': ' es una simulación de gestión de gremio caprichosa pero profunda. Recluta y entrena héroes, envía escuadrones en misiones, y míralos crecer. Expande salas, desbloquea instalaciones como laboratorios de alquimia y dojos, crea equipo, y equilibra riesgo vs. recompensa para construir el gremio más renombrado del reino.',
+        'games.endlesswave.desc': ' es un shooter espacial donde cada partida hace más fuerte a la siguiente. Abre fuego contra oleadas de enemigos cada vez más duras, acumula moneda de mejora y gástala en un profundo árbol de mejoras incrementales — y luego elige entre varios modos de juego, desde partidas de supervivencia infinitas hasta desafíos concretos de alta presión.',
+        'games.nihongo.desc': ' es una app para aprender japonés construida como un juego. Practica hiragana, katakana y kanji en lecciones breves, fija las palabras con repaso de repetición espaciada y construye vocabulario real — con rachas, niveles y seguimiento del progreso para que vuelvas cada día.',
         'games.contact': 'Contacto',
         'games.steam_soon': 'Steam (pronto)',
         'games.store_soon': 'Página de la tienda próximamente',
@@ -1857,9 +1815,8 @@
         
         // Games section
         'games.title': 'ゲーム',
-        'games.floor.desc': 'どこにも行かないことについてのアイドルエレベーターアドベンチャー—それをなぜか進歩と呼んでいます。奇妙な乗客、紛失・発見されたアップグレード、そして各ランでエレベーターをより高く押し上げるプレステージライド。',
-        'games.cartridge.desc': 'は、カードをプレイしないレトロSFローグライクカードバトラーです—カートリッジをロードします。各ランでは、グリッチ、ウイルス、不正なマシンと戦うキューブボットQBとして、破損した施設の奥深くへ進みます。モジュール間のシナジーを発見し、熱と電力を管理し、ファームウェアを書き換えるのに十分長く生き残ってください。',
-        'games.guildies.desc': 'は、風変わりでありながら深いギルド管理シムです。ヒーローを募集・訓練し、チームをクエストに送り、彼らの成長を見守ります。ホールを拡張し、錬金術ラボや道場などの施設をアンロックし、装備を作成し、リスクと報酬のバランスを取って、王国で最も有名なギルドを築きます。',
+        'games.endlesswave.desc': 'は、プレイするたびに次のランが強くなるスペースシューティングです。激化する敵のウェーブを撃ち抜き、アップグレード通貨を貯め、奥深いインクリメンタルなアップグレードツリーに投資しましょう。エンドレスのサバイバルから緊張感のあるチャレンジまで、複数のゲームモードから選べます。',
+        'games.nihongo.desc': 'は、ゲームのように学べる日本語学習アプリです。ひらがな・カタカナ・漢字を短いレッスンで練習し、間隔反復の復習で単語を定着させ、実用的な語彙を積み上げます。連続記録、レベル、進捗トラッキングで毎日続けられます。',
         'games.contact': 'お問い合わせ',
         'games.steam_soon': 'Steam（近日公開）',
         'games.store_soon': 'ストアページ近日公開',
