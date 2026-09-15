@@ -392,7 +392,10 @@
         .menu-panel.open .menu-panel-inner a:nth-child(7){opacity:1;transform:none;transition-delay:340ms}
         @media (prefers-reduced-motion:reduce){.menu-panel,.menu-panel a{transition:none !important;transform:none !important}}
 
-        /* Spotify Now Playing */
+        /* Spotify Now Playing
+           DISABLED: see index.html — the now-playing API is not responding.
+           Delete the .now-playing rule directly below to re-enable. */
+        .now-playing{display:none !important}
         .now-playing{display:flex;align-items:center;gap:.75rem;padding:.5rem;background:rgba(30,215,96,.1);border:1px solid rgba(30,215,96,.3);border-radius:8px;transition:all .3s ease}
         .now-playing:hover{background:rgba(30,215,96,.15);border-color:rgba(30,215,96,.5)}
         .np-art,.np-art-mobile{width:40px;height:40px;background:#333;border-radius:6px;flex-shrink:0;background-size:cover;background-position:center}

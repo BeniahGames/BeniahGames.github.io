@@ -433,7 +433,11 @@
     .menu-panel.open .menu-panel-inner a:nth-child(7){opacity:1;transform:none;transition-delay:340ms}
     @media (prefers-reduced-motion:reduce){.menu-panel,.menu-panel a{transition:none !important;transform:none !important}}
 
-    /* Spotify Now Playing */
+    /* Spotify Now Playing
+       DISABLED: the now-playing API is not responding, so the widget only ever
+       showed a dead "Not playing" chip. To re-enable: delete the .now-playing
+       rule directly below and set SPOTIFY_ENABLED = true in the script. */
+    .now-playing{display:none !important}
     .now-playing{display:flex;align-items:center;gap:.75rem;padding:.5rem;background:rgba(30,215,96,.1);border:1px solid rgba(30,215,96,.3);border-radius:8px;transition:all .3s ease}
     .now-playing:hover{background:rgba(30,215,96,.15);border-color:rgba(30,215,96,.5)}
     .np-art,.np-art-mobile{width:40px;height:40px;background:#333;border-radius:6px;flex-shrink:0;background-size:cover;background-position:center}
@@ -2918,6 +2922,11 @@
 
     // Spotify Now Playing
     (() => {
+      // Disabled for now: the now-playing API is not responding. Flip this to
+      // true (and drop the .now-playing{display:none} rule in the stylesheet)
+      // to bring the widget back.
+      const SPOTIFY_ENABLED = false;
+
       const API = 'https://now-playing-api-one.vercel.app/api/now-playing';
       
       // Desktop elements
@@ -2939,13 +2948,14 @@
 
           if (!data.isPlaying) {
             // Desktop
-            title.textContent = translations[currentLanguage]['spotify.not_playing'] || "Not playing";
+            const notPlaying = (translations[localStorage.getItem('selectedLanguage') || 'en'] || {})['spotify.not_playing'] || "Not playing";
+            title.textContent = notPlaying;
             artist.textContent = "";
             link.style.display = "none";
             art.style.backgroundImage = "";
             
             // Mobile
-            titleMobile.textContent = translations[currentLanguage]['spotify.not_playing'] || "Not playing";
+            titleMobile.textContent = notPlaying;
             artistMobile.textContent = "";
             linkMobile.style.display = "none";
             artMobile.style.backgroundImage = "";
@@ -2990,6 +3000,11 @@
           // swallow errors; keep last state
           console.log('Spotify API error:', e);
         }
+      }
+
+      if (!SPOTIFY_ENABLED) {
+        document.querySelectorAll('.now-playing').forEach(el => el.remove());
+        return;
       }
 
       refresh();
