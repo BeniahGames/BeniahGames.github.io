@@ -152,8 +152,12 @@
     a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
 
     @media (max-width:768px){
-      .nav-links{gap:1rem;font-size:.9rem}
+      .nav{flex-wrap:wrap;row-gap:.5rem}
+      .nav-links{gap:.85rem;font-size:.85rem;flex-wrap:wrap;justify-content:flex-end}
       .grid{grid-template-columns:1fr}
+    }
+    @media (max-width:420px){
+      .nav-links{gap:.7rem;font-size:.8rem}
     }
     @media (prefers-reduced-motion:reduce){
       *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
@@ -283,7 +287,7 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <p>&copy; 2025 Beniah Gepts. · <a href="../#contact">Contact</a> · <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a></p>
+      <p>&copy; 2025 Beniah Gepts. · <a href="../#contact">Contact</a> · <a href="../privacy/">Privacy</a> · <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a></p>
     </div>
   </footer>
 </body>

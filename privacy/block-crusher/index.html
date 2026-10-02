@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Block Crusher Privacy Policy — Beniah.games</title>
+  <meta name="description" content="How the Block Crusher game for Android handles your data." />
+  <link rel="icon" href="../../assets/Beniah.Games.Icon.png" type="image/png" />
+  <style>
+    :root{
+      --bg:#0b0c10; --panel:#14161b; --panel-2:#1a1d24; --text:#e9eef6; --muted:#a3adbe;
+      --accent:#ffcc00; --accent-2:#ffd84d; --link:#ffcc00; --border:#262b37;
+      --glass:linear-gradient(180deg,rgba(26,29,37,.86),rgba(15,17,22,.93));
+      --shadow:0 14px 36px rgba(0,0,0,.45);
+      --maxw:1180px; --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial,sans-serif;
+      background:var(--bg);color:var(--text);line-height:1.7;
+      position:relative;z-index:0;overflow-x:hidden;
+    }
+
+    /* Background layers (shared look with the rest of the site) */
+    .parallax{position:fixed;inset:0;height:100vh;overflow:hidden;z-index:-1}
+    .layer{position:absolute;inset:-10%}
+    .layer-back{background:url('../../assets/bg/bg-space.jpg') no-repeat center center;background-size:cover;opacity:.85}
+    .layer-mid{background:url('../../assets/bg/bg-stars-far.png') repeat;background-size:320px 320px;opacity:.5}
+    .layer-front{background:url('../../assets/bg/bg-stars-near.png') repeat;background-size:256px 256px;opacity:.75;
+      animation:twinkle 7s ease-in-out infinite}
+    @keyframes twinkle{0%,100%{opacity:.75}50%{opacity:.42}}
+
+    .container{max-width:var(--maxw);margin:0 auto;padding:0 1.25rem}
+
+    /* Header */
+    .header{
+      position:sticky;top:0;z-index:100;padding:.6rem 0;
+      background:linear-gradient(180deg,rgba(11,12,16,.92),rgba(11,12,16,.72));
+      border-bottom:1px solid var(--border);backdrop-filter:saturate(160%) blur(12px);
+      box-shadow:0 1px 0 rgba(255,204,0,.16),0 10px 30px rgba(0,0,0,.35);
+    }
+    .nav{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+    .brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--text);font-weight:700}
+    .brand::before{content:"";width:.55rem;height:.55rem;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(255,204,0,.9)}
+    .brand img{height:40px}
+    .nav-links{display:flex;gap:1.5rem;list-style:none;margin:0;padding:0}
+    .nav-links a{color:var(--muted);text-decoration:none;transition:color .2s}
+    .nav-links a:hover{color:var(--accent)}
+
+    /* Document */
+    main{padding:clamp(2.25rem,5vw,3.5rem) 0 clamp(3rem,7vw,4.5rem)}
+    .doc{
+      max-width:820px;margin:0 auto;background:var(--glass);backdrop-filter:blur(10px);
+      border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+      padding:clamp(1.5rem,4vw,2.75rem);
+    }
+    .doc h1{margin:0 0 .35rem;font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.15;letter-spacing:-.02em}
+    .doc h2{margin:2.25rem 0 .5rem;font-size:1.05rem;color:var(--accent);letter-spacing:.01em}
+    .doc p,.doc li{color:var(--text)}
+    .meta{color:var(--muted);margin:0 0 1.5rem;font-size:.92rem}
+    .summary{
+      border-left:3px solid var(--accent);background:rgba(255,204,0,.06);
+      border-radius:0 12px 12px 0;padding:.9rem 1.1rem;margin:0;
+    }
+    .doc ul{padding-left:1.35rem;margin:.5rem 0}
+    .doc li{margin:.3rem 0}
+    .doc a{color:var(--link);overflow-wrap:anywhere}
+    .doc a:hover{color:var(--accent-2)}
+    .doc-foot{
+      margin-top:2.25rem;padding-top:1.25rem;border-top:1px solid var(--border);
+      color:var(--muted);font-size:.88rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+    }
+    .doc-foot a{color:var(--muted);text-decoration:none}
+    .doc-foot a:hover{color:var(--accent)}
+
+    /* Footer */
+    .footer{
+      border-top:1px solid var(--border);padding:1.75rem 0;text-align:center;color:var(--muted);font-size:.9rem;
+      background:linear-gradient(0deg,rgba(11,12,16,.92),rgba(11,12,16,.55));backdrop-filter:blur(10px);
+      box-shadow:0 -1px 0 rgba(255,204,0,.14);
+    }
+    .footer a{color:var(--muted);text-decoration:none}
+    .footer a:hover{color:var(--accent)}
+
+    a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
+
+    @media (max-width:768px){
+      .nav{flex-wrap:wrap;row-gap:.5rem}
+      .nav-links{gap:.85rem;font-size:.85rem;flex-wrap:wrap;justify-content:flex-end}
+    }
+    @media (max-width:420px){
+      .nav-links{gap:.7rem;font-size:.8rem}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+      html{scroll-behavior:auto}
+    }
+  </style>
+</head>
+<body>
+  <!-- Background layers -->
+  <div class="parallax" aria-hidden="true">
+    <div class="layer layer-back"></div>
+    <div class="layer layer-mid"></div>
+    <div class="layer layer-front"></div>
+  </div>
+
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <a href="../../" class="brand">
+          <img src="../../assets/Beniah.Games.Logo.png" alt="Beniah.games">
+        </a>
+        <ul class="nav-links">
+          <li><a href="../../#games">Games</a></li>
+          <li><a href="../../devlogs/">Devlogs</a></li>
+          <li><a href="../">Privacy</a></li>
+          <li><a href="../../#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <article class="doc">
+        <h1>Block Crusher Privacy Policy</h1>
+        <p class="meta">Effective 2 October 2026 &middot; Applies to the Block Crusher game for Android (package com.blockcrusher)</p>
+
+        <p class="summary">
+          Block Crusher has no accounts and asks you for no personal information. Your progress stays on
+          your phone. The only data that leaves your device goes to Google, to show ads and to ask for
+          your consent to them where the law requires it.
+        </p>
+
+        <h2>Who we are</h2>
+        <p>
+          Block Crusher is made by Beniah Gepts, an independent developer based in Belgium
+          (<a href="https://beniah.games">beniah.games</a>). For anything about this policy or your data, write to
+          <a href="mailto:contact@beniah.games">contact@beniah.games</a>.
+        </p>
+
+        <h2>What stays on your device</h2>
+        <p>The game keeps the following on your phone so you can pick up where you left off:</p>
+        <ul>
+          <li>your progress, scores and best results, including saved runs;</li>
+          <li>coins, power-ups and the cosmetics you have unlocked or equipped;</li>
+          <li>your settings, such as sound, music, vibration and controls.</li>
+        </ul>
+        <p>
+          This information is never sent to us. It is removed when you uninstall the game or clear its data.
+          If Android's own backup is turned on in your phone's settings, Android may copy it to your Google
+          account so it can be restored on a new phone; that copy is held by Google under your account, and
+          we cannot see it.
+        </p>
+
+        <h2>Advertising</h2>
+        <p>
+          The game shows ads through Google AdMob. To deliver ads, measure them and prevent fraud, Google
+          may collect and process information from your device, including:
+        </p>
+        <ul>
+          <li>your device's advertising ID;</li>
+          <li>your IP address, and an approximate location worked out from it;</li>
+          <li>information about your device, such as its model, operating system and language;</li>
+          <li>how you interact with the ads you see.</li>
+        </ul>
+        <p>
+          Whether ads are personalised depends on your choices and on where you live. Google's handling of this
+          data is described in
+          <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites or apps that use its services</a>
+          and in the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.
+        </p>
+        <p>
+          You can reset or delete your advertising ID, or opt out of personalised ads, at any time in your
+          phone's settings (on most phones: Settings &rsaquo; Google &rsaquo; Ads, or Settings &rsaquo;
+          Privacy &rsaquo; Ads).
+        </p>
+
+        <h2>Your consent to ads (EEA, UK and Switzerland)</h2>
+        <p>
+          If you are in the European Economic Area, the United Kingdom or Switzerland, the game asks for your
+          consent before any ad is requested, using Google's User Messaging Platform. No ads are loaded until you
+          have answered. You can change your answer at any time in the game under
+          <strong>Options &rsaquo; Ad privacy choices</strong>.
+        </p>
+
+        <h2>What we don't do</h2>
+        <ul>
+          <li>We don't ask for your name, email address, phone number or any other personal details.</li>
+          <li>We don't use analytics or crash-reporting services.</li>
+          <li>We don't ask for access to your location, contacts, camera, microphone or files.</li>
+          <li>We don't sell your data or share it with anyone other than Google's advertising services described above.</li>
+        </ul>
+
+        <h2>Purchases</h2>
+        <p>
+          The game does not currently take any payment. If real in-app purchases are added in a later version,
+          they will be processed by Google Play, we will never see your payment details, and this policy will be
+          updated before that version is released.
+        </p>
+
+        <h2>Children</h2>
+        <p>
+          Block Crusher is intended for a general audience aged 13 and over and is not directed at children
+          under 13. We don't knowingly collect personal information from children. If you believe a child has
+          provided personal information through the game, contact us and we will help remove it.
+        </p>
+
+        <h2>Your rights</h2>
+        <p>
+          We hold no personal data about you ourselves. You can withdraw or change your consent to ads in the game
+          at any time, as described above. For the advertising data Google processes, you can use the controls in
+          your Google account and phone settings, or contact Google. If you live in the EEA or the UK you also have
+          the right to complain to your data protection authority; in Belgium that is the
+          <a href="https://www.dataprotectionauthority.be">Data Protection Authority</a>.
+        </p>
+
+        <h2>Changes to this policy</h2>
+        <p>
+          If the way the game handles data changes, we will update this page and its effective date before the
+          change reaches the game.
+        </p>
+
+        <h2>Contact</h2>
+        <p><a href="mailto:contact@beniah.games">contact@beniah.games</a></p>
+
+        <div class="doc-foot">
+          <span>&copy; 2026 Beniah Gepts &middot; Block Crusher</span>
+          <a href="../">← All privacy policies</a>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Beniah Gepts. · <a href="../../#contact">Contact</a> · <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a></p>
+    </div>
+  </footer>
+</body>
+</html>
