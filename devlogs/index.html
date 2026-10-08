@@ -3,213 +3,119 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Devlogs — Beniah.games</title>
-  <meta name="description" content="Development logs and updates for Beniah.games indie projects." />
+  <title>Devlogs &mdash; Beniah.games</title>
+  <meta name="description" content="Development logs and behind-the-scenes updates from Beniah.games." />
   <link rel="icon" href="../assets/Beniah.Games.Icon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
   <style>
-    :root{
-      --bg:#0b0c10; --panel:#14161b; --panel-2:#1a1d24; --text:#e9eef6; --muted:#a3adbe;
-      --accent:#ffcc00; --accent-2:#ffd84d; --link:#ffcc00; --border:#262b37;
-      --glass:linear-gradient(180deg,rgba(26,29,37,.86),rgba(15,17,22,.93));
-      --shadow:0 14px 36px rgba(0,0,0,.45);
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial,sans-serif;
-      background:var(--bg);color:var(--text);line-height:1.6;
-      position:relative;z-index:0;overflow-x:hidden;
-    }
-
-    /* Background layers (shared look with the home page) */
-    .parallax{position:fixed;inset:0;height:100vh;overflow:hidden;z-index:-1}
-    .layer{position:absolute;inset:-10%}
-    .layer-back{background:url('../assets/bg/bg-space.jpg') no-repeat center center;background-size:cover;opacity:.85}
-    .layer-mid{background:url('../assets/bg/bg-stars-far.png') repeat;background-size:320px 320px;opacity:.5}
-    .layer-front{background:url('../assets/bg/bg-stars-near.png') repeat;background-size:256px 256px;opacity:.75;
-      animation:twinkle 7s ease-in-out infinite}
-    @keyframes twinkle{0%,100%{opacity:.75}50%{opacity:.42}}
-
-    /* Header */
-    header{
-      background:linear-gradient(180deg,rgba(11,12,16,.92),rgba(11,12,16,.72));
-      border-bottom:1px solid var(--border);backdrop-filter:saturate(160%) blur(12px);
-      box-shadow:0 1px 0 rgba(255,204,0,.16),0 10px 30px rgba(0,0,0,.35);
-      padding:.85rem 0;position:sticky;top:0;z-index:100;
-    }
-    .header-content{
-      max-width:1200px;margin:0 auto;padding:0 2rem;
-      display:flex;align-items:center;justify-content:space-between;
-    }
-    .logo{
-      display:flex;align-items:center;gap:1rem;text-decoration:none;color:var(--text);
-    }
-    .logo img{width:40px;height:40px;border-radius:8px;}
-    .logo h1{margin:0;font-size:1.5rem;font-weight:700;}
-    .nav-links{display:flex;gap:2rem;align-items:center;}
-    .nav-links a{color:var(--muted);text-decoration:none;transition:color .2s;}
-    .nav-links a:hover{color:var(--accent);}
-
-    /* Hamburger + Mobile Panel */
-    .hamburger{display:none;flex-direction:column;gap:.45rem;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--accent);border-radius:10px;cursor:pointer;background:transparent}
-    .hamburger span{width:20px;height:2px;background:var(--accent);transition:.25s}
-    .hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-    .hamburger[aria-expanded="true"] span:nth-child(2){opacity:0}
-    .hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-    @media(max-width:820px){
-      .nav-links{display:flex}
-      .nav-links > a{display:none}
-      .hamburger{display:flex}
-    }
-    .menu-panel{
-      position:fixed;top:80px;left:0;right:0;background:var(--panel);border-bottom:1px solid var(--border);
-      transform:scaleY(0);transform-origin:top;opacity:0;pointer-events:none;transition:transform .25s,opacity .25s;z-index:99;
-    }
-    .menu-panel.open{transform:scaleY(1);opacity:1;pointer-events:auto;box-shadow:0 8px 20px rgba(0,0,0,.45)}
-    .menu-panel-inner{max-width:1100px;margin:0 auto;padding:.75rem 1rem;display:grid;gap:.5rem}
-    .menu-panel a{
-      position:relative;color:var(--text);text-decoration:none;padding:.75rem 1rem;border-radius:8px;
-      transition:background .2s,transform .25s,opacity .25s;opacity:0;transform:translateY(-10px);
-    }
-    .menu-panel a:hover{background:#171a21}
-    .menu-panel a::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s}
-    .menu-panel a:hover::after{transform:scaleX(1)}
-    .menu-panel.open .menu-panel-inner a:nth-child(1){opacity:1;transform:none;transition-delay:40ms}
-    .menu-panel.open .menu-panel-inner a:nth-child(2){opacity:1;transform:none;transition-delay:90ms}
-    .menu-panel.open .menu-panel-inner a:nth-child(3){opacity:1;transform:none;transition-delay:140ms}
-    .menu-panel.open .menu-panel-inner a:nth-child(4){opacity:1;transform:none;transition-delay:190ms}
-    .menu-panel.open .menu-panel-inner a:nth-child(5){opacity:1;transform:none;transition-delay:240ms}
-    .menu-panel.open .menu-panel-inner a:nth-child(6){opacity:1;transform:none;transition-delay:290ms}
-
-    /* Main Content */
-    main{max-width:1180px;margin:0 auto;padding:clamp(2.5rem,6vw,4rem) 1.25rem 4rem;}
-    .page-header{text-align:center;margin-bottom:clamp(2rem,5vw,3rem);}
-    .page-header h1{font-size:clamp(2.1rem,5vw,3rem);margin:0 0 .75rem;letter-spacing:-.03em;line-height:1.05;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-    .page-header p{font-size:1.05rem;color:var(--muted);margin:0 auto;max-width:52ch;}
-
-    /* Game Filter */
-    .filter-section{margin-bottom:2rem;}
-    .filter-buttons{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;}
-    .filter-btn{
-      background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);
-      padding:.5rem 1rem;border-radius:999px;cursor:pointer;transition:all .2s;
-    }
-    .filter-btn:hover,.filter-btn.active{
-      background:var(--accent);color:var(--bg);border-color:var(--accent);
-    }
-
-    /* Devlog Grid */
-    .devlogs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:1.25rem;}
-    .devlog-card{
-      background:var(--glass);backdrop-filter:blur(10px);
-      border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
-      padding:1.5rem;transition:transform .25s,box-shadow .3s,border-color .3s;
-    }
-    .devlog-card:hover{transform:translateY(-4px);border-color:rgba(255,204,0,.45);box-shadow:0 18px 44px rgba(0,0,0,.5);}
-    .devlog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
-    .devlog-game{
-      background:var(--accent);color:var(--bg);padding:.25rem .75rem;
-      border-radius:20px;font-size:.875rem;font-weight:600;
-    }
-    .devlog-date{color:var(--muted);font-size:.875rem;}
-    .devlog-title{font-size:1.25rem;font-weight:600;margin:0 0 .5rem 0;}
-    .devlog-title a{color:var(--text);text-decoration:none;}
-    .devlog-title a:hover{color:var(--accent);}
-    .devlog-excerpt{color:var(--muted);margin:0 0 1rem 0;}
-    .devlog-tags{display:flex;gap:.5rem;flex-wrap:wrap;}
-    .devlog-tag{
-      background:var(--panel-2);color:var(--muted);padding:.25rem .5rem;
-      border-radius:4px;font-size:.75rem;
-    }
-
-    /* Empty State */
-    .empty-state{
-      text-align:center;padding:3.5rem 2rem;color:var(--muted);
-      border:1px dashed var(--border);border-radius:var(--radius);
-    }
-    a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
-    @media (prefers-reduced-motion:reduce){
-      *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
-      html{scroll-behavior:auto}
-    }
-    .empty-state h3{margin:0 0 1rem 0;font-size:1.5rem;}
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .header-content{padding:0 1rem;}
-      main{padding:1rem;}
-      .page-header h1{font-size:2rem;}
-      .devlogs-grid{grid-template-columns:1fr;}
-      .filter-buttons{justify-content:flex-start;}
-    }
+    /* background art sits one level up from this page */
+    .layer-back{background:
+      radial-gradient(60% 45% at 78% 8%,rgba(255,204,0,.17),transparent 62%),
+      radial-gradient(55% 45% at 10% 78%,rgba(92,114,235,.16),transparent 66%),
+      url('../assets/bg/bg-space.jpg') center/cover no-repeat}
+    .layer-mid{background:url('../assets/bg/bg-stars-far.png') repeat;background-size:340px 340px}
+    .layer-front{background:url('../assets/bg/bg-stars-near.png') repeat;background-size:260px 260px}
   </style>
 </head>
 <body>
-  <!-- Background layers -->
   <div class="parallax" aria-hidden="true">
     <div class="layer layer-back"></div>
     <div class="layer layer-mid"></div>
     <div class="layer layer-front"></div>
   </div>
+  <div class="grain" aria-hidden="true"></div>
 
-  <header>
-    <div class="header-content">
-      <a href="../" class="logo">
-        <img src="../assets/Beniah.Games.Icon.png" alt="Beniah.games">
-        <h1>Beniah.games</h1>
+  <nav class="nav" id="top">
+    <div class="nav-inner">
+      <a class="brand" href="../" aria-label="Beniah.games">
+        <span class="dot"></span>
+        <img src="../assets/Beniah.Games.Logo.png" alt="Beniah.games">
       </a>
-      <nav class="nav-links">
-        <a href="../#games">Games</a>
+      <div class="nav-links">
+        <a href="../games/">Games</a>
         <a href="../#about">About</a>
+        <a href="./" class="is-active">Devlogs</a>
         <a href="../#faq">FAQ</a>
         <a href="../#contact">Contact</a>
-        <a href="./" style="color: var(--accent);">Devlogs</a>
-        
-        <!-- Hamburger Menu Button -->
-        <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="Open menu">
+      </div>
+      <div class="nav-actions">
+        <a class="nav-cta" href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.865-.608 1.249a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.077.077 0 00.084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.104c-.652-.247-1.27-.55-1.845-.899a.077.077 0 01-.007-.127c.124-.093.248-.19.366-.287a.074.074 0 01.077-.01c3.869 1.776 8.065 1.776 11.896 0a.075.075 0 01.078.009c.118.098.242.195.366.288a.077.077 0 01-.006.127 12.298 12.298 0 01-1.846.898.077.077 0 00-.04.105c.36.698.772 1.364 1.225 1.994a.076.076 0 00.084.027 19.876 19.876 0 005.994-3.03.077.077 0 00.031-.056c.5-5.177-.838-9.673-3.548-13.66a.06.06 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.947 2.419-2.157 2.419z"/></svg><span>Discord</span>
+        </a>
+        <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
-      </nav>
-
-      <!-- Mobile Panel -->
-      <div class="menu-panel" id="menu-panel">
-        <div class="menu-panel-inner">
-          <a href="../#about">About</a>
-          <a href="../#games">Games</a>
-          <a href="./" style="color: var(--accent);">Devlogs</a>
-          <a href="../#faq">FAQ</a>
-          <a href="../#contact">Contact</a>
-          <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a>
-        </div>
       </div>
     </div>
-  </header>
+    <div class="menu-panel" id="menu-panel">
+      <div class="menu-panel-inner">
+        <a href="../games/">Games</a>
+        <a href="../#about">About</a>
+        <a href="./" class="is-active">Devlogs</a>
+        <a href="../#faq">FAQ</a>
+        <a href="../#contact">Contact</a>
+        <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a>
+      </div>
+    </div>
+  </nav>
 
   <main>
-    <div class="page-header">
-      <h1>Development Logs</h1>
-      <p>Behind-the-scenes updates and insights from game development</p>
-    </div>
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <span class="sec-label">Devlog</span>
+            <h2>Development Logs</h2>
+            <p class="sec-note">Behind-the-scenes updates and insights from game development.</p>
+          </div>
+        </div>
 
-    <div class="filter-section">
-      <div class="filter-buttons">
-        <button class="filter-btn active" data-game="all">All Games</button>
-        <!-- Game filter buttons will be populated by JavaScript -->
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-game="all">All Games</button>
+        </div>
+
+        <div class="devlogs-grid" id="devlogs-container"></div>
+
+        <div class="empty-state" id="empty-state" style="display:none">
+          <h3>No devlogs yet</h3>
+          <p>Check back soon for development updates and behind-the-scenes content.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/Beniah.Games.Logo.png" alt="Beniah.games">
+        <p>Indie games made in Belgium &mdash; currently building for Android.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="../games/">Games</a></li>
+          <li><a href="../#about">About</a></li>
+          <li><a href="../devlogs/">Devlogs</a></li>
+          <li><a href="../privacy/">Privacy</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="../#contact">Contact</a></li>
+          <li><a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a></li>
+          <li><a href="mailto:contact@beniah.games">contact@beniah.games</a></li>
+        </ul>
       </div>
     </div>
-
-    <div class="devlogs-grid" id="devlogs-container">
-      <!-- Devlog entries will be populated by JavaScript -->
+    <div class="footer-bottom">
+      <span>&copy; 2026 Beniah Gepts.</span>
+      <span>Made with Godot, Krita and too much coffee.</span>
     </div>
-
-    <div class="empty-state" id="empty-state" style="display: none;">
-      <h3>No devlogs yet</h3>
-      <p>Check back soon for development updates and behind-the-scenes content!</p>
-    </div>
-  </main>
+  </footer>
 
   <script>
     let devlogs = [];
@@ -342,6 +248,18 @@
 
     // Export function for main page
     window.getLatestDevlog = () => window.latestDevlog || null;
+  </script>
+
+  <script>
+    (() => {
+      const burger = document.getElementById('hamburger');
+      const panel = document.getElementById('menu-panel');
+      if (!burger || !panel) return;
+      burger.addEventListener('click', () => {
+        const open = panel.classList.toggle('open');
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    })();
   </script>
 </body>
 </html>
