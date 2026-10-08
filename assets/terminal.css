@@ -1,5 +1,5 @@
 /* Beniah.games — terminal shell.
-   Home page only; the other pages use assets/site.css. */
+   Every page uses this; terminal-nav.js drives the prompt on the static ones. */
 
 :root{
   --bg:#07080a;
@@ -273,3 +273,74 @@ details.q .a code{background:rgba(255,204,0,.1);padding:0 .25rem;border-radius:3
   .cart{animation:none;transform:rotateX(-10deg) rotateY(-24deg)}
   .crt::before{animation:none}
 }
+
+/* ============================================================
+   Static terminal pages (games, devlogs, privacy, 404)
+   ============================================================ */
+.page-head{margin-bottom:1.2rem}
+.page-head h1{
+  font-size:clamp(1.1rem,3vw,1.5rem);font-weight:700;letter-spacing:.2em;margin:0;color:#fff6d0;
+  text-shadow:0 0 14px rgba(255,204,0,.5);
+}
+.page-head .sub{color:var(--muted);margin-top:.3rem}
+.page-head .rule{color:var(--faint);letter-spacing:.06em;margin-top:.2rem}
+
+/* long-form document (privacy policy) */
+.doc h1{font-size:clamp(1.05rem,2.8vw,1.4rem);letter-spacing:.18em;color:#fff6d0;margin:0 0 .4rem;
+  text-shadow:0 0 14px rgba(255,204,0,.45)}
+.doc .meta{color:var(--faint);font-size:.85rem;margin:0 0 1.4rem}
+.doc .summary{border-left:2px solid var(--amber);background:rgba(255,204,0,.06);
+  padding:.8rem 1rem;margin:0 0 1.6rem;color:var(--text)}
+.doc h2{font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);
+  margin:1.9rem 0 .5rem}
+.doc h2::before{content:"// "}
+.doc p{color:var(--muted);margin:0 0 .75rem;max-width:84ch}
+.doc ul{margin:.3rem 0 .9rem;padding-left:1.3rem;color:var(--muted);max-width:84ch}
+.doc li{margin:.22rem 0}
+.doc a{color:var(--amber);overflow-wrap:anywhere}
+.doc strong{color:var(--text)}
+.doc-foot{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;color:var(--faint);font-size:.85rem}
+.doc-foot a{color:var(--amber);text-decoration:none}
+
+/* devlog list */
+.filter-buttons{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin:0 0 1.3rem}
+.filter-btn{
+  appearance:none;border:0;background:transparent;font:inherit;font-size:.9rem;color:var(--amber);
+  cursor:pointer;padding:.1rem .35rem;border-radius:5px;
+}
+.filter-btn::before{content:"> "}
+.filter-btn:hover{background:var(--amber-soft);color:#fff6d0}
+.filter-btn.active{background:var(--amber);color:#14130d}
+.devlogs-grid{display:grid;gap:1rem}
+.devlog-card{border:1px solid var(--line);border-radius:8px;padding:1rem 1.1rem;background:rgba(255,204,0,.03)}
+.devlog-card:hover{border-color:var(--amber)}
+.devlog-meta{display:flex;gap:.9rem;flex-wrap:wrap;align-items:center;margin-bottom:.4rem;font-size:.8rem}
+.devlog-game{color:#14130d;background:var(--amber);padding:0 .5rem;border-radius:3px;letter-spacing:.06em}
+.devlog-date{color:var(--faint)}
+.devlog-title{font-size:1rem;margin:0 0 .35rem;font-weight:700}
+.devlog-title a{color:var(--text);text-decoration:none}
+.devlog-title a:hover{color:var(--amber)}
+.devlog-excerpt{color:var(--muted);font-size:.92rem;margin:0}
+.devlog-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem}
+.devlog-tag{font-size:.72rem;color:var(--faint);border:1px solid var(--line);border-radius:3px;padding:0 .4rem}
+.empty-state{border:1px dashed var(--line);border-radius:8px;padding:2rem 1rem;text-align:center;color:var(--faint)}
+.empty-state h3{color:var(--muted);font-size:.95rem;margin:0 0 .4rem}
+
+/* policy index rows */
+.policy-row{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  border:1px solid var(--line);border-radius:8px;padding:.9rem 1.1rem;text-decoration:none;
+  background:rgba(255,204,0,.03);color:inherit;
+}
+.policy-row:hover{border-color:var(--amber);background:var(--amber-soft)}
+.policy-row h2{font-size:.95rem;margin:0;color:var(--text);letter-spacing:.08em}
+.policy-row .meta{color:var(--faint);font-size:.82rem;margin-top:.15rem}
+.policy-row .go{color:var(--amber);font-size:.85rem;letter-spacing:.1em}
+
+.barnav{display:none;gap:1.1rem}
+@media(min-width:620px){.barnav{display:flex}}
+.barlink{color:var(--muted);text-decoration:none;font-size:.78rem;letter-spacing:.12em}
+.barlink:hover{color:var(--amber)}
+.barlink.on{color:var(--amber)}
+.barlink.on::before{content:"> "}

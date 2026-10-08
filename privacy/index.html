@@ -8,127 +8,44 @@
   <link rel="icon" href="../assets/Beniah.Games.Icon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/site.css">
-  <style>
-    /* background art sits one level up from this page */
-    .layer-back{background:
-      radial-gradient(60% 45% at 78% 8%,rgba(255,204,0,.17),transparent 62%),
-      radial-gradient(55% 45% at 10% 78%,rgba(92,114,235,.16),transparent 66%),
-      url('../assets/bg/bg-space.jpg') center/cover no-repeat}
-    .layer-mid{background:url('../assets/bg/bg-stars-far.png') repeat;background-size:340px 340px}
-    .layer-front{background:url('../assets/bg/bg-stars-near.png') repeat;background-size:260px 260px}
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/terminal.css">
 </head>
-<body>
-  <div class="parallax" aria-hidden="true">
-    <div class="layer layer-back"></div>
-    <div class="layer layer-mid"></div>
-    <div class="layer layer-front"></div>
-  </div>
-  <div class="grain" aria-hidden="true"></div>
+<body data-root="../">
+  <header class="bar">
+    <a class="brand" href="../" aria-label="Beniah.games"><img src="../assets/Beniah.Games.Logo.png" alt="Beniah.games"></a>
+    <span class="sep"></span>
+    <nav class="barnav">
+      <a class="barlink" href="../">HOME</a>
+      <a class="barlink" href="../games/">PROJECTS</a>
+      <a class="barlink" href="../devlogs/">DEVLOG</a>
+      <a class="barlink on" href="../privacy/">PRIVACY</a>
+    </nav>
+  </header>
 
-  <nav class="nav" id="top">
-    <div class="nav-inner">
-      <a class="brand" href="../" aria-label="Beniah.games">
-        <span class="dot"></span>
-        <img src="../assets/Beniah.Games.Logo.png" alt="Beniah.games">
-      </a>
-      <div class="nav-links">
-        <a href="../games/">Games</a>
-        <a href="../#about">About</a>
-        <a href="../devlogs/">Devlogs</a>
-        <a href="../#faq">FAQ</a>
-        <a href="../#contact">Contact</a>
-      </div>
-      <div class="nav-actions">
-        <a class="nav-cta" href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.865-.608 1.249a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.077.077 0 00.084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.104c-.652-.247-1.27-.55-1.845-.899a.077.077 0 01-.007-.127c.124-.093.248-.19.366-.287a.074.074 0 01.077-.01c3.869 1.776 8.065 1.776 11.896 0a.075.075 0 01.078.009c.118.098.242.195.366.288a.077.077 0 01-.006.127 12.298 12.298 0 01-1.846.898.077.077 0 00-.04.105c.36.698.772 1.364 1.225 1.994a.076.076 0 00.084.027 19.876 19.876 0 005.994-3.03.077.077 0 00.031-.056c.5-5.177-.838-9.673-3.548-13.66a.06.06 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.947 2.419-2.157 2.419z"/></svg><span>Discord</span>
+  <main class="crt">
+    <div class="screen">
+      <div class="out">
+        <div class="page-head">
+          <h1>PRIVACY POLICIES</h1>
+          <p class="rule">--------------------------------------------</p>
+          <p class="sub">Each app has its own policy, written in plain language.</p>
+        </div>
+        <a class="policy-row" href="block-crusher/">
+          <span><h2>BLOCK CRUSHER</h2><span class="meta">Android &middot; effective 2 October 2026</span></span>
+          <span class="go">READ &rarr;</span>
         </a>
-        <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
+        <div class="gap"></div>
+        <div class="cmds"><button class="cmd" type="button" data-cmd="HOME">HOME</button><button class="cmd" type="button" data-cmd="PROJECTS">PROJECTS</button></div>
+        <div id="nav-out"></div>
       </div>
+      <form class="prompt" autocomplete="off" onsubmit="return false">
+        <span class="sign">&gt;</span>
+        <label class="sr-only" for="cmdline">Terminal command</label>
+        <input id="cmdline" type="text" spellcheck="false" autocapitalize="characters" placeholder="type a command — try HELP">
+      </form>
     </div>
-    <div class="menu-panel" id="menu-panel">
-      <div class="menu-panel-inner">
-        <a href="../games/">Games</a>
-        <a href="../#about">About</a>
-        <a href="../devlogs/">Devlogs</a>
-        <a href="../#faq">FAQ</a>
-        <a href="../#contact">Contact</a>
-        <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a>
-      </div>
-    </div>
-  </nav>
-
-  <main>
-    <section>
-      <div class="wrap">
-        <div class="sec-head">
-          <div>
-            <span class="sec-label">Legal</span>
-            <h2>Privacy</h2>
-            <p class="sec-note">Each app has its own privacy policy, written in plain language.</p>
-          </div>
-        </div>
-        <div class="policy-list">
-          <a class="card policy-card reveal revealed" href="block-crusher/">
-            <div>
-              <h3>Block Crusher</h3>
-              <p class="card-desc" style="margin:.35rem 0 0">Android &middot; effective 2 October 2026</p>
-            </div>
-            <span class="policy-go">Read &rarr;</span>
-          </a>
-        </div>
-      </div>
-    </section>
   </main>
-
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <img src="../assets/Beniah.Games.Logo.png" alt="Beniah.games">
-        <p>Indie games made in Belgium &mdash; currently building for Android.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Explore</h4>
-        <ul>
-          <li><a href="../games/">Games</a></li>
-          <li><a href="../#about">About</a></li>
-          <li><a href="../devlogs/">Devlogs</a></li>
-          <li><a href="../privacy/">Privacy</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Connect</h4>
-        <ul>
-          <li><a href="../#contact">Contact</a></li>
-          <li><a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a></li>
-          <li><a href="mailto:contact@beniah.games">contact@beniah.games</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>&copy; 2026 Beniah Gepts.</span>
-      <span>Made with Godot, Krita and too much coffee.</span>
-    </div>
-  </footer>
-
-  <script>
-    (() => {
-      const burger = document.getElementById('hamburger');
-      const panel = document.getElementById('menu-panel');
-      if (!burger || !panel) return;
-      burger.addEventListener('click', () => {
-        const open = panel.classList.toggle('open');
-        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-      panel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        panel.classList.remove('open');
-        burger.setAttribute('aria-expanded', 'false');
-      }));
-    })();
-  </script>
+  <script src="../assets/terminal-nav.js"></script>
 </body>
 </html>
