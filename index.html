@@ -1879,6 +1879,57 @@
       const gap = () => put(el('div', 'gap'));
       const html = (markup, cls) => { const n = el('div', cls); n.innerHTML = markup; return put(n); };
 
+      // ---------------------------------------------------------- progress
+      // Local only: everything lives in this browser, nothing is sent anywhere.
+      const ACHIEVEMENTS = [
+        { id: 'boot',     name: 'FIRST CONTACT',   hint: 'switch the terminal on' },
+        { id: 'rtfm',     name: 'RTFM',            hint: 'ask for HELP' },
+        { id: 'explorer', name: 'EXPLORER',        hint: 'visit every screen' },
+        { id: 'rack',     name: 'RACK COMPLETE',   hint: 'open every cartridge dossier' },
+        { id: 'whoami',   name: 'IDENTITY CRISIS', hint: 'a classic question' },
+        { id: 'sudo',     name: 'NICE TRY',        hint: 'ask for permissions you do not have' },
+        { id: 'coffee',   name: 'FUEL',            hint: 'what every developer actually runs on' },
+        { id: 'konami',   name: 'THE CODE',        hint: 'up, up, down, down ...' },
+        { id: 'digger',   name: 'SPELUNKER',       hint: 'find three commands HELP never mentions' },
+        { id: 'all',      name: 'COMPLETIONIST',   hint: 'unlock everything else' },
+      ];
+      const SCREENS = ['ABOUT', 'PROJECTS', 'DEVLOG', 'FAQ', 'CONTACT'];
+      const SAVE_KEY = 'bg-terminal-progress';
+      const BLANK = { got: [], screens: [], carts: [], secrets: [] };
+
+      let P = BLANK;
+      try { P = Object.assign({}, BLANK, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) {}
+      const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(P)); } catch (e) {} };
+      const has = id => P.got.indexOf(id) !== -1;
+
+      function unlock(id) {
+        if (has(id)) return;
+        const a = ACHIEVEMENTS.filter(x => x.id === id)[0];
+        if (!a) return;
+        P.got.push(id); save();
+        line('*** ACHIEVEMENT UNLOCKED — ' + a.name + ' ***', 'l ok');
+        if (window.audioManager) window.audioManager.playSound('alienOpen');
+        if (!has('all') && P.got.length === ACHIEVEMENTS.length - 1) unlock('all');
+      }
+
+      function meter() {
+        const n = P.got.length, total = ACHIEVEMENTS.length;
+        const filled = Math.round((n / total) * 10);
+        return '█'.repeat(filled) + '░'.repeat(10 - filled) + '  ' + n + '/' + total;
+      }
+      function visit(screen) {
+        if (P.screens.indexOf(screen) === -1) { P.screens.push(screen); save(); }
+        if (SCREENS.every(x => P.screens.indexOf(x) !== -1)) unlock('explorer');
+      }
+      function collect(i) {
+        if (P.carts.indexOf(i) === -1) { P.carts.push(i); save(); }
+        if (P.carts.length >= GAMES.length) unlock('rack');
+      }
+      function secret(name) {
+        if (P.secrets.indexOf(name) === -1) { P.secrets.push(name); save(); }
+        if (P.secrets.length >= 3) unlock('digger');
+      }
+
       // type a line out one character at a time; resolves when done
       function type(text, cls = 'l', speed = 9) {
         const node = put(el('p', cls));
@@ -1932,10 +1983,11 @@
         dl2.appendChild(el('dd', 'bar-meter', '█'.repeat(7) + '░'.repeat(3)));
         dl2.appendChild(el('dt', null, 'PROJECTS:')); dl2.appendChild(el('dd', null, GAMES.length + ' IN DEVELOPMENT'));
         dl2.appendChild(el('dt', null, 'SHIPPING TO:')); dl2.appendChild(el('dd', null, 'ANDROID · STEAM'));
+        dl2.appendChild(el('dt', null, 'EXPLORATION:')); dl2.appendChild(el('dd', 'bar-meter', meter()));
         put(dl2);
         gap();
-        commandRow(['ABOUT', 'PROJECTS', 'DEVLOG', 'FAQ', 'CONTACT']);
-        line('type a command, or HELP for everything this thing knows', 'l faint');
+        commandRow(['ABOUT', 'PROJECTS', 'DEVLOG', 'FAQ', 'CONTACT', 'ACHIEVEMENTS']);
+        line('type a command, or HELP for most of what this thing knows', 'l faint');
       }
 
       async function about() {
@@ -1952,6 +2004,7 @@
           .forEach(([k, v]) => { dl.appendChild(el('dt', null, k + ':')); dl.appendChild(el('dd', null, v)); });
         put(dl);
         gap();
+        visit('ABOUT');
         commandRow(['PROJECTS', 'CONTACT', 'HOME']);
       }
 
@@ -1981,6 +2034,7 @@
           rack.appendChild(slot);
         });
         put(rack);
+        visit('PROJECTS');
         commandRow(['ALL GAMES', 'DEVLOG', 'HOME']);
       }
 
@@ -1997,6 +2051,7 @@
              '<span data-translate="' + g.key + '">' + g.desc + '</span></p>');
         if (g.link) html('<p class="link-row"><a href="' + g.link + '">' + g.linkLabel + '</a></p>');
         if (window.applyI18n) window.applyI18n();
+        collect(i);
         out.scrollTop = out.scrollHeight;
       }
 
@@ -2022,6 +2077,7 @@
         gap();
         html('<p class="link-row"><a href="./devlogs/">OPEN FULL DEVLOG ARCHIVE &rarr;</a></p>');
         gap();
+        visit('DEVLOG');
         commandRow(['PROJECTS', 'HOME']);
       }
 
@@ -2037,6 +2093,7 @@
         });
         if (window.applyI18n) window.applyI18n();
         gap();
+        visit('FAQ');
         commandRow(['CONTACT', 'HOME']);
       }
 
@@ -2052,7 +2109,25 @@
         put(el('div', 'panel')).appendChild(form);
         if (window.applyI18n) window.applyI18n();
         gap();
+        visit('CONTACT');
         commandRow(['ABOUT', 'HOME']);
+      }
+
+
+      async function achievements() {
+        clear();
+        await type('> ACHIEVEMENTS', 'l hl');
+        line('EXPLORATION: ' + meter(), 'l bar-meter');
+        gap();
+        ACHIEVEMENTS.forEach(a => {
+          if (has(a.id)) line('[█] ' + a.name, 'l');
+          else line('[ ] ???  — ' + a.hint, 'l faint');
+        });
+        gap();
+        line('progress is kept in this browser only; nothing is sent anywhere', 'l faint');
+        line('RESET wipes it', 'l faint');
+        gap();
+        commandRow(['PROJECTS', 'HOME']);
       }
 
       async function help() {
@@ -2063,11 +2138,14 @@
         [['ABOUT', 'who is behind this'], ['PROJECTS', 'the cartridge rack'], ['DEVLOG', 'latest development logs'],
          ['FAQ', 'questions people ask'], ['CONTACT', 'send a message'], ['ALL GAMES', 'the full games page'],
          ['PRIVACY', 'privacy policies'], ['DISCORD', 'open the server'], ['LOGIN', 'account access'],
+         ['ACHIEVEMENTS', 'what you have found so far'],
          ['CLEAR', 'wipe the screen'], ['HOME', 'back to the start']]
           .forEach(([k, v]) => { dl.appendChild(el('dt', null, k)); dl.appendChild(el('dd', 'dim', v)); });
         put(dl);
         gap();
         line('arrow keys walk back through what you have typed', 'l faint');
+        line('this list is not complete. some commands are not on it.', 'l faint');
+        unlock('rtfm');
       }
 
       // ---------------------------------------------------------- router
@@ -2079,6 +2157,50 @@
         PRIVACY: async () => { line('> opening privacy/ ...', 'l ok'); location.href = './privacy/'; },
         DISCORD: async () => { line('> opening discord ...', 'l ok'); window.open('https://discord.gg/PW6UZWtZ7C', '_blank', 'noopener'); },
         LOGIN: async () => { const m = document.getElementById('signup-modal'); if (m) m.classList.add('show'); line('> auth panel open', 'l ok'); },
+        ACHIEVEMENTS: achievements, ACH: achievements,
+        RESET: async () => {
+          P = { got: [], screens: [], carts: [], secrets: [] }; save();
+          line('> progress wiped. the rack forgets you.', 'l ok');
+        },
+
+        // --- not listed in HELP ---
+        WHOAMI: async () => {
+          line('> whoami', 'l');
+          line('guest@beniah.games', 'l dim');
+          line('on this side of the screen, though, you are the main character.', 'l dim');
+          secret('whoami'); unlock('whoami');
+        },
+        SUDO: async () => {
+          line('> sudo', 'l');
+          line('nice try. this system has exactly one admin and he is busy making games.', 'l err');
+          secret('sudo'); unlock('sudo');
+        },
+        COFFEE: async () => {
+          line('> coffee', 'l');
+          line('   ( (', 'l dim');
+          line('    ) )', 'l dim');
+          line('  ........', 'l dim');
+          line('  |      |]', 'l dim');
+          line('  \\      /', 'l dim');
+          line('   `----´', 'l dim');
+          line('brewing. this is what the games actually run on.', 'l dim');
+          secret('coffee'); unlock('coffee');
+        },
+        LS: async () => {
+          line('> ls', 'l');
+          line('games/   devlogs/   privacy/   secrets/', 'l dim');
+          line('ls: secrets/: permission denied', 'l err');
+          secret('ls');
+        },
+        CAT: async () => { line('> cat', 'l'); line('no cats here. try PROJECTS.', 'l dim'); secret('cat'); },
+        '42': async () => { line('> 42', 'l'); line('the answer. the question is still in development.', 'l dim'); secret('42'); },
+        EXIT: async () => { line('> exit', 'l'); line('there is no exit, only more games.', 'l dim'); secret('exit'); },
+        QUIT: async () => { line('> quit', 'l'); line('there is no exit, only more games.', 'l dim'); secret('exit'); },
+        'RM -RF /': async () => {
+          line('> rm -rf /', 'l');
+          line('permission denied. also, rude.', 'l err');
+          secret('rm');
+        },
       };
 
       async function run(raw) {
@@ -2131,8 +2253,32 @@
         ];
         for (const b of boot) { await type(b, 'l faint', 6); }
         await new Promise(r => setTimeout(r, reduced ? 0 : 260));
+        const firstRun = !has('boot');
+        if (firstRun) { P.got.push('boot'); save(); }
         await home();
+        if (firstRun) {
+          line('*** ACHIEVEMENT UNLOCKED \u2014 FIRST CONTACT ***', 'l ok');
+          if (window.audioManager) window.audioManager.playSound('alienOpen');
+        }
         input.focus();
+      })();
+
+      // up up down down left right left right B A
+      (() => {
+        const CODE = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+        let at = 0;
+        document.addEventListener('keydown', e => {
+          const want = CODE[at];
+          const key = want.length === 1 ? (e.key || '').toLowerCase() : e.key;
+          at = key === want ? at + 1 : (key === CODE[0] ? 1 : 0);
+          if (at < CODE.length) return;
+          at = 0;
+          document.body.classList.add('konami');
+          setTimeout(() => document.body.classList.remove('konami'), 4000);
+          line('> ↑↑↓↓←→←→BA', 'l hl');
+          line('phosphor realigned. 30 extra lives were not included.', 'l dim');
+          unlock('konami');
+        });
       })();
     })();
 
