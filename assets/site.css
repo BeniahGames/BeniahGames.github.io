@@ -653,3 +653,32 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,t
   padding:.2rem .6rem;background:rgba(255,255,255,.03)}
 .empty-state{border:1px dashed var(--line);border-radius:var(--radius);padding:3rem 1.5rem;text-align:center;color:var(--faint)}
 .empty-state h3{color:var(--text);margin-bottom:.5rem}
+
+/* ============================================================
+   Tool bubbles — the software behind the games, drifting on scroll
+   Icons from simple-icons (CC0-1.0)
+   ============================================================ */
+.tool-field{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.bubble{
+  position:absolute;left:var(--x);top:var(--y);
+  width:var(--size);height:var(--size);margin-left:calc(var(--size) / -2);
+  display:grid;place-items:center;border-radius:50%;
+  border:1px solid rgba(255,255,255,.07);
+  background:radial-gradient(120% 120% at 30% 25%,rgba(255,255,255,.07),rgba(255,255,255,.015));
+  backdrop-filter:blur(5px);
+  box-shadow:0 18px 40px -26px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:bubbleFloat 11s ease-in-out infinite;
+  will-change:transform;
+}
+.bubble:nth-child(even){animation-duration:14s;animation-delay:-4s}
+.bubble:nth-child(3n){animation-duration:17s;animation-delay:-8s}
+.bubble svg{
+  width:42%;height:42%;fill:rgba(255,204,0,.5);
+  filter:drop-shadow(0 0 12px rgba(255,204,0,.3));
+}
+.bubble:nth-child(3n+1) svg{fill:rgba(233,239,250,.3);filter:none}
+@keyframes bubbleFloat{0%,100%{translate:0 0}50%{translate:0 -14px}}
+
+/* they are scenery, not content: keep them off small screens */
+@media(max-width:1180px){.tool-field{display:none}}
+@media (prefers-reduced-motion:reduce){.bubble{animation:none;transform:none !important}}
