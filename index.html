@@ -113,33 +113,11 @@
         </div>
         <ul class="hero-stats">
           <li><b>05</b><span>In development</span></li>
-          <li><b>Android</b><span>Platform</span></li>
+          <li><b>Android · Steam</b><span>Platforms</span></li>
           <li><b>Godot</b><span>Engine</span></li>
         </ul>
       </div>
 
-      <div class="hero-art">
-          <a class="mini" href="#games">
-            <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.4c2.5 2.3 3.8 5.2 3.8 8.6l-1.3 4.4H9.5L8.2 11c0-3.4 1.3-6.3 3.8-8.6Z"/><circle cx="12" cy="9.4" r="1.7"/><path d="M9.6 15.4 7.4 19l2.7-1 1.9 3 1.9-3 2.7 1-2.2-3.6"/></svg></span>
-            <span><span class="mini-name"><span class="glitch" data-text="0">0</span>:Nadir</span><span class="mini-sub">Space shooter</span></span>
-          </a>
-          <a class="mini" href="#games">
-            <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 4.6c6.2 1.7 12.6 1.7 18.8 0"/><path d="M4.6 8.2h14.8"/><path d="M6.6 5.4V20"/><path d="M17.4 5.4V20"/><path d="M6.6 12.2h10.8"/></svg></span>
-            <span><span class="mini-name">NihonGO</span><span class="mini-sub">Japanese learning</span></span>
-          </a>
-          <a class="mini" href="#games">
-            <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.4l2.25 4.75 5.15.72-3.75 3.6.92 5.14L12 15.2l-4.57 2.41.92-5.14L4.6 8.87l5.15-.72z"/><path d="M19.6 3.6v2.2M18.5 4.7h2.2M4 16.4v1.8M3.1 17.3h1.8"/></svg></span>
-            <span><span class="mini-name">MCS</span><span class="mini-sub">Idle clicker</span></span>
-          </a>
-          <a class="mini" href="#games">
-            <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.2" y="3.2" width="7.4" height="7.4" rx="1.6"/><rect x="13.4" y="3.2" width="7.4" height="7.4" rx="1.6"/><rect x="3.2" y="13.4" width="7.4" height="7.4" rx="1.6"/><path d="M14.6 19.4l1.8-4.4 1.2 2.1 2.6-.9-2 5"/></svg></span>
-            <span><span class="mini-name">Block Crusher</span><span class="mini-sub">Arcade puzzler</span></span>
-          </a>
-          <a class="mini" href="#games">
-            <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12h2.6M19 12h2.6M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9"/></svg></span>
-            <span class="mini-text"><span class="mini-name">Sunkeeper</span><span class="mini-sub">Idle galaxy · Steam</span></span>
-          </a>
-      </div>
     </div>
   </header>
 
@@ -152,108 +130,126 @@
             <span class="sec-label" data-translate="section.games">In development</span>
             <h2 data-translate="games.title">Games</h2>
           </div>
+          <div class="sec-actions">
+          <button id="expand-all-btn" class="btn btn-sm" data-translate="games.expand_all">Expand All</button>
           <a class="btn btn-sm" href="games/">All games <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
         </div>
         <div class="games-grid">
-        <article class="card card-span-7 reveal">
+        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-7 reveal">
           <div class="card-head">
             <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.4c2.5 2.3 3.8 5.2 3.8 8.6l-1.3 4.4H9.5L8.2 11c0-3.4 1.3-6.3 3.8-8.6Z"/><circle cx="12" cy="9.4" r="1.7"/><path d="M9.6 15.4 7.4 19l2.7-1 1.9 3 1.9-3 2.7 1-2.2-3.6"/></svg></span>
             <div>
               <span class="pill">Space shooter · Incremental</span>
               <h3><span class="glitch" data-text="0">0</span>:Nadir</h3>
             </div>
+            <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="chips">
             <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6"/><path d="M10.4 18.6h3.2"/></svg> Android</span>
             <span class="chip">Multiple game modes</span>
           </div>
-          <p class="card-desc"><strong><span class="glitch" data-text="0">0</span>:Nadir</strong><span data-translate="games.nadir.desc"> is a space shooter where every run makes the next one stronger. Blast through escalating enemy waves, bank upgrade currency, and spend it on a deep incremental upgrade tree — then pick your poison across multiple game modes, from endless survival runs to focused, high-pressure challenges.</span></p>
+          <div class="collapsible">
+            <p class="card-desc"><strong><span class="glitch" data-text="0">0</span>:Nadir</strong><span data-translate="games.nadir.desc"> is a space shooter where every run makes the next one stronger. Blast through escalating enemy waves, bank upgrade currency, and spend it on a deep incremental upgrade tree — then pick your poison across multiple game modes, from endless survival runs to focused, high-pressure challenges.</span></p>
           <div class="card-actions">
-            <a class="btn-store" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
-            <a class="btn btn-sm" href="#contact" data-translate="games.contact">Contact</a>
+            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
+            <a class="btn btn-sm no-toggle" href="#contact" data-translate="games.contact">Contact</a>
           </div>
           <p class="status"><span data-translate="games.early_dev">Currently in early development.</span></p>
+          </div>
         </article>
 
-        <article class="card card-span-5 reveal">
+        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-5 reveal">
           <div class="card-head">
             <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 4.6c6.2 1.7 12.6 1.7 18.8 0"/><path d="M4.6 8.2h14.8"/><path d="M6.6 5.4V20"/><path d="M17.4 5.4V20"/><path d="M6.6 12.2h10.8"/></svg></span>
             <div>
               <span class="pill">Learning · Japanese</span>
               <h3>NihonGO</h3>
             </div>
+            <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="chips">
             <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6"/><path d="M10.4 18.6h3.2"/></svg> Android</span>
             <span class="chip">Hiragana · Katakana · Kanji</span>
           </div>
-          <p class="card-desc"><strong>NihonGO</strong><span data-translate="games.nihongo.desc"> is a Japanese learning app built like a game. Drill hiragana, katakana, and kanji in bite-sized lessons, lock words in with spaced-repetition reviews, and build real vocabulary — with streaks, levels, and progress tracking to keep you showing up every day.</span></p>
+          <div class="collapsible">
+            <p class="card-desc"><strong>NihonGO</strong><span data-translate="games.nihongo.desc"> is a Japanese learning app built like a game. Drill hiragana, katakana, and kanji in bite-sized lessons, lock words in with spaced-repetition reviews, and build real vocabulary — with streaks, levels, and progress tracking to keep you showing up every day.</span></p>
           <div class="card-actions">
-            <a class="btn-store" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
-            <a class="btn btn-sm" href="#contact" data-translate="games.contact">Contact</a>
+            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
+            <a class="btn btn-sm no-toggle" href="#contact" data-translate="games.contact">Contact</a>
           </div>
           <p class="status"><span data-translate="games.early_dev">Currently in early development.</span></p>
+          </div>
         </article>
 
-        <article class="card card-span-5 reveal">
+        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-5 reveal">
           <div class="card-head">
             <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.4l2.25 4.75 5.15.72-3.75 3.6.92 5.14L12 15.2l-4.57 2.41.92-5.14L4.6 8.87l5.15-.72z"/><path d="M19.6 3.6v2.2M18.5 4.7h2.2M4 16.4v1.8M3.1 17.3h1.8"/></svg></span>
             <div>
               <span class="pill">Idle clicker · Parody</span>
               <h3>MCS</h3>
             </div>
+            <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="chips">
             <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6"/><path d="M10.4 18.6h3.2"/></svg> Android</span>
             <span class="chip">80+ NPCs</span>
             <span class="chip">Hidden mini-games</span>
           </div>
-          <p class="card-desc"><strong>MCS</strong><span data-translate="games.mcs.desc"> (Main Character Syndrome) is an idle clicker that parodies social media. You're the one real person on a map full of self-aware NPCs: tap, post, and watch your hearts and followers climb as a whole fake internet opens up around you — parody networks, a bank that loses your money on purpose, and a small hidden game inside nearly every app.</span></p>
+          <div class="collapsible">
+            <p class="card-desc"><strong>MCS</strong><span data-translate="games.mcs.desc"> (Main Character Syndrome) is an idle clicker that parodies social media. You're the one real person on a map full of self-aware NPCs: tap, post, and watch your hearts and followers climb as a whole fake internet opens up around you — parody networks, a bank that loses your money on purpose, and a small hidden game inside nearly every app.</span></p>
           <div class="card-actions">
-            <a class="btn-store" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
-            <a class="btn btn-sm" href="#contact" data-translate="games.contact">Contact</a>
+            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
+            <a class="btn btn-sm no-toggle" href="#contact" data-translate="games.contact">Contact</a>
           </div>
           <p class="status"><span data-translate="games.early_dev">Currently in early development.</span></p>
+          </div>
         </article>
 
-        <article class="card card-span-7 reveal">
+        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-7 reveal">
           <div class="card-head">
             <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.2" y="3.2" width="7.4" height="7.4" rx="1.6"/><rect x="13.4" y="3.2" width="7.4" height="7.4" rx="1.6"/><rect x="3.2" y="13.4" width="7.4" height="7.4" rx="1.6"/><path d="M14.6 19.4l1.8-4.4 1.2 2.1 2.6-.9-2 5"/></svg></span>
             <div>
               <span class="pill">Puzzle · Arcade</span>
               <h3>Block Crusher</h3>
             </div>
+            <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="chips">
             <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6"/><path d="M10.4 18.6h3.2"/></svg> Android</span>
             <span class="chip">Free with ads</span>
             <span class="chip">Power-ups &amp; cosmetics</span>
           </div>
-          <p class="card-desc"><strong>Block Crusher</strong><span data-translate="games.blockcrusher.desc"> is a block-smashing arcade puzzler for Android. Clear the board, push for a new best score, and spend the coins you earn on power-ups and cosmetics — no accounts, nothing to buy, and your progress stays on your phone.</span></p>
+          <div class="collapsible">
+            <p class="card-desc"><strong>Block Crusher</strong><span data-translate="games.blockcrusher.desc"> is a block-smashing arcade puzzler for Android. Clear the board, push for a new best score, and spend the coins you earn on power-ups and cosmetics — no accounts, nothing to buy, and your progress stays on your phone.</span></p>
           <div class="card-actions">
-            <a class="btn-store" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
-            <a class="btn btn-sm" href="privacy/block-crusher/" data-translate="games.privacy">Privacy policy</a>
+            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
+            <a class="btn btn-sm no-toggle" href="privacy/block-crusher/" data-translate="games.privacy">Privacy policy</a>
+          </div>
           </div>
         </article>
 
-        <article class="card card-span-12 reveal">
+        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-12 reveal">
           <div class="card-head">
             <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12h2.6M19 12h2.6M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9"/></svg></span>
             <div>
               <span class="pill">Idle incremental · Galaxy</span>
               <h3>Sunkeeper</h3>
             </div>
+            <span class="chev" aria-hidden="true">⌄</span>
           </div>
           <div class="chips">
             <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4" width="18.8" height="13" rx="2.2"/><path d="M8.5 21h7M12 17v4"/></svg> Steam</span>
             <span class="chip">Release Q1 2027</span>
           </div>
-          <p class="card-desc" data-translate="games.sunkeeper.desc">Tend a newborn star in the corner of your desktop. Gather light, raise worlds and guide their people from the first fire to the stars. Collapse your sun in a supernova, decipher a lost alien alphabet, and, at the very end, tear open a black hole into the multiverse.</p>
+          <div class="collapsible">
+            <p class="card-desc" data-translate="games.sunkeeper.desc">Tend a newborn star in the corner of your desktop. Gather light, raise worlds and guide their people from the first fire to the stars. Collapse your sun in a supernova, decipher a lost alien alphabet, and, at the very end, tear open a black hole into the multiverse.</p>
           <div class="card-actions">
-            <a class="btn-store" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4" width="18.8" height="13" rx="2.2"/><path d="M8.5 21h7M12 17v4"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Steam</span></span></a>
-            <a class="btn btn-sm" href="#contact" data-translate="games.contact">Contact</a>
+            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4" width="18.8" height="13" rx="2.2"/><path d="M8.5 21h7M12 17v4"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Steam</span></span></a>
+            <a class="btn btn-sm no-toggle" href="#contact" data-translate="games.contact">Contact</a>
           </div>
           <p class="status"><span data-translate="games.early_dev">Currently in early development.</span></p>
+          </div>
         </article>
         </div>
       </div>
@@ -2265,23 +2261,6 @@
       window.addEventListener('resize', tick);
     })();
 
-    // Pointer drift on the hero tiles
-    (() => {
-      const art = document.querySelector('.hero-art');
-      if (!art || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const tiles = [...art.querySelectorAll('.mini')];
-
-      art.addEventListener('pointermove', e => {
-        const r = art.getBoundingClientRect();
-        const dx = (e.clientX - r.left) / r.width - 0.5;
-        const dy = (e.clientY - r.top) / r.height - 0.5;
-        tiles.forEach((tile, i) => {
-          const depth = (i + 1) * 3;
-          tile.style.transform = 'translate3d(' + (dx * depth).toFixed(2) + 'px,' + (dy * depth).toFixed(2) + 'px,0)';
-        });
-      });
-      art.addEventListener('pointerleave', () => tiles.forEach(t => { t.style.transform = ''; }));
-    })();
 
     // Close the mobile menu after following a link
     (() => {
@@ -2292,6 +2271,130 @@
         panel.classList.remove('open');
         burger.setAttribute('aria-expanded', 'false');
       }));
+    })();
+
+    // Collapsible cards (all)
+    (() => {
+      const cards = document.querySelectorAll('#games .card');
+      cards.forEach((card, index) => {
+        const collapsibleContent = card.querySelector('.collapsible');
+        if (!collapsibleContent) return;
+
+        // prevent toggling when clicking links/buttons inside
+        card.querySelectorAll('.no-toggle, .no-toggle *')
+            .forEach(el => el.addEventListener('click', e => e.stopPropagation()));
+
+        function toggleCard(shouldExpand) {
+          // Only affect this specific card - let CSS handle the animation
+          card.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
+          
+          // Also add/remove a class for additional specificity
+          if (shouldExpand) {
+            card.classList.add('expanded');
+          } else {
+            card.classList.remove('expanded');
+          }
+        }
+
+        card.addEventListener('click', async (e) => {
+          // Prevent event bubbling
+          e.stopPropagation();
+          
+          // Only toggle this specific card
+          const isCurrentlyExpanded = card.getAttribute('aria-expanded') === 'true';
+          const willExpand = !isCurrentlyExpanded;
+          
+          // Play appropriate sound effect
+          if (window.audioManager) {
+            if (willExpand) {
+              await window.audioManager.playSound('gadgetOpen');
+            } else {
+              await window.audioManager.playSound('gadgetClose');
+            }
+          }
+          
+          toggleCard(willExpand);
+        });
+
+        card.addEventListener('keydown', async (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Only toggle this specific card
+            const isCurrentlyExpanded = card.getAttribute('aria-expanded') === 'true';
+            const willExpand = !isCurrentlyExpanded;
+            
+            // Play appropriate sound effect
+            if (window.audioManager) {
+              if (willExpand) {
+                await window.audioManager.playSound('gadgetOpen');
+              } else {
+                await window.audioManager.playSound('gadgetClose');
+              }
+            }
+            
+            toggleCard(willExpand);
+          }
+        });
+      });
+    })();
+
+    // Expand All Button
+    (() => {
+      const expandAllBtn = document.getElementById('expand-all-btn');
+      const gameCards = document.querySelectorAll('#games .card');
+      
+      if (!expandAllBtn || !gameCards.length) return;
+      
+      let allExpanded = false;
+      
+      const updateButtonText = () => {
+        const expandedCards = document.querySelectorAll('#games .card[aria-expanded="true"]');
+        allExpanded = expandedCards.length === gameCards.length;
+        
+        // Update button text based on current state
+        if (allExpanded) {
+          expandAllBtn.setAttribute('data-translate', 'games.collapse_all');
+          expandAllBtn.textContent = 'Collapse All';
+        } else {
+          expandAllBtn.setAttribute('data-translate', 'games.expand_all');
+          expandAllBtn.textContent = 'Expand All';
+        }
+      };
+      
+      expandAllBtn.addEventListener('click', async () => {
+        const shouldExpand = !allExpanded;
+        
+        // Play appropriate sound effect
+        if (window.audioManager) {
+          if (shouldExpand) {
+            await window.audioManager.playSound('alienOpen');
+          } else {
+            await window.audioManager.playSound('alienClose');
+          }
+        }
+        
+        gameCards.forEach(card => {
+          card.setAttribute('aria-expanded', shouldExpand);
+          if (shouldExpand) {
+            card.classList.add('expanded');
+          } else {
+            card.classList.remove('expanded');
+          }
+        });
+        
+        updateButtonText();
+      });
+      
+      // Listen for individual card changes to update button state
+      gameCards.forEach(card => {
+        const observer = new MutationObserver(updateButtonText);
+        observer.observe(card, { attributes: true, attributeFilter: ['aria-expanded'] });
+      });
+      
+      // Initial button state
+      updateButtonText();
     })();
 
   </script>
