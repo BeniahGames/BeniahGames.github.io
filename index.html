@@ -3,458 +3,233 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Beniah.games — Indie Game Dev</title>
-  <meta name="description" content="Indie game developer from Belgium building quirky, endlessly fun games for Android." />
+  <title>Beniah.games — Terminal</title>
+  <meta name="description" content="Indie game developer from Belgium building games for Android and Steam. Browse the cartridge rack from the terminal." />
   <link rel="icon" href="assets/Beniah.Games.Icon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/terminal.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-  <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-  <!-- Atmosphere -->
-  <div class="parallax" aria-hidden="true">
-    <div class="layer layer-back"></div>
-    <div class="layer layer-mid"></div>
-    <div class="layer layer-front"></div>
-  </div>
-  <div class="grain" aria-hidden="true"></div>
+  <header class="bar">
+    <a class="brand" href="./" aria-label="Beniah.games">
+      <img src="assets/Beniah.Games.Logo.png" alt="Beniah.games">
+    </a>
+    <span class="sep"></span>
+    <span class="stat"><span class="dot"></span>SYS ONLINE</span>
 
-  <!-- Tools I build with. Icons: simple-icons (CC0-1.0). -->
-  <div class="tool-field" aria-hidden="true">
-    <span class="bubble" style="--x:6%;--y:6%;--size:80px" data-speed="0.16" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Godot</title><path d="M9.5598.683c-1.096.244-2.1812.5831-3.1983 1.0951.023.8981.081 1.7582.199 2.6323-.395.253-.81.47-1.178.766-.375.288-.7581.564-1.0971.9011-.6781-.448-1.3962-.869-2.1352-1.2411C1.3532 5.6934.608 6.6186 0 7.6546c.458.7411.936 1.4352 1.4521 2.0942h.014v6.3565c.012 0 .023 0 .035.003l3.8963.376c.204.02.364.184.378.3891l.12 1.7201 3.3994.242.234-1.587c.03-.206.207-.358.415-.358h4.1114c.208 0 .385.152.415.358l.234 1.587 3.3993-.242.12-1.72a.4196.4196 0 01.378-.3891l3.8954-.376c.012 0 .023-.003.035-.003v-.5071h.002V9.7498h.014c.516-.659.994-1.3531 1.4521-2.0942-.608-1.036-1.3541-1.9611-2.1512-2.8192-.739.372-1.4571.793-2.1352 1.2411-.339-.337-.721-.613-1.096-.901-.369-.296-.7841-.5131-1.1781-.7661.117-.8741.175-1.7342.199-2.6323-1.0171-.512-2.1012-.851-3.1983-1.095-.438.736-.838 1.533-1.1871 2.3121-.414-.069-.829-.094-1.2461-.099h-.016c-.417.005-.832.03-1.2461.099-.349-.779-.749-1.576-1.1881-2.3121l.001-.001zM6.4765 9.9889c1.2971 0 2.3492 1.0511 2.3492 2.3482s-1.052 2.3482-2.3492 2.3482c-1.296 0-2.3482-1.051-2.3482-2.3482 0-1.297 1.0511-2.3482 2.3482-2.3482zm11.049 0c1.296 0 2.3482 1.0511 2.3482 2.3482s-1.0511 2.3482-2.3482 2.3482-2.3492-1.051-2.3492-2.3482c0-1.297 1.051-2.3482 2.3492-2.3482zm-10.824.9301c-.861 0-1.559.698-1.559 1.5591s.698 1.5582 1.559 1.5582c.8611 0 1.5592-.698 1.5592-1.5582 0-.86-.697-1.559-1.5591-1.559zm10.598 0c-.8611 0-1.5582.698-1.5582 1.5591s.697 1.5582 1.5581 1.5582c.8611 0 1.5592-.698 1.5592-1.5582 0-.86-.697-1.559-1.5592-1.559zm-5.2985.453c.417 0 .757.308.757.6871v2.1622c0 .379-.339.687-.757.687s-.756-.308-.756-.687V12.059c0-.379.339-.687.756-.687zM1.4601 16.9464c.002.377.006.789.006.871 0 3.7014 4.6944 5.4795 10.5269 5.5005h.014c5.8325-.02 10.5259-1.7991 10.5259-5.5004 0-.084.005-.495.007-.871l-3.5023.338-.121 1.729a.421.421 0 01-.389.3901l-4.1814.296a.4203.4203 0 01-.415-.358l-.238-1.6141h-3.3863l-.238 1.6141a.4192.4192 0 01-.4451.357l-4.1513-.296c-.208-.015-.375-.181-.389-.389l-.12-1.7292-3.5044-.337z"/></svg></span>
-    <span class="bubble" style="--x:93%;--y:11%;--size:60px" data-speed="0.1" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Krita</title><path d="M.652.76a.625.625 0 00-.5.246c-.352.448-.035.898.362 1.262.206.189 1.77 1.794 3.428 3.527a11.054 11.054 0 011.815-1.983C3.667 2.515 1.694 1.266 1.461 1.1 1.201.914.917.762.652.76zm5.105 3.052c1.848 1.148 3.786 2.332 4.693 2.84 1.469.821 3.758 2.684 4.092 4.434.535.466 2.182 1.916 2.596 2.413.698-.211 1.518.133 2.06 1.12.866 1.583.227 3.747-1.968 4.988a5.42 5.42 0 01-.296.267l.296-.267c1.14-1.468-.714-2.44-1.175-3.864a2.06 2.06 0 01-.11-.78c-.533-.282-2.11-1.452-2.795-1.965-1.801.16-4.207-1.773-5.35-3.08-.7-.802-2.32-2.517-3.858-4.123a11.052 11.052 0 00-2.046 6.393A11.052 11.052 0 1012.948 1.136c-2.64.004-5.19.954-7.19 2.676zm8.71 7.552c-.515.126-.968.831-1.118 1.306-.038.115-.04.303.066.342.802.592 1.556 1.168 2.4 1.7.162-.393.746-.963 1.096-1.2zm-11.53 1.639c.812 1.898 5.798 7.17 12.06 2.695a2.07 2.07 0 00.114.715c.46 1.42 2.36 2.427 1.238 3.89-2.135 1.364-5 1.201-6.989.528-3.558-1.204-5.914-4.332-6.424-7.828zm13.782.7a.771.771 0 00-.065.049c-.004.003-.008.008-.011.008.003-.003.007-.008.01-.008.024-.015.044-.034.066-.048z"/></svg></span>
-    <span class="bubble" style="--x:4%;--y:19%;--size:54px" data-speed="0.24" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Blender</title><path d="M12.51 13.214c.046-.8.438-1.506 1.03-2.006a3.424 3.424 0 0 1 2.212-.79c.85 0 1.631.3 2.211.79.592.5.983 1.206 1.028 2.005.045.823-.285 1.586-.865 2.153a3.389 3.389 0 0 1-2.374.938 3.393 3.393 0 0 1-2.376-.938c-.58-.567-.91-1.33-.865-2.152M7.35 14.831c.006.314.106.922.256 1.398a7.372 7.372 0 0 0 1.593 2.757 8.227 8.227 0 0 0 2.787 2.001 8.947 8.947 0 0 0 3.66.76 8.964 8.964 0 0 0 3.657-.772 8.285 8.285 0 0 0 2.785-2.01 7.428 7.428 0 0 0 1.592-2.762 6.964 6.964 0 0 0 .25-3.074 7.123 7.123 0 0 0-1.016-2.779 7.764 7.764 0 0 0-1.852-2.043h.002L13.566 2.55l-.02-.015c-.492-.378-1.319-.376-1.86.002-.547.382-.609 1.015-.123 1.415l-.001.001 3.126 2.543-9.53.01h-.013c-.788.001-1.545.518-1.695 1.172-.154.665.38 1.217 1.2 1.22V8.9l4.83-.01-8.62 6.617-.034.025c-.813.622-1.075 1.658-.563 2.313.52.667 1.625.668 2.447.004L7.414 14s-.069.52-.063.831zm12.09 1.741c-.97.988-2.326 1.548-3.795 1.55-1.47.004-2.827-.552-3.797-1.538a4.51 4.51 0 0 1-1.036-1.622 4.282 4.282 0 0 1 .282-3.519 4.702 4.702 0 0 1 1.153-1.371c.942-.768 2.141-1.183 3.396-1.185 1.256-.002 2.455.41 3.398 1.175.48.391.87.854 1.152 1.367a4.28 4.28 0 0 1 .522 1.706 4.236 4.236 0 0 1-.239 1.811 4.54 4.54 0 0 1-1.035 1.626"/></svg></span>
-    <span class="bubble" style="--x:95%;--y:22%;--size:72px" data-speed="0.13" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Android</title><path d="M18.4395 5.5586c-.675 1.1664-1.352 2.3318-2.0274 3.498-.0366-.0155-.0742-.0286-.1113-.043-1.8249-.6957-3.484-.8-4.42-.787-1.8551.0185-3.3544.4643-4.2597.8203-.084-.1494-1.7526-3.021-2.0215-3.4864a1.1451 1.1451 0 0 0-.1406-.1914c-.3312-.364-.9054-.4859-1.379-.203-.475.282-.7136.9361-.3886 1.5019 1.9466 3.3696-.0966-.2158 1.9473 3.3593.0172.031-.4946.2642-1.3926 1.0177C2.8987 12.176.452 14.772 0 18.9902h24c-.119-1.1108-.3686-2.099-.7461-3.0683-.7438-1.9118-1.8435-3.2928-2.7402-4.1836a12.1048 12.1048 0 0 0-2.1309-1.6875c.6594-1.122 1.312-2.2559 1.9649-3.3848.2077-.3615.1886-.7956-.0079-1.1191a1.1001 1.1001 0 0 0-.8515-.5332c-.5225-.0536-.9392.3128-1.0488.5449zm-.0391 8.461c.3944.5926.324 1.3306-.1563 1.6503-.4799.3197-1.188.0985-1.582-.4941-.3944-.5927-.324-1.3307.1563-1.6504.4727-.315 1.1812-.1086 1.582.4941zM7.207 13.5273c.4803.3197.5506 1.0577.1563 1.6504-.394.5926-1.1038.8138-1.584.4941-.48-.3197-.5503-1.0577-.1563-1.6504.4008-.6021 1.1087-.8106 1.584-.4941z"/></svg></span>
-    <span class="bubble" style="--x:7%;--y:31%;--size:46px" data-speed="0.19" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Aseprite</title><path d="M4.006 0v1.6h15.988V0zm15.988 1.6v1.6h1.6V1.6zm1.6 1.6v14.4h-1.6v1.6H4.006v-1.6h-1.6V3.2H.809v17.6h1.599v1.6h1.599V24h15.988v-1.6h1.6v-1.6h1.598V3.2zm-19.187 0h1.599V1.6h-1.6zm4.796 3.2v6.4h1.6V6.4zm7.995 0v6.4h1.599V6.4z"/></svg></span>
-    <span class="bubble" style="--x:91%;--y:35%;--size:56px" data-speed="0.21" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Steam</title><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg></span>
-    <span class="bubble" style="--x:3%;--y:43%;--size:62px" data-speed="0.11" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Godot</title><path d="M9.5598.683c-1.096.244-2.1812.5831-3.1983 1.0951.023.8981.081 1.7582.199 2.6323-.395.253-.81.47-1.178.766-.375.288-.7581.564-1.0971.9011-.6781-.448-1.3962-.869-2.1352-1.2411C1.3532 5.6934.608 6.6186 0 7.6546c.458.7411.936 1.4352 1.4521 2.0942h.014v6.3565c.012 0 .023 0 .035.003l3.8963.376c.204.02.364.184.378.3891l.12 1.7201 3.3994.242.234-1.587c.03-.206.207-.358.415-.358h4.1114c.208 0 .385.152.415.358l.234 1.587 3.3993-.242.12-1.72a.4196.4196 0 01.378-.3891l3.8954-.376c.012 0 .023-.003.035-.003v-.5071h.002V9.7498h.014c.516-.659.994-1.3531 1.4521-2.0942-.608-1.036-1.3541-1.9611-2.1512-2.8192-.739.372-1.4571.793-2.1352 1.2411-.339-.337-.721-.613-1.096-.901-.369-.296-.7841-.5131-1.1781-.7661.117-.8741.175-1.7342.199-2.6323-1.0171-.512-2.1012-.851-3.1983-1.095-.438.736-.838 1.533-1.1871 2.3121-.414-.069-.829-.094-1.2461-.099h-.016c-.417.005-.832.03-1.2461.099-.349-.779-.749-1.576-1.1881-2.3121l.001-.001zM6.4765 9.9889c1.2971 0 2.3492 1.0511 2.3492 2.3482s-1.052 2.3482-2.3492 2.3482c-1.296 0-2.3482-1.051-2.3482-2.3482 0-1.297 1.0511-2.3482 2.3482-2.3482zm11.049 0c1.296 0 2.3482 1.0511 2.3482 2.3482s-1.0511 2.3482-2.3482 2.3482-2.3492-1.051-2.3492-2.3482c0-1.297 1.051-2.3482 2.3492-2.3482zm-10.824.9301c-.861 0-1.559.698-1.559 1.5591s.698 1.5582 1.559 1.5582c.8611 0 1.5592-.698 1.5592-1.5582 0-.86-.697-1.559-1.5591-1.559zm10.598 0c-.8611 0-1.5582.698-1.5582 1.5591s.697 1.5582 1.5581 1.5582c.8611 0 1.5592-.698 1.5592-1.5582 0-.86-.697-1.559-1.5592-1.559zm-5.2985.453c.417 0 .757.308.757.6871v2.1622c0 .379-.339.687-.757.687s-.756-.308-.756-.687V12.059c0-.379.339-.687.756-.687zM1.4601 16.9464c.002.377.006.789.006.871 0 3.7014 4.6944 5.4795 10.5269 5.5005h.014c5.8325-.02 10.5259-1.7991 10.5259-5.5004 0-.084.005-.495.007-.871l-3.5023.338-.121 1.729a.421.421 0 01-.389.3901l-4.1814.296a.4203.4203 0 01-.415-.358l-.238-1.6141h-3.3863l-.238 1.6141a.4192.4192 0 01-.4451.357l-4.1513-.296c-.208-.015-.375-.181-.389-.389l-.12-1.7292-3.5044-.337z"/></svg></span>
-    <span class="bubble" style="--x:96%;--y:47%;--size:50px" data-speed="0.17" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Krita</title><path d="M.652.76a.625.625 0 00-.5.246c-.352.448-.035.898.362 1.262.206.189 1.77 1.794 3.428 3.527a11.054 11.054 0 011.815-1.983C3.667 2.515 1.694 1.266 1.461 1.1 1.201.914.917.762.652.76zm5.105 3.052c1.848 1.148 3.786 2.332 4.693 2.84 1.469.821 3.758 2.684 4.092 4.434.535.466 2.182 1.916 2.596 2.413.698-.211 1.518.133 2.06 1.12.866 1.583.227 3.747-1.968 4.988a5.42 5.42 0 01-.296.267l.296-.267c1.14-1.468-.714-2.44-1.175-3.864a2.06 2.06 0 01-.11-.78c-.533-.282-2.11-1.452-2.795-1.965-1.801.16-4.207-1.773-5.35-3.08-.7-.802-2.32-2.517-3.858-4.123a11.052 11.052 0 00-2.046 6.393A11.052 11.052 0 1012.948 1.136c-2.64.004-5.19.954-7.19 2.676zm8.71 7.552c-.515.126-.968.831-1.118 1.306-.038.115-.04.303.066.342.802.592 1.556 1.168 2.4 1.7.162-.393.746-.963 1.096-1.2zm-11.53 1.639c.812 1.898 5.798 7.17 12.06 2.695a2.07 2.07 0 00.114.715c.46 1.42 2.36 2.427 1.238 3.89-2.135 1.364-5 1.201-6.989.528-3.558-1.204-5.914-4.332-6.424-7.828zm13.782.7a.771.771 0 00-.065.049c-.004.003-.008.008-.011.008.003-.003.007-.008.01-.008.024-.015.044-.034.066-.048z"/></svg></span>
-    <span class="bubble" style="--x:8%;--y:54%;--size:70px" data-speed="0.14" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Blender</title><path d="M12.51 13.214c.046-.8.438-1.506 1.03-2.006a3.424 3.424 0 0 1 2.212-.79c.85 0 1.631.3 2.211.79.592.5.983 1.206 1.028 2.005.045.823-.285 1.586-.865 2.153a3.389 3.389 0 0 1-2.374.938 3.393 3.393 0 0 1-2.376-.938c-.58-.567-.91-1.33-.865-2.152M7.35 14.831c.006.314.106.922.256 1.398a7.372 7.372 0 0 0 1.593 2.757 8.227 8.227 0 0 0 2.787 2.001 8.947 8.947 0 0 0 3.66.76 8.964 8.964 0 0 0 3.657-.772 8.285 8.285 0 0 0 2.785-2.01 7.428 7.428 0 0 0 1.592-2.762 6.964 6.964 0 0 0 .25-3.074 7.123 7.123 0 0 0-1.016-2.779 7.764 7.764 0 0 0-1.852-2.043h.002L13.566 2.55l-.02-.015c-.492-.378-1.319-.376-1.86.002-.547.382-.609 1.015-.123 1.415l-.001.001 3.126 2.543-9.53.01h-.013c-.788.001-1.545.518-1.695 1.172-.154.665.38 1.217 1.2 1.22V8.9l4.83-.01-8.62 6.617-.034.025c-.813.622-1.075 1.658-.563 2.313.52.667 1.625.668 2.447.004L7.414 14s-.069.52-.063.831zm12.09 1.741c-.97.988-2.326 1.548-3.795 1.55-1.47.004-2.827-.552-3.797-1.538a4.51 4.51 0 0 1-1.036-1.622 4.282 4.282 0 0 1 .282-3.519 4.702 4.702 0 0 1 1.153-1.371c.942-.768 2.141-1.183 3.396-1.185 1.256-.002 2.455.41 3.398 1.175.48.391.87.854 1.152 1.367a4.28 4.28 0 0 1 .522 1.706 4.236 4.236 0 0 1-.239 1.811 4.54 4.54 0 0 1-1.035 1.626"/></svg></span>
-    <span class="bubble" style="--x:92%;--y:58%;--size:48px" data-speed="0.23" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Android</title><path d="M18.4395 5.5586c-.675 1.1664-1.352 2.3318-2.0274 3.498-.0366-.0155-.0742-.0286-.1113-.043-1.8249-.6957-3.484-.8-4.42-.787-1.8551.0185-3.3544.4643-4.2597.8203-.084-.1494-1.7526-3.021-2.0215-3.4864a1.1451 1.1451 0 0 0-.1406-.1914c-.3312-.364-.9054-.4859-1.379-.203-.475.282-.7136.9361-.3886 1.5019 1.9466 3.3696-.0966-.2158 1.9473 3.3593.0172.031-.4946.2642-1.3926 1.0177C2.8987 12.176.452 14.772 0 18.9902h24c-.119-1.1108-.3686-2.099-.7461-3.0683-.7438-1.9118-1.8435-3.2928-2.7402-4.1836a12.1048 12.1048 0 0 0-2.1309-1.6875c.6594-1.122 1.312-2.2559 1.9649-3.3848.2077-.3615.1886-.7956-.0079-1.1191a1.1001 1.1001 0 0 0-.8515-.5332c-.5225-.0536-.9392.3128-1.0488.5449zm-.0391 8.461c.3944.5926.324 1.3306-.1563 1.6503-.4799.3197-1.188.0985-1.582-.4941-.3944-.5927-.324-1.3307.1563-1.6504.4727-.315 1.1812-.1086 1.582.4941zM7.207 13.5273c.4803.3197.5506 1.0577.1563 1.6504-.394.5926-1.1038.8138-1.584.4941-.48-.3197-.5503-1.0577-.1563-1.6504.4008-.6021 1.1087-.8106 1.584-.4941z"/></svg></span>
-    <span class="bubble" style="--x:5%;--y:66%;--size:58px" data-speed="0.18" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Steam</title><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg></span>
-    <span class="bubble" style="--x:95%;--y:70%;--size:62px" data-speed="0.12" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Aseprite</title><path d="M4.006 0v1.6h15.988V0zm15.988 1.6v1.6h1.6V1.6zm1.6 1.6v14.4h-1.6v1.6H4.006v-1.6h-1.6V3.2H.809v17.6h1.599v1.6h1.599V24h15.988v-1.6h1.6v-1.6h1.598V3.2zm-19.187 0h1.599V1.6h-1.6zm4.796 3.2v6.4h1.6V6.4zm7.995 0v6.4h1.599V6.4z"/></svg></span>
-    <span class="bubble" style="--x:6%;--y:78%;--size:52px" data-speed="0.2" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Krita</title><path d="M.652.76a.625.625 0 00-.5.246c-.352.448-.035.898.362 1.262.206.189 1.77 1.794 3.428 3.527a11.054 11.054 0 011.815-1.983C3.667 2.515 1.694 1.266 1.461 1.1 1.201.914.917.762.652.76zm5.105 3.052c1.848 1.148 3.786 2.332 4.693 2.84 1.469.821 3.758 2.684 4.092 4.434.535.466 2.182 1.916 2.596 2.413.698-.211 1.518.133 2.06 1.12.866 1.583.227 3.747-1.968 4.988a5.42 5.42 0 01-.296.267l.296-.267c1.14-1.468-.714-2.44-1.175-3.864a2.06 2.06 0 01-.11-.78c-.533-.282-2.11-1.452-2.795-1.965-1.801.16-4.207-1.773-5.35-3.08-.7-.802-2.32-2.517-3.858-4.123a11.052 11.052 0 00-2.046 6.393A11.052 11.052 0 1012.948 1.136c-2.64.004-5.19.954-7.19 2.676zm8.71 7.552c-.515.126-.968.831-1.118 1.306-.038.115-.04.303.066.342.802.592 1.556 1.168 2.4 1.7.162-.393.746-.963 1.096-1.2zm-11.53 1.639c.812 1.898 5.798 7.17 12.06 2.695a2.07 2.07 0 00.114.715c.46 1.42 2.36 2.427 1.238 3.89-2.135 1.364-5 1.201-6.989.528-3.558-1.204-5.914-4.332-6.424-7.828zm13.782.7a.771.771 0 00-.065.049c-.004.003-.008.008-.011.008.003-.003.007-.008.01-.008.024-.015.044-.034.066-.048z"/></svg></span>
-    <span class="bubble" style="--x:91%;--y:82%;--size:66px" data-speed="0.15" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Godot</title><path d="M9.5598.683c-1.096.244-2.1812.5831-3.1983 1.0951.023.8981.081 1.7582.199 2.6323-.395.253-.81.47-1.178.766-.375.288-.7581.564-1.0971.9011-.6781-.448-1.3962-.869-2.1352-1.2411C1.3532 5.6934.608 6.6186 0 7.6546c.458.7411.936 1.4352 1.4521 2.0942h.014v6.3565c.012 0 .023 0 .035.003l3.8963.376c.204.02.364.184.378.3891l.12 1.7201 3.3994.242.234-1.587c.03-.206.207-.358.415-.358h4.1114c.208 0 .385.152.415.358l.234 1.587 3.3993-.242.12-1.72a.4196.4196 0 01.378-.3891l3.8954-.376c.012 0 .023-.003.035-.003v-.5071h.002V9.7498h.014c.516-.659.994-1.3531 1.4521-2.0942-.608-1.036-1.3541-1.9611-2.1512-2.8192-.739.372-1.4571.793-2.1352 1.2411-.339-.337-.721-.613-1.096-.901-.369-.296-.7841-.5131-1.1781-.7661.117-.8741.175-1.7342.199-2.6323-1.0171-.512-2.1012-.851-3.1983-1.095-.438.736-.838 1.533-1.1871 2.3121-.414-.069-.829-.094-1.2461-.099h-.016c-.417.005-.832.03-1.2461.099-.349-.779-.749-1.576-1.1881-2.3121l.001-.001zM6.4765 9.9889c1.2971 0 2.3492 1.0511 2.3492 2.3482s-1.052 2.3482-2.3492 2.3482c-1.296 0-2.3482-1.051-2.3482-2.3482 0-1.297 1.0511-2.3482 2.3482-2.3482zm11.049 0c1.296 0 2.3482 1.0511 2.3482 2.3482s-1.0511 2.3482-2.3482 2.3482-2.3492-1.051-2.3492-2.3482c0-1.297 1.051-2.3482 2.3492-2.3482zm-10.824.9301c-.861 0-1.559.698-1.559 1.5591s.698 1.5582 1.559 1.5582c.8611 0 1.5592-.698 1.5592-1.5582 0-.86-.697-1.559-1.5591-1.559zm10.598 0c-.8611 0-1.5582.698-1.5582 1.5591s.697 1.5582 1.5581 1.5582c.8611 0 1.5592-.698 1.5592-1.5582 0-.86-.697-1.559-1.5592-1.559zm-5.2985.453c.417 0 .757.308.757.6871v2.1622c0 .379-.339.687-.757.687s-.756-.308-.756-.687V12.059c0-.379.339-.687.756-.687zM1.4601 16.9464c.002.377.006.789.006.871 0 3.7014 4.6944 5.4795 10.5269 5.5005h.014c5.8325-.02 10.5259-1.7991 10.5259-5.5004 0-.084.005-.495.007-.871l-3.5023.338-.121 1.729a.421.421 0 01-.389.3901l-4.1814.296a.4203.4203 0 01-.415-.358l-.238-1.6141h-3.3863l-.238 1.6141a.4192.4192 0 01-.4451.357l-4.1513-.296c-.208-.015-.375-.181-.389-.389l-.12-1.7292-3.5044-.337z"/></svg></span>
-    <span class="bubble" style="--x:4%;--y:90%;--size:60px" data-speed="0.22" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Android</title><path d="M18.4395 5.5586c-.675 1.1664-1.352 2.3318-2.0274 3.498-.0366-.0155-.0742-.0286-.1113-.043-1.8249-.6957-3.484-.8-4.42-.787-1.8551.0185-3.3544.4643-4.2597.8203-.084-.1494-1.7526-3.021-2.0215-3.4864a1.1451 1.1451 0 0 0-.1406-.1914c-.3312-.364-.9054-.4859-1.379-.203-.475.282-.7136.9361-.3886 1.5019 1.9466 3.3696-.0966-.2158 1.9473 3.3593.0172.031-.4946.2642-1.3926 1.0177C2.8987 12.176.452 14.772 0 18.9902h24c-.119-1.1108-.3686-2.099-.7461-3.0683-.7438-1.9118-1.8435-3.2928-2.7402-4.1836a12.1048 12.1048 0 0 0-2.1309-1.6875c.6594-1.122 1.312-2.2559 1.9649-3.3848.2077-.3615.1886-.7956-.0079-1.1191a1.1001 1.1001 0 0 0-.8515-.5332c-.5225-.0536-.9392.3128-1.0488.5449zm-.0391 8.461c.3944.5926.324 1.3306-.1563 1.6503-.4799.3197-1.188.0985-1.582-.4941-.3944-.5927-.324-1.3307.1563-1.6504.4727-.315 1.1812-.1086 1.582.4941zM7.207 13.5273c.4803.3197.5506 1.0577.1563 1.6504-.394.5926-1.1038.8138-1.584.4941-.48-.3197-.5503-1.0577-.1563-1.6504.4008-.6021 1.1087-.8106 1.584-.4941z"/></svg></span>
-    <span class="bubble" style="--x:94%;--y:94%;--size:54px" data-speed="0.16" aria-hidden="true"><svg viewBox="0 0 24 24"><title>Blender</title><path d="M12.51 13.214c.046-.8.438-1.506 1.03-2.006a3.424 3.424 0 0 1 2.212-.79c.85 0 1.631.3 2.211.79.592.5.983 1.206 1.028 2.005.045.823-.285 1.586-.865 2.153a3.389 3.389 0 0 1-2.374.938 3.393 3.393 0 0 1-2.376-.938c-.58-.567-.91-1.33-.865-2.152M7.35 14.831c.006.314.106.922.256 1.398a7.372 7.372 0 0 0 1.593 2.757 8.227 8.227 0 0 0 2.787 2.001 8.947 8.947 0 0 0 3.66.76 8.964 8.964 0 0 0 3.657-.772 8.285 8.285 0 0 0 2.785-2.01 7.428 7.428 0 0 0 1.592-2.762 6.964 6.964 0 0 0 .25-3.074 7.123 7.123 0 0 0-1.016-2.779 7.764 7.764 0 0 0-1.852-2.043h.002L13.566 2.55l-.02-.015c-.492-.378-1.319-.376-1.86.002-.547.382-.609 1.015-.123 1.415l-.001.001 3.126 2.543-9.53.01h-.013c-.788.001-1.545.518-1.695 1.172-.154.665.38 1.217 1.2 1.22V8.9l4.83-.01-8.62 6.617-.034.025c-.813.622-1.075 1.658-.563 2.313.52.667 1.625.668 2.447.004L7.414 14s-.069.52-.063.831zm12.09 1.741c-.97.988-2.326 1.548-3.795 1.55-1.47.004-2.827-.552-3.797-1.538a4.51 4.51 0 0 1-1.036-1.622 4.282 4.282 0 0 1 .282-3.519 4.702 4.702 0 0 1 1.153-1.371c.942-.768 2.141-1.183 3.396-1.185 1.256-.002 2.455.41 3.398 1.175.48.391.87.854 1.152 1.367a4.28 4.28 0 0 1 .522 1.706 4.236 4.236 0 0 1-.239 1.811 4.54 4.54 0 0 1-1.035 1.626"/></svg></span>
-  </div>
-
-  <!-- Navigation -->
-  <nav class="nav" id="top">
-    <div class="nav-inner">
-      <a class="brand" href="#top" aria-label="Beniah.games">
-        <span class="dot"></span>
-        <img src="assets/Beniah.Games.Logo.png" alt="Beniah.games">
-      </a>
-
-      <div class="nav-links">
-        <a href="#games" data-translate="nav.games">Games</a>
-        <a href="#about" data-translate="nav.about">About</a>
-        <a href="devlogs/" data-translate="nav.devlogs">Devlogs</a>
-        <a href="#faq" data-translate="nav.faq">FAQ</a>
-        <a href="#contact" data-translate="nav.contact">Contact</a>
-      </div>
-
-      <div class="nav-actions">
-        <div class="language-selector" id="language-selector">
-          <button class="language-btn" id="language-btn" aria-label="Select language">
-            <span class="flag" id="current-flag">🇺🇸</span>
-            <span id="current-lang">EN</span>
-          </button>
-          <div class="language-dropdown" id="language-dropdown">
-            <a href="#" class="language-option active" data-lang="en"><span class="flag">🇺🇸</span><span>English</span></a>
-            <a href="#" class="language-option" data-lang="nl"><span class="flag">🇳🇱</span><span>Nederlands</span></a>
-            <a href="#" class="language-option" data-lang="de"><span class="flag">🇩🇪</span><span>Deutsch</span></a>
-            <a href="#" class="language-option" data-lang="it"><span class="flag">🇮🇹</span><span>Italiano</span></a>
-            <a href="#" class="language-option" data-lang="es"><span class="flag">🇪🇸</span><span>Español</span></a>
-            <a href="#" class="language-option" data-lang="ja"><span class="flag">🇯🇵</span><span>日本語</span></a>
-          </div>
-        </div>
-
-        <div class="volume-control" id="volume-control">
-          <button class="volume-btn" id="volume-btn" aria-label="Sound"><svg class="volume-icon" id="volume-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Zm4.2 2.4a1 1 0 0 0-1.3 1.5 4.5 4.5 0 0 1 0 6.2 1 1 0 0 0 1.4 1.4 6.5 6.5 0 0 0 0-9.1Z"/></svg></button>
-          <div class="volume-slider-container" id="volume-slider-container">
-            <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="0" aria-label="Volume">
-            <div class="volume-percentage" id="volume-percentage">0%</div>
-          </div>
-        </div>
-
-        <div class="user-icon-container">
-          <button class="icon-btn" id="user-icon" aria-label="Account"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.2 0-8 2.1-8 4.7V21a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.3C20 16.1 16.2 14 12 14Z"/></svg></button>
-          <div class="user-icon-dropdown" id="user-icon-dropdown" style="display:none">
-            <a href="/user/" data-translate="nav.profile">Profile</a>
-            <a href="#" id="user-icon-logout" data-translate="nav.logout">Logout</a>
-          </div>
-        </div>
-
-        <div class="user-menu" id="auth-button" style="display:none">
-          <div class="user-dropdown">
-            <a href="/user/" data-translate="nav.profile">Profile</a>
-            <a href="#" id="logout-btn" data-translate="nav.logout">Logout</a>
-          </div>
-        </div>
-
-        <a class="nav-cta" href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.865-.608 1.249a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.077.077 0 00.084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.104c-.652-.247-1.27-.55-1.845-.899a.077.077 0 01-.007-.127c.124-.093.248-.19.366-.287a.074.074 0 01.077-.01c3.869 1.776 8.065 1.776 11.896 0a.075.075 0 01.078.009c.118.098.242.195.366.288a.077.077 0 01-.006.127 12.298 12.298 0 01-1.846.898.077.077 0 00-.04.105c.36.698.772 1.364 1.225 1.994a.076.076 0 00.084.027 19.876 19.876 0 005.994-3.03.077.077 0 00.031-.056c.5-5.177-.838-9.673-3.548-13.66a.06.06 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.947 2.419-2.157 2.419z"/></svg><span>Discord</span>
-        </a>
-
-        <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
+    <div class="language-selector" id="language-selector">
+      <button class="language-btn" id="language-btn" aria-label="Language"><span class="flag" id="current-flag">🇺🇸</span><span id="current-lang">EN</span></button>
+      <div class="language-dropdown" id="language-dropdown">
+        <a href="#" class="language-option active" data-lang="en"><span>English</span></a>
+        <a href="#" class="language-option" data-lang="nl"><span>Nederlands</span></a>
+        <a href="#" class="language-option" data-lang="de"><span>Deutsch</span></a>
+        <a href="#" class="language-option" data-lang="it"><span>Italiano</span></a>
+        <a href="#" class="language-option" data-lang="es"><span>Español</span></a>
+        <a href="#" class="language-option" data-lang="ja"><span>日本語</span></a>
       </div>
     </div>
-    <div id="scroll-progress"></div>
 
-    <div class="menu-panel" id="menu-panel">
-      <div class="menu-panel-inner">
-        <a href="#games" data-translate="nav.games">Games</a>
-        <a href="#about" data-translate="nav.about">About</a>
-        <a href="devlogs/" data-translate="nav.devlogs">Devlogs</a>
-        <a href="#faq" data-translate="nav.faq">FAQ</a>
-        <a href="#contact" data-translate="nav.contact">Contact</a>
-        <a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a>
+    <div class="volume-control" id="volume-control">
+      <button class="volume-btn" id="volume-btn" aria-label="Sound"><svg viewBox="0 0 24 24" class="volume-icon" id="volume-icon" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Zm4.2 2.4a1 1 0 0 0-1.3 1.5 4.5 4.5 0 0 1 0 6.2 1 1 0 0 0 1.4 1.4 6.5 6.5 0 0 0 0-9.1Z"/></svg></button>
+      <div class="volume-slider-container" id="volume-slider-container">
+        <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="0" aria-label="Volume">
+        <div class="volume-percentage" id="volume-percentage">0%</div>
       </div>
     </div>
-  </nav>
 
-  <!-- Hero -->
-  <header class="hero">
-    <div class="hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow" data-translate="hero.kicker">Indie game dev · Belgium</span>
-        <h1 data-translate="hero.headline">Games, art, pixels, and a dash of chaos</h1>
-        <p class="hero-lead" data-translate="hero.tagline">Welcome to my little corner of the internet, this is where I share what I've been making — from quirky game projects and devlogs, to photography, sketches, and the occasional rambling blog post. Basically, whatever I'm tinkering with.</p>
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="#games" data-translate="hero.cta1">Games</a>
-          <a class="btn" href="#about" data-translate="hero.cta2">Learn more</a>
-        </div>
-        <ul class="hero-stats">
-          <li><b>05</b><span>In development</span></li>
-          <li><b>Android · Steam</b><span>Platforms</span></li>
-          <li><b>Godot</b><span>Engine</span></li>
-        </ul>
+    <div class="user-icon-container">
+      <button id="user-icon" aria-label="Account"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.2 0-8 2.1-8 4.7V21a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.3C20 16.1 16.2 14 12 14Z"/></svg></button>
+      <div class="user-icon-dropdown" id="user-icon-dropdown" style="display:none">
+        <a href="/user/" data-translate="nav.profile">Profile</a>
+        <a href="#" id="user-icon-logout" data-translate="nav.logout">Logout</a>
       </div>
-
+    </div>
+    <div class="user-menu" id="auth-button" style="display:none">
+      <div class="user-dropdown"><a href="/user/" data-translate="nav.profile">Profile</a><a href="#" id="logout-btn" data-translate="nav.logout">Logout</a></div>
     </div>
   </header>
 
-  <main>
-    <!-- Games -->
-    <section id="games">
-      <div class="wrap">
-        <div class="sec-head">
-          <div>
-            <span class="sec-label" data-translate="section.games">In development</span>
-            <h2 data-translate="games.title">Games</h2>
-          </div>
-          <div class="sec-actions">
-          <button id="expand-all-btn" class="btn btn-sm" data-translate="games.expand_all">Expand All</button>
-          <a class="btn btn-sm" href="games/">All games <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-        </div>
-        <div class="games-grid">
-        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-7 reveal">
-          <div class="card-head">
-            <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.4c2.5 2.3 3.8 5.2 3.8 8.6l-1.3 4.4H9.5L8.2 11c0-3.4 1.3-6.3 3.8-8.6Z"/><circle cx="12" cy="9.4" r="1.7"/><path d="M9.6 15.4 7.4 19l2.7-1 1.9 3 1.9-3 2.7 1-2.2-3.6"/></svg></span>
-            <div>
-              <span class="pill">Space shooter · Incremental</span>
-              <h3><span class="glitch" data-text="0">0</span>:Nadir</h3>
-            </div>
-            <span class="chev" aria-hidden="true">⌄</span>
-          </div>
-          <div class="chips">
-            <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6"/><path d="M10.4 18.6h3.2"/></svg> Android</span>
-            <span class="chip">Multiple game modes</span>
-          </div>
-          <div class="collapsible">
-            <p class="card-desc"><strong><span class="glitch" data-text="0">0</span>:Nadir</strong><span data-translate="games.nadir.desc"> is a space shooter where every run makes the next one stronger. Blast through escalating enemy waves, bank upgrade currency, and spend it on a deep incremental upgrade tree — then pick your poison across multiple game modes, from endless survival runs to focused, high-pressure challenges.</span></p>
-          <div class="card-actions">
-            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
-            <a class="btn btn-sm no-toggle" href="#contact" data-translate="games.contact">Contact</a>
-          </div>
-          <p class="status"><span data-translate="games.early_dev">Currently in early development.</span></p>
-          </div>
-        </article>
-
-        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-5 reveal">
-          <div class="card-head">
-            <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 4.6c6.2 1.7 12.6 1.7 18.8 0"/><path d="M4.6 8.2h14.8"/><path d="M6.6 5.4V20"/><path d="M17.4 5.4V20"/><path d="M6.6 12.2h10.8"/></svg></span>
-            <div>
-              <span class="pill">Learning · Japanese</span>
-              <h3>NihonGO</h3>
-            </div>
-            <span class="chev" aria-hidden="true">⌄</span>
-          </div>
-          <div class="chips">
-            <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6"/><path d="M10.4 18.6h3.2"/></svg> Android</span>
-            <span class="chip">Hiragana · Katakana · Kanji</span>
-          </div>
-          <div class="collapsible">
-            <p class="card-desc"><strong>NihonGO</strong><span data-translate="games.nihongo.desc"> is a Japanese learning app built like a game. Drill hiragana, katakana, and kanji in bite-sized lessons, lock words in with spaced-repetition reviews, and build real vocabulary — with streaks, levels, and progress tracking to keep you showing up every day.</span></p>
-          <div class="card-actions">
-            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
-            <a class="btn btn-sm no-toggle" href="#contact" data-translate="games.contact">Contact</a>
-          </div>
-          <p class="status"><span data-translate="games.early_dev">Currently in early development.</span></p>
-          </div>
-        </article>
-
-        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-5 reveal">
-          <div class="card-head">
-            <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.4l2.25 4.75 5.15.72-3.75 3.6.92 5.14L12 15.2l-4.57 2.41.92-5.14L4.6 8.87l5.15-.72z"/><path d="M19.6 3.6v2.2M18.5 4.7h2.2M4 16.4v1.8M3.1 17.3h1.8"/></svg></span>
-            <div>
-              <span class="pill">Idle clicker · Parody</span>
-              <h3>MCS</h3>
-            </div>
-            <span class="chev" aria-hidden="true">⌄</span>
-          </div>
-          <div class="chips">
-            <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6"/><path d="M10.4 18.6h3.2"/></svg> Android</span>
-            <span class="chip">80+ NPCs</span>
-            <span class="chip">Hidden mini-games</span>
-          </div>
-          <div class="collapsible">
-            <p class="card-desc"><strong>MCS</strong><span data-translate="games.mcs.desc"> (Main Character Syndrome) is an idle clicker that parodies social media. You're the one real person on a map full of self-aware NPCs: tap, post, and watch your hearts and followers climb as a whole fake internet opens up around you — parody networks, a bank that loses your money on purpose, and a small hidden game inside nearly every app.</span></p>
-          <div class="card-actions">
-            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
-            <a class="btn btn-sm no-toggle" href="#contact" data-translate="games.contact">Contact</a>
-          </div>
-          <p class="status"><span data-translate="games.early_dev">Currently in early development.</span></p>
-          </div>
-        </article>
-
-        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-7 reveal">
-          <div class="card-head">
-            <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.2" y="3.2" width="7.4" height="7.4" rx="1.6"/><rect x="13.4" y="3.2" width="7.4" height="7.4" rx="1.6"/><rect x="3.2" y="13.4" width="7.4" height="7.4" rx="1.6"/><path d="M14.6 19.4l1.8-4.4 1.2 2.1 2.6-.9-2 5"/></svg></span>
-            <div>
-              <span class="pill">Puzzle · Arcade</span>
-              <h3>Block Crusher</h3>
-            </div>
-            <span class="chev" aria-hidden="true">⌄</span>
-          </div>
-          <div class="chips">
-            <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.6"/><path d="M10.4 18.6h3.2"/></svg> Android</span>
-            <span class="chip">Free with ads</span>
-            <span class="chip">Power-ups &amp; cosmetics</span>
-          </div>
-          <div class="collapsible">
-            <p class="card-desc"><strong>Block Crusher</strong><span data-translate="games.blockcrusher.desc"> is a block-smashing arcade puzzler for Android. Clear the board, push for a new best score, and spend the coins you earn on power-ups and cosmetics — no accounts, nothing to buy, and your progress stays on your phone.</span></p>
-          <div class="card-actions">
-            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 2.2a1 1 0 0 0-.6.93v17.74a1 1 0 0 0 1.53.85l14.2-8.87a1 1 0 0 0 0-1.7L5.53 2.3a1 1 0 0 0-.93-.1Z"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Google Play</span></span></a>
-            <a class="btn btn-sm no-toggle" href="privacy/block-crusher/" data-translate="games.privacy">Privacy policy</a>
-          </div>
-          </div>
-        </article>
-
-        <article role="button" tabindex="0" aria-expanded="false" class="card card-span-12 reveal">
-          <div class="card-head">
-            <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12h2.6M19 12h2.6M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9"/></svg></span>
-            <div>
-              <span class="pill">Idle incremental · Galaxy</span>
-              <h3>Sunkeeper</h3>
-            </div>
-            <span class="chev" aria-hidden="true">⌄</span>
-          </div>
-          <div class="chips">
-            <span class="chip chip-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4" width="18.8" height="13" rx="2.2"/><path d="M8.5 21h7M12 17v4"/></svg> Steam</span>
-            <span class="chip">Release Q1 2027</span>
-          </div>
-          <div class="collapsible">
-            <p class="card-desc" data-translate="games.sunkeeper.desc">Tend a newborn star in the corner of your desktop. Gather light, raise worlds and guide their people from the first fire to the stars. Collapse your sun in a supernova, decipher a lost alien alphabet, and, at the very end, tear open a black hole into the multiverse.</p>
-          <div class="card-actions">
-            <a class="btn-store no-toggle" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4" width="18.8" height="13" rx="2.2"/><path d="M8.5 21h7M12 17v4"/></svg><span class="bs-text"><span class="bs-top" data-translate="games.soon_label">Coming soon to</span><span class="bs-main">Steam</span></span></a>
-            <a class="btn btn-sm no-toggle" href="#contact" data-translate="games.contact">Contact</a>
-          </div>
-          <p class="status"><span data-translate="games.early_dev">Currently in early development.</span></p>
-          </div>
-        </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- About -->
-    <section id="about">
-      <div class="wrap">
-        <div class="sec-head">
-          <div>
-            <span class="sec-label" data-translate="section.about">Who's behind it</span>
-            <h2 data-translate="about.title">About</h2>
-          </div>
-        </div>
-        <div class="about-grid">
-          <div class="about-copy reveal">
-            <p><span data-translate="about.p1_1">Hi, I'm </span><strong>Beniah Gepts</strong><span data-translate="about.p1_2">, an indie developer from Belgium.  
-      I'm relatively new to the game development scene, but I've been passionate about games for over 30 years.  
-      I grew up playing and studying them, and now I'm dedicated to creating my own worlds.</span></p>
-            <p data-translate="about.p2">My goal is simple: to make games of great quality that focus on one thing above all else — being fun.  
-      Whether it's quirky idle projects or retro-inspired adventures, I want to craft experiences that bring players joy and a smile.</p>
-          </div>
-          <aside class="panel reveal">
-            <ul class="facts">
-              <li><span class="k">Based in</span><span class="v">Belgium</span></li>
-              <li><span class="k">Engine</span><span class="v">Godot</span></li>
-              <li><span class="k">Art</span><span class="v">Krita · Aseprite · Blender</span></li>
-              <li><span class="k">Platform</span><span class="v">Android · Steam</span></li>
-              <li><span class="k">Projects</span><span class="v">5 in development</span></li>
-            </ul>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <!-- Devlog -->
-    <section id="devlog">
-      <div class="wrap">
-        <div class="sec-head">
-          <div>
-            <span class="sec-label" data-translate="section.devlog">Latest update</span>
-            <h2 data-translate="devlog.title">Devlog</h2>
-            <p class="sec-note" data-translate="devlog.lead">Stay up to date with the latest development progress and insights.</p>
-          </div>
-          <a class="btn btn-sm" href="devlogs/" data-translate="devlog.view_all">View All Devlogs</a>
-        </div>
-        <div id="latest-devlog-container" class="reveal">
-          <div class="devlog-empty"><span data-translate="devlog.loading">Loading latest update...</span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section id="faq">
-      <div class="wrap">
-        <div class="sec-head">
-          <div>
-            <span class="sec-label" data-translate="section.faq">Good to know</span>
-            <h2 data-translate="faq.title">FAQ</h2>
-            <p class="sec-note" data-translate="faq.lead">Questions you might be thinking. If you don't see yours, ping me!</p>
-          </div>
-        </div>
-        <div class="faq">
-        <details>
-          <summary data-translate="faq.q1">What tools do you use?</summary>
-          <div class="answer" data-translate="faq.a1">I build with <strong>Godot</strong> for the engine. Art & pixels with <strong>Krita</strong>, <strong>Aseprite</strong>,
-            <strong>PixelOver</strong>, and <strong>SpriteMancer</strong>. 3D and renders in <strong>Blender</strong>.</div>
-        </details>
-        <details>
-          <summary data-translate="faq.q2">Which platforms will your games be on?</summary>
-          <div class="answer" data-translate="faq.a2"><strong>Android first</strong> for the mobile games, which all head to Google Play.
-            <strong>Sunkeeper</strong> is the exception: it is being built for PC and is coming to Steam in Q1 2027.
-            Console ports are something I'll look at later, once the games are stable and the porting path makes sense.</div>
-        </details>
-        <details>
-          <summary data-translate="faq.q3">Where are save files stored?</summary>
-          <div class="answer" data-translate="faq.a3">On your device. Android apps keep their save data in the app's own private storage, so it stays with the install
-            — and it goes away if you uninstall. Cloud saves are on the list, so your progress can follow you between devices.</div>
-        </details>
-        <details>
-          <summary data-translate="faq.q4">Can I stream or make videos of your games?</summary>
-          <div class="answer" data-translate="faq.a4">Absolutely! You're welcome to record, stream, or monetize content featuring my games.
-            If you do, feel free to share it in the Discord — I'd love to check it out!</div>
-        </details>
-        <details>
-          <summary data-translate="faq.q5">I'm having an issue with a game — how can I get help?</summary>
-          <div class="answer" data-translate="faq.a5">Please reach out at <a href="mailto:contact@beniah.games" style="color:var(--link)">contact@beniah.games</a>
-            or post in the Discord server.
-            To help me fix it faster, include:
-            <ul>
-              <li>Your device + Android version (e.g., Pixel 7, Android 14)</li>
-              <li>Game version/build date</li>
-              <li>Steps to reproduce (what you did right before it happened)</li>
-              <li>Screenshots or a short clip if possible</li>
-              <li>Any error text or logs</li>
-            </ul></div>
-        </details>
-        <details>
-          <summary data-translate="faq.q6">Are all games on the site being actively worked on?</summary>
-          <div class="answer" data-translate="faq.a6">Not at the same time. Whenever I come up with a feature idea that doesn't quite fit my current project, I build a quick prototype to test it out. If it turns out fun, I add it to my list of projects. Once the prototype phase is done, I usually put it on hold and return to my main project. Every game listed on this site is something I believe in and plan to eventually release in a playable state.</div>
-        </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section id="contact">
-      <div class="wrap">
-        <div class="sec-head">
-          <div>
-            <span class="sec-label" data-translate="section.contact">Get in touch</span>
-            <h2 data-translate="contact.title">Contact</h2>
-            <p class="sec-note" data-translate="contact.lead">Say hi, ask a question, or talk shop.</p>
-          </div>
-        </div>
-        <div class="contact-grid">
-          <form id="contact-form" class="panel reveal">
-            <div class="field-row">
-              <div class="field">
-                <label for="contact-name" data-translate="contact.form.name">Name</label>
-                <input type="text" id="contact-name" name="name" required data-translate-placeholder="contact.form.name_placeholder">
-              </div>
-              <div class="field">
-                <label for="contact-email" data-translate="contact.form.email">Your Email</label>
-                <input type="email" id="contact-email" name="email" required data-translate-placeholder="contact.form.email_placeholder">
-              </div>
-            </div>
-            <div class="field">
-              <label for="contact-subject" data-translate="contact.form.subject">Subject</label>
-              <input type="text" id="contact-subject" name="subject" required data-translate-placeholder="contact.form.subject_placeholder">
-            </div>
-            <div class="field">
-              <label for="contact-message" data-translate="contact.form.message">Message</label>
-              <textarea id="contact-message" name="message" rows="5" required data-translate-placeholder="contact.form.message_placeholder"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary" data-translate="contact.form.send">Send Message</button>
-            <div id="form-status" class="form-status" style="display:none"></div>
-          </form>
-
-          <aside class="panel contact-side reveal">
-            <p data-translate="contact.email">Email: <a href="mailto:contact@beniah.games">contact@beniah.games</a></p>
-            <p style="margin-top:.9rem" data-translate="contact.discord_label">Discord:</p>
-            <a class="btn btn-primary" href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.865-.608 1.249a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.077.077 0 00.084-.027c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.104c-.652-.247-1.27-.55-1.845-.899a.077.077 0 01-.007-.127c.124-.093.248-.19.366-.287a.074.074 0 01.077-.01c3.869 1.776 8.065 1.776 11.896 0a.075.075 0 01.078.009c.118.098.242.195.366.288a.077.077 0 01-.006.127 12.298 12.298 0 01-1.846.898.077.077 0 00-.04.105c.36.698.772 1.364 1.225 1.994a.076.076 0 00.084.027 19.876 19.876 0 005.994-3.03.077.077 0 00.031-.056c.5-5.177-.838-9.673-3.548-13.66a.06.06 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.947 2.419-2.157 2.419z"/></svg><span data-translate="contact.discord_link">Join the server</span>
-            </a>
-          </aside>
-        </div>
-      </div>
-    </section>
+  <main class="crt">
+    <div class="screen">
+      <div class="out" id="out" role="log" aria-live="polite"></div>
+      <form class="prompt" id="prompt" autocomplete="off" onsubmit="return false">
+        <span class="sign">&gt;</span>
+        <label class="sr-only" for="cmdline">Terminal command</label>
+        <input id="cmdline" name="cmdline" type="text" spellcheck="false" autocapitalize="characters"
+               placeholder="type a command — try HELP">
+      </form>
+    </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <img src="assets/Beniah.Games.Logo.png" alt="Beniah.games">
-        <p data-translate="footer.tagline">Indie games made in Belgium — building for Android and Steam.</p>
+  <!-- the contact form lives here until CONTACT asks for it -->
+  <template id="contact-template">
+    <form id="contact-form">
+      <div class="row2">
+        <div class="field">
+          <label for="contact-name" data-translate="contact.form.name">Name</label>
+          <input type="text" id="contact-name" name="name" required>
+        </div>
+        <div class="field">
+          <label for="contact-email" data-translate="contact.form.email">Your Email</label>
+          <input type="email" id="contact-email" name="email" required>
+        </div>
       </div>
-      <div class="footer-col">
-        <h4 data-translate="footer.explore">Explore</h4>
-        <ul>
-          <li><a href="#games" data-translate="nav.games">Games</a></li>
-          <li><a href="#about" data-translate="nav.about">About</a></li>
-          <li><a href="devlogs/" data-translate="nav.devlogs">Devlogs</a></li>
-          <li><a href="#faq" data-translate="nav.faq">FAQ</a></li>
-          <li><a href="privacy/" data-translate="footer.privacy">Privacy</a></li>
-        </ul>
+      <div class="field">
+        <label for="contact-subject" data-translate="contact.form.subject">Subject</label>
+        <input type="text" id="contact-subject" name="subject" required>
       </div>
-      <div class="footer-col">
-        <h4 data-translate="footer.connect">Connect</h4>
-        <ul>
-          <li><a href="#contact" data-translate="nav.contact">Contact</a></li>
-          <li><a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">Discord</a></li>
-          <li><a href="mailto:contact@beniah.games">contact@beniah.games</a></li>
-        </ul>
+      <div class="field">
+        <label for="contact-message" data-translate="contact.form.message">Message</label>
+        <textarea id="contact-message" name="message" rows="5" required></textarea>
       </div>
-    </div>
-    <div class="footer-bottom">
-      <span data-translate="footer.copyright">© 2025 Beniah Gepts.</span>
-      <span>Made with Godot, Krita and too much coffee.</span>
-    </div>
-  </footer>
+      <button type="submit" class="btn" data-translate="contact.form.send">Send Message</button>
+      <div id="form-status" class="form-status" style="display:none"></div>
+    </form>
+  </template>
 
-  <button id="back-to-top" aria-label="Back to top" data-translate="ui.back_to_top">↑</button>
+  <div id="signup-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="login-tab" data-translate="login.title">Login</button>
+        <button class="tab-btn" id="signup-tab" data-translate="signup.title">Sign Up</button>
+      </div>
+      <div id="login-form-container" class="form-container active">
+        <form id="login-form">
+          <div class="form-group"><label for="login-email" data-translate="login.email">Email:</label><input type="email" id="login-email" name="email" required></div>
+          <div class="form-group"><label for="login-password" data-translate="login.password">Password:</label><input type="password" id="login-password" name="password" required></div>
+          <button type="submit" data-translate="login.submit">Login</button>
+          <div id="login-message" class="message"></div>
+        </form>
+      </div>
+      <div id="signup-form-container" class="form-container">
+        <form id="signup-form">
+          <div class="form-group"><label for="email" data-translate="signup.email">Email:</label><input type="email" id="email" name="email" required></div>
+          <div class="form-group"><label for="password" data-translate="signup.password">Password:</label><input type="password" id="password" name="password" required></div>
+          <div class="form-group"><label for="confirm-password" data-translate="signup.confirm_password">Confirm Password:</label><input type="password" id="confirm-password" name="confirm-password" required></div>
+          <div class="captcha-container"><div class="h-captcha" data-sitekey="046c6cd4-135a-4bba-8fa6-30403bc05c96"></div></div>
+          <button type="submit" data-translate="signup.submit">Sign Up</button>
+          <div id="signup-message" class="message"></div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <script>
+    window.BG_GAMES = [
+      {
+            "name": "0:Nadir",
+            "short": "0:NADIR",
+            "genre": "Space shooter · Incremental",
+            "platform": "ANDROID",
+            "status": "In early development",
+            "key": "games.nadir.desc",
+            "desc": "is a space shooter where every run makes the next one stronger. Blast through escalating enemy waves, bank upgrade currency, and spend it on a deep incremental upgrade tree — then pick your poison across multiple game modes, from endless survival runs to focused, high-pressure challenges.",
+            "link": "",
+            "linkLabel": "",
+            "sticker": "",
+            "lead": "0:Nadir"
+      },
+      {
+            "name": "NihonGO",
+            "short": "NihonGO",
+            "genre": "Learning · Japanese",
+            "platform": "ANDROID",
+            "status": "In early development",
+            "key": "games.nihongo.desc",
+            "desc": "is a Japanese learning app built like a game. Drill hiragana, katakana, and kanji in bite-sized lessons, lock words in with spaced-repetition reviews, and build real vocabulary — with streaks, levels, and progress tracking to keep you showing up every day.",
+            "link": "",
+            "linkLabel": "",
+            "sticker": "",
+            "lead": "NihonGO"
+      },
+      {
+            "name": "MCS",
+            "short": "MCS",
+            "genre": "Idle clicker · Parody",
+            "platform": "ANDROID",
+            "status": "In early development",
+            "key": "games.mcs.desc",
+            "desc": "(Main Character Syndrome) is an idle clicker that parodies social media. You're the one real person on a map full of self-aware NPCs: tap, post, and watch your hearts and followers climb as a whole fake internet opens up around you — parody networks, a bank that loses your money on purpose, and a small hidden game inside nearly every app.",
+            "link": "",
+            "linkLabel": "",
+            "sticker": "",
+            "lead": "MCS"
+      },
+      {
+            "name": "Block Crusher",
+            "short": "BLOCK\nCRUSHER",
+            "genre": "Puzzle · Arcade",
+            "platform": "ANDROID",
+            "status": "Coming to Google Play",
+            "key": "games.blockcrusher.desc",
+            "desc": "is a block-smashing arcade puzzler for Android. Clear the board, push for a new best score, and spend the coins you earn on power-ups and cosmetics — no accounts, nothing to buy, and your progress stays on your phone.",
+            "link": "./privacy/block-crusher/",
+            "linkLabel": "PRIVACY POLICY →",
+            "sticker": "",
+            "lead": "Block Crusher"
+      },
+      {
+            "name": "Sunkeeper",
+            "short": "SUN\nKEEPER",
+            "genre": "Idle incremental · Galaxy",
+            "platform": "STEAM",
+            "status": "Release Q1 2027",
+            "key": "games.sunkeeper.desc",
+            "desc": "Tend a newborn star in the corner of your desktop. Gather light, raise worlds and guide their people from the first fire to the stars. Collapse your sun in a supernova, decipher a lost alien alphabet, and, at the very end, tear open a black hole into the multiverse.",
+            "link": "",
+            "linkLabel": "",
+            "sticker": "",
+            "lead": ""
+      }
+];
+    window.BG_COPY = {
+      "about1": ", an indie developer from Belgium. I'm relatively new to the game development scene, but I've been passionate about games for over 30 years. I grew up playing and studying them, and now I'm dedicated to creating my own worlds.",
+      "about2": "My goal is simple: to make games of great quality that focus on one thing above all else — being fun. Whether it's quirky idle projects or retro-inspired adventures, I want to craft experiences that bring players joy and a smile.",
+      "faq": [
+            {
+                  "qk": "faq.q1",
+                  "q": "What tools do you use?",
+                  "ak": "faq.a1",
+                  "a": "I build with <strong>Godot</strong> for the engine. Art & pixels with <strong>Krita</strong>, <strong>Aseprite</strong>, <strong>PixelOver</strong>, and <strong>SpriteMancer</strong>. 3D and renders in <strong>Blender</strong>."
+            },
+            {
+                  "qk": "faq.q2",
+                  "q": "Which platforms will your games be on?",
+                  "ak": "faq.a2",
+                  "a": "<strong>Android first</strong> for the mobile games, which all head to Google Play. <strong>Sunkeeper</strong> is the exception: it is being built for PC and is coming to Steam in Q1 2027. Console ports are something I'll look at later, once the games are stable and the porting path makes sense."
+            },
+            {
+                  "qk": "faq.q3",
+                  "q": "Where are save files stored?",
+                  "ak": "faq.a3",
+                  "a": "On your device. Android apps keep their save data in the app's own private storage, so it stays with the install — and it goes away if you uninstall. Cloud saves are on the list, so your progress can follow you between devices."
+            },
+            {
+                  "qk": "faq.q4",
+                  "q": "Can I stream or make videos of your games?",
+                  "ak": "faq.a4",
+                  "a": "Absolutely! You're welcome to record, stream, or monetize content featuring my games. If you do, feel free to share it in the Discord — I'd love to check it out!"
+            },
+            {
+                  "qk": "faq.q5",
+                  "q": "I'm having an issue with a game — how can I get help?",
+                  "ak": "faq.a5",
+                  "a": "Please reach out at <a href=\"mailto:contact@beniah.games\" style=\"color:var(--link)\">contact@beniah.games</a> or post in the Discord server. To help me fix it faster, include: <ul> <li>Your device + Android version (e.g., Pixel 7, Android 14)</li> <li>Game version/build date</li> <li>Steps to reproduce (what you did right before it happened)</li> <li>Screenshots or a short clip if possible</li> <li>Any error text or logs</li> </ul>"
+            },
+            {
+                  "qk": "faq.q6",
+                  "q": "Are all games on the site being actively worked on?",
+                  "ak": "faq.a6",
+                  "a": "Not at the same time. Whenever I come up with a feature idea that doesn't quite fit my current project, I build a quick prototype to test it out. If it turns out fun, I add it to my list of projects. Once the prototype phase is done, I usually put it on hold and return to my main project. Every game listed on this site is something I believe in and plan to eventually release in a playable state."
+            }
+      ]
+};
+
     // Translation data
     const translations = {
       en: {
@@ -1100,89 +875,6 @@
       }
     };
 
-    // Scroll-based parallax (movement only on scroll) - optimized for mobile
-    (() => {
-      const back = document.querySelector('.layer-back');
-      const mid = document.querySelector('.layer-mid');
-      const front = document.querySelector('.layer-front');
-      
-      let ticking = false;
-      
-      const apply = () => {
-        const y = window.scrollY || window.pageYOffset || 0;
-        
-        // Use transform3d for better mobile performance
-        // Adjusted values to work with larger layer sizes and prevent gaps
-        back.style.transform = `translate3d(0, ${y * 0.05}px, 0)`;   // far (slower)
-        mid.style.transform = `translate3d(0, ${y * 0.15}px, 0)`;    // mid 
-        front.style.transform = `translate3d(0, ${y * 0.25}px, 0)`;  // near
-        
-        ticking = false;
-      };
-      
-      const requestTick = () => {
-        if (!ticking) {
-          requestAnimationFrame(apply);
-          ticking = true;
-        }
-      };
-      
-      // Initial application
-      apply();
-      
-      // Handle scroll events with throttling for better performance
-      window.addEventListener('scroll', requestTick, { passive: true });
-      
-      // Handle touch events for mobile devices
-      let touchStartY = 0;
-      let isScrolling = false;
-      
-      window.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-        isScrolling = false;
-      }, { passive: true });
-      
-      window.addEventListener('touchmove', (e) => {
-        if (!isScrolling) {
-          isScrolling = true;
-          requestTick();
-        }
-      }, { passive: true });
-      
-      // Handle orientation changes on mobile
-      window.addEventListener('orientationchange', () => {
-        setTimeout(apply, 100);
-      });
-    })();
-
-    // Reveal on scroll (with fallback so cards never stay hidden)
-    document.addEventListener('DOMContentLoaded', () => {
-      const els = document.querySelectorAll('.reveal');
-
-      if (!('IntersectionObserver' in window)) {
-        els.forEach(el => el.classList.add('revealed'));
-        return;
-      }
-
-      let anyRevealed = false;
-      const obs = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            e.target.classList.add('revealed');
-            obs.unobserve(e.target);
-            anyRevealed = true;
-          }
-        });
-      }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
-
-      els.forEach(el => obs.observe(el));
-
-      // Safety: if nothing reveals quickly, just show them (prevents "empty grid")
-      setTimeout(() => {
-        if (!anyRevealed) els.forEach(el => el.classList.add('revealed'));
-      }, 600);
-    });
-
     // Audio Manager System
     (() => {
       let audioContext;
@@ -1435,63 +1127,6 @@
       };
     })();
 
-
-
-
-
-    // Hamburger menu
-    (() => {
-      const hamburger = document.getElementById('hamburger');
-      const panel = document.getElementById('menu-panel');
-      
-      hamburger.addEventListener('click', async () => {
-        const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
-        
-        // Play sound effect when opening menu
-        if (window.audioManager && !isOpen) {
-          await window.audioManager.playSound('holographicOpen');
-        }
-        
-        hamburger.setAttribute('aria-expanded', !isOpen);
-        panel.classList.toggle('open', !isOpen);
-      });
-
-      // Close menu when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!hamburger.contains(e.target) && !panel.contains(e.target)) {
-          hamburger.setAttribute('aria-expanded', 'false');
-          panel.classList.remove('open');
-        }
-      });
-
-      // Close menu when pressing escape
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          hamburger.setAttribute('aria-expanded', 'false');
-          panel.classList.remove('open');
-        }
-      });
-    })();
-
-    // Back to top button
-    (() => {
-      const backToTop = document.getElementById('back-to-top');
-      
-      const toggleVisibility = () => {
-        if (window.scrollY > 300) {
-          backToTop.classList.add('show');
-        } else {
-          backToTop.classList.remove('show');
-        }
-      };
-
-      window.addEventListener('scroll', toggleVisibility, { passive: true });
-      
-      backToTop.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    })();
-
     // Language switching functionality
     (() => {
       const languageSelector = document.querySelector('#language-selector');
@@ -1576,6 +1211,9 @@
       // Initialize with current language
       updateTranslations(currentLanguage);
       updateLanguageButton(currentLanguage);
+
+      // screens are built after load, so the terminal re-applies this per render
+      window.applyI18n = () => updateTranslations(currentLanguage);
       
       // Toggle dropdown
       languageButton.addEventListener('click', (e) => {
@@ -1647,8 +1285,6 @@
       });
     })();
 
-
-
     // Contact Form
     (() => {
       const form = document.getElementById('contact-form');
@@ -1702,48 +1338,6 @@
         submitBtn.textContent = originalText;
       });
     })();
-
-
-    // Load latest devlog for main page
-    async function loadLatestDevlog() {
-      const container = document.getElementById('latest-devlog-container');
-      if (!container) return;
-
-      try {
-        const response = await fetch('./devlogs/devlogs.json?v=' + Date.now());
-        const data = await response.json();
-        
-        if (!data.devlogs || data.devlogs.length === 0) {
-          container.innerHTML = `<p data-translate="devlog.no_entries">No devlog entries available yet.</p>`;
-          return;
-        }
-
-        // Sort by date (newest first) and get the latest
-        const sortedDevlogs = data.devlogs.sort((a, b) => new Date(b.date) - new Date(a.date));
-        const latest = sortedDevlogs[0];
-
-        // Create preview card
-        const gameInfo = data.games[latest.game] || { name: latest.game, description: 'Game development updates' };
-        
-        container.innerHTML = `
-          <div class="devlog-card-preview">
-            <div class="devlog-meta">
-              <span class="devlog-game">${gameInfo.name}</span>
-              <span class="devlog-date">${new Date(latest.date).toLocaleDateString()}</span>
-            </div>
-            <h3 class="devlog-title">${latest.title}</h3>
-            <p class="devlog-excerpt">${latest.excerpt}</p>
-            <a href="./devlogs/${latest.id}.html" class="devlog-read-more">Read More →</a>
-          </div>
-        `;
-      } catch (error) {
-        console.error('Failed to load latest devlog:', error);
-        container.innerHTML = `<p data-translate="devlog.no_entries">No devlog entries available yet.</p>`;
-      }
-    }
-
-    // Load latest devlog when page loads
-    document.addEventListener('DOMContentLoaded', loadLatestDevlog);
 
     // Tab switching functionality for auth modal
     function showForm(formType) {
@@ -2257,241 +1851,291 @@
         }
       });
     });
-    // Scroll progress bar + active section in the nav
+
+    // ============================================================
+    // Terminal engine
+    // ============================================================
     (() => {
-      const bar = document.getElementById('scroll-progress');
-      const links = [...document.querySelectorAll('.nav-links > a[href^="#"]')];
-      const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-      let ticking = false;
+      const out = document.getElementById('out');
+      const input = document.getElementById('cmdline');
+      const screen = document.querySelector('.screen');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      const update = () => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        const y = window.scrollY || window.pageYOffset || 0;
-        if (bar) bar.style.width = (max > 0 ? Math.min(100, (y / max) * 100) : 0) + '%';
+      const GAMES = window.BG_GAMES;
+      const COPY = window.BG_COPY;
 
-        let current = null;
-        sections.forEach(sec => { if (sec.getBoundingClientRect().top <= 140) current = sec; });
-        links.forEach(a => a.classList.toggle('is-active', !!current && a.getAttribute('href') === '#' + current.id));
-        ticking = false;
+      let typing = null;          // cancels an in-flight type-out
+      const history = [];
+      let historyAt = -1;
+
+      const el = (tag, cls, text) => {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
       };
-      const tick = () => { if (!ticking) { requestAnimationFrame(update); ticking = true; } };
+      const put = node => { out.appendChild(node); out.scrollTop = out.scrollHeight; return node; };
+      const line = (text = '', cls = 'l') => put(el('p', cls, text));
+      const gap = () => put(el('div', 'gap'));
+      const html = (markup, cls) => { const n = el('div', cls); n.innerHTML = markup; return put(n); };
 
-      update();
-      window.addEventListener('scroll', tick, { passive: true });
-      window.addEventListener('resize', tick);
-    })();
-
-
-    // Close the mobile menu after following a link
-    (() => {
-      const panel = document.getElementById('menu-panel');
-      const burger = document.getElementById('hamburger');
-      if (!panel || !burger) return;
-      panel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        panel.classList.remove('open');
-        burger.setAttribute('aria-expanded', 'false');
-      }));
-    })();
-
-    // Collapsible cards (all)
-    (() => {
-      const cards = document.querySelectorAll('#games .card');
-      cards.forEach((card, index) => {
-        const collapsibleContent = card.querySelector('.collapsible');
-        if (!collapsibleContent) return;
-
-        // prevent toggling when clicking links/buttons inside
-        card.querySelectorAll('.no-toggle, .no-toggle *')
-            .forEach(el => el.addEventListener('click', e => e.stopPropagation()));
-
-        function toggleCard(shouldExpand) {
-          // Only affect this specific card - let CSS handle the animation
-          card.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
-          
-          // Also add/remove a class for additional specificity
-          if (shouldExpand) {
-            card.classList.add('expanded');
-          } else {
-            card.classList.remove('expanded');
-          }
-        }
-
-        card.addEventListener('click', async (e) => {
-          // Prevent event bubbling
-          e.stopPropagation();
-          
-          // Only toggle this specific card
-          const isCurrentlyExpanded = card.getAttribute('aria-expanded') === 'true';
-          const willExpand = !isCurrentlyExpanded;
-          
-          // Play appropriate sound effect
-          if (window.audioManager) {
-            if (willExpand) {
-              await window.audioManager.playSound('gadgetOpen');
-            } else {
-              await window.audioManager.playSound('gadgetClose');
-            }
-          }
-          
-          toggleCard(willExpand);
+      // type a line out one character at a time; resolves when done
+      function type(text, cls = 'l', speed = 9) {
+        const node = put(el('p', cls));
+        if (reduced) { node.textContent = text; return Promise.resolve(node); }
+        return new Promise(resolve => {
+          let i = 0;
+          const cursor = el('span', 'cursor');
+          node.appendChild(cursor);
+          const tick = () => {
+            if (typing !== token) return resolve(node);
+            i += Math.max(1, Math.round(text.length / 90));
+            cursor.remove();
+            node.textContent = text.slice(0, i);
+            if (i < text.length) { node.appendChild(cursor); out.scrollTop = out.scrollHeight; setTimeout(tick, speed); }
+            else resolve(node);
+          };
+          const token = typing;
+          setTimeout(tick, speed);
         });
+      }
 
-        card.addEventListener('keydown', async (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Only toggle this specific card
-            const isCurrentlyExpanded = card.getAttribute('aria-expanded') === 'true';
-            const willExpand = !isCurrentlyExpanded;
-            
-            // Play appropriate sound effect
-            if (window.audioManager) {
-              if (willExpand) {
-                await window.audioManager.playSound('gadgetOpen');
-              } else {
-                await window.audioManager.playSound('gadgetClose');
-              }
-            }
-            
-            toggleCard(willExpand);
-          }
+      const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+      function commandRow(list) {
+        const row = el('div', 'cmds');
+        list.forEach(name => {
+          const b = el('button', 'cmd', name);
+          b.type = 'button';
+          b.addEventListener('click', () => run(name));
+          row.appendChild(b);
         });
-      });
-    })();
+        return put(row);
+      }
 
-    // Expand All Button
-    (() => {
-      const expandAllBtn = document.getElementById('expand-all-btn');
-      const gameCards = document.querySelectorAll('#games .card');
-      
-      if (!expandAllBtn || !gameCards.length) return;
-      
-      let allExpanded = false;
-      
-      const updateButtonText = () => {
-        const expandedCards = document.querySelectorAll('#games .card[aria-expanded="true"]');
-        allExpanded = expandedCards.length === gameCards.length;
-        
-        // Update button text based on current state
-        if (allExpanded) {
-          expandAllBtn.setAttribute('data-translate', 'games.collapse_all');
-          expandAllBtn.textContent = 'Collapse All';
-        } else {
-          expandAllBtn.setAttribute('data-translate', 'games.expand_all');
-          expandAllBtn.textContent = 'Expand All';
+      function clear() { typing = Symbol('run'); out.innerHTML = ''; }
+
+      // ---------------------------------------------------------- screens
+      async function home() {
+        clear();
+        await type('BENIAH.GAMES TERMINAL', 'ttl');
+        line('-'.repeat(44), 'l rule');
+        gap();
+        const dl = el('dl', 'kv');
+        [['USER', 'BENIAH GEPTS'], ['LOCATION', 'BELGIUM'], ['CLASS', 'INDIE DEVELOPER']]
+          .forEach(([k, v]) => { dl.appendChild(el('dt', null, k + ':')); dl.appendChild(el('dd', null, v)); });
+        put(dl);
+        gap();
+        const dl2 = el('dl', 'kv');
+        dl2.appendChild(el('dt', null, 'PLAYING GAMES:')); dl2.appendChild(el('dd', null, '30+ YEARS'));
+        dl2.appendChild(el('dt', null, 'MAKING GAMES:'));
+        dl2.appendChild(el('dd', 'bar-meter', '█'.repeat(7) + '░'.repeat(3)));
+        dl2.appendChild(el('dt', null, 'PROJECTS:')); dl2.appendChild(el('dd', null, GAMES.length + ' IN DEVELOPMENT'));
+        dl2.appendChild(el('dt', null, 'SHIPPING TO:')); dl2.appendChild(el('dd', null, 'ANDROID · STEAM'));
+        put(dl2);
+        gap();
+        commandRow(['ABOUT', 'PROJECTS', 'DEVLOG', 'FAQ', 'CONTACT']);
+        line('type a command, or HELP for everything this thing knows', 'l faint');
+      }
+
+      async function about() {
+        clear();
+        await type('> ABOUT', 'l hl');
+        gap();
+        html('<p class="l">Hi, I\'m <span class="hl">Beniah Gepts</span>' + COPY.about1 + '</p>');
+        gap();
+        html('<p class="l">' + COPY.about2 + '</p>');
+        gap();
+        const dl = el('dl', 'kv');
+        [['BASED IN', 'Belgium'], ['ENGINE', 'Godot'], ['ART', 'Krita · Aseprite · Blender'],
+         ['PLATFORMS', 'Android · Steam'], ['PROJECTS', GAMES.length + ' in development']]
+          .forEach(([k, v]) => { dl.appendChild(el('dt', null, k + ':')); dl.appendChild(el('dd', null, v)); });
+        put(dl);
+        gap();
+        commandRow(['PROJECTS', 'CONTACT', 'HOME']);
+      }
+
+      async function projects() {
+        clear();
+        await type('> PROJECTS  —  ' + GAMES.length + ' cartridges loaded', 'l hl');
+        line('click a cartridge, or type its number, for the full dossier', 'l faint');
+        const rack = el('div', 'rack');
+        GAMES.forEach((g, i) => {
+          const slot = el('div', 'slot');
+          const cart = el('button', 'cart');
+          cart.type = 'button';
+          cart.setAttribute('aria-label', g.name + ' — open dossier');
+          cart.innerHTML =
+            '<span class="face front"><span class="notch"></span>' +
+              '<span class="label">' + esc(g.short) + '<small>' + esc(g.platform) + '</small></span>' +
+              '<span class="ridges"></span>' +
+              (g.sticker ? '<span class="sticker" style="background-image:url(' + g.sticker + ')"></span>' : '') +
+            '</span>' +
+            '<span class="face back"></span>' +
+            '<span class="face side left"></span><span class="face side right"></span>' +
+            '<span class="face cap top"></span><span class="face cap bottom"></span>';
+          cart.addEventListener('click', () => dossier(i));
+          slot.appendChild(cart);
+          slot.appendChild(el('div', 'name', String(i + 1).padStart(2, '0') + '. ' + g.name));
+          slot.appendChild(el('div', 'meta', g.genre));
+          rack.appendChild(slot);
+        });
+        put(rack);
+        commandRow(['ALL GAMES', 'DEVLOG', 'HOME']);
+      }
+
+      function dossier(i) {
+        const g = GAMES[i];
+        if (!g) return;
+        gap();
+        line('> LOAD ' + g.name.toUpperCase(), 'l hl');
+        const dl = el('dl', 'kv');
+        [['TITLE', g.name], ['GENRE', g.genre], ['PLATFORM', g.platform], ['STATUS', g.status]]
+          .forEach(([k, v]) => { dl.appendChild(el('dt', null, k + ':')); dl.appendChild(el('dd', null, v)); });
+        put(dl);
+        html('<p class="l dim">' + (g.lead ? '<span class="hl">' + esc(g.lead) + '</span>' : '') +
+             '<span data-translate="' + g.key + '">' + g.desc + '</span></p>');
+        if (g.link) html('<p class="link-row"><a href="' + g.link + '">' + g.linkLabel + '</a></p>');
+        if (window.applyI18n) window.applyI18n();
+        out.scrollTop = out.scrollHeight;
+      }
+
+      async function devlog() {
+        clear();
+        await type('> DEVLOG', 'l hl');
+        gap();
+        const host = put(el('div'));
+        host.innerHTML = '<p class="l faint">reading devlogs/devlogs.json ...</p>';
+        try {
+          const r = await fetch('./devlogs/devlogs.json?v=' + Date.now());
+          const data = await r.json();
+          const logs = (data.devlogs || []).slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+          if (!logs.length) { host.innerHTML = '<p class="l dim">No devlog entries available yet.</p>'; }
+          else {
+            host.innerHTML = logs.slice(0, 5).map(l =>
+              '<p class="l"><span class="hl">' + esc(new Date(l.date).toISOString().slice(0, 10)) + '</span>  ' +
+              esc(l.title) + '</p><p class="l dim" style="padding-left:12ch">' + esc(l.excerpt) + '</p>').join('');
+          }
+        } catch (e) {
+          host.innerHTML = '<p class="l err">devlog feed unreachable</p>';
         }
+        gap();
+        html('<p class="link-row"><a href="./devlogs/">OPEN FULL DEVLOG ARCHIVE &rarr;</a></p>');
+        gap();
+        commandRow(['PROJECTS', 'HOME']);
+      }
+
+      async function faq() {
+        clear();
+        await type('> FAQ', 'l hl');
+        gap();
+        COPY.faq.forEach(f => {
+          const d = el('details', 'q');
+          const sum = el('summary'); sum.setAttribute('data-translate', f.qk); sum.textContent = f.q;
+          const ans = el('div', 'a'); ans.setAttribute('data-translate', f.ak); ans.innerHTML = f.a;
+          d.appendChild(sum); d.appendChild(ans); put(d);
+        });
+        if (window.applyI18n) window.applyI18n();
+        gap();
+        commandRow(['CONTACT', 'HOME']);
+      }
+
+      async function contact() {
+        clear();
+        await type('> CONTACT', 'l hl');
+        line('open channels', 'l faint');
+        gap();
+        html('<p class="link-row"><a href="mailto:contact@beniah.games">contact@beniah.games</a>' +
+             '<a href="https://discord.gg/PW6UZWtZ7C" target="_blank" rel="noopener">DISCORD SERVER</a></p>');
+        gap();
+        const form = document.getElementById('contact-template').content.cloneNode(true);
+        put(el('div', 'panel')).appendChild(form);
+        if (window.applyI18n) window.applyI18n();
+        gap();
+        commandRow(['ABOUT', 'HOME']);
+      }
+
+      async function help() {
+        clear();
+        await type('> HELP', 'l hl');
+        gap();
+        const dl = el('dl', 'kv');
+        [['ABOUT', 'who is behind this'], ['PROJECTS', 'the cartridge rack'], ['DEVLOG', 'latest development logs'],
+         ['FAQ', 'questions people ask'], ['CONTACT', 'send a message'], ['ALL GAMES', 'the full games page'],
+         ['PRIVACY', 'privacy policies'], ['DISCORD', 'open the server'], ['LOGIN', 'account access'],
+         ['CLEAR', 'wipe the screen'], ['HOME', 'back to the start']]
+          .forEach(([k, v]) => { dl.appendChild(el('dt', null, k)); dl.appendChild(el('dd', 'dim', v)); });
+        put(dl);
+        gap();
+        line('arrow keys walk back through what you have typed', 'l faint');
+      }
+
+      // ---------------------------------------------------------- router
+      const ROUTES = {
+        HOME: home, ABOUT: about, PROJECTS: projects, GAMES: projects, PROJECT: projects,
+        DEVLOG: devlog, DEVLOGS: devlog, FAQ: faq, CONTACT: contact, HELP: help, '?': help,
+        CLEAR: async () => { clear(); },
+        'ALL GAMES': async () => { line('> opening games/ ...', 'l ok'); location.href = './games/'; },
+        PRIVACY: async () => { line('> opening privacy/ ...', 'l ok'); location.href = './privacy/'; },
+        DISCORD: async () => { line('> opening discord ...', 'l ok'); window.open('https://discord.gg/PW6UZWtZ7C', '_blank', 'noopener'); },
+        LOGIN: async () => { const m = document.getElementById('signup-modal'); if (m) m.classList.add('show'); line('> auth panel open', 'l ok'); },
       };
-      
-      expandAllBtn.addEventListener('click', async () => {
-        const shouldExpand = !allExpanded;
-        
-        // Play appropriate sound effect
-        if (window.audioManager) {
-          if (shouldExpand) {
-            await window.audioManager.playSound('alienOpen');
-          } else {
-            await window.audioManager.playSound('alienClose');
-          }
+
+      async function run(raw) {
+        const cmd = String(raw || '').trim().toUpperCase();
+        if (!cmd) return;
+        typing = Symbol('run');
+        if (window.audioManager) window.audioManager.playSound('gadgetOpen');
+
+        // a bare number on the PROJECTS screen opens that cartridge
+        if (/^\d+$/.test(cmd) && document.querySelector('.rack')) {
+          const i = parseInt(cmd, 10) - 1;
+          if (GAMES[i]) return dossier(i);
         }
-        
-        gameCards.forEach(card => {
-          card.setAttribute('aria-expanded', shouldExpand);
-          if (shouldExpand) {
-            card.classList.add('expanded');
-          } else {
-            card.classList.remove('expanded');
-          }
-        });
-        
-        updateButtonText();
+        const fn = ROUTES[cmd];
+        if (fn) return fn();
+        line('> ' + cmd, 'l');
+        line("command not found: " + cmd + " — type HELP", 'l err');
+      }
+      window.termRun = run;
+
+      // ---------------------------------------------------------- input
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          const v = input.value;
+          if (v.trim()) { history.push(v); historyAt = history.length; }
+          input.value = '';
+          run(v);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (historyAt > 0) { historyAt--; input.value = history[historyAt]; }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (historyAt < history.length - 1) { historyAt++; input.value = history[historyAt]; }
+          else { historyAt = history.length; input.value = ''; }
+        }
       });
-      
-      // Listen for individual card changes to update button state
-      gameCards.forEach(card => {
-        const observer = new MutationObserver(updateButtonText);
-        observer.observe(card, { attributes: true, attributeFilter: ['aria-expanded'] });
+      // clicking anywhere on the screen puts the caret back in the prompt
+      screen.addEventListener('click', e => {
+        if (e.target.closest('button, a, input, textarea, summary, details')) return;
+        input.focus();
       });
-      
-      // Initial button state
-      updateButtonText();
-    })();
 
-    // Tool bubbles drift as you scroll
-    (() => {
-      const bubbles = [...document.querySelectorAll('.tool-field .bubble')];
-      if (!bubbles.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-      let ticking = false;
-      const apply = () => {
-        const y = window.scrollY || window.pageYOffset || 0;
-        bubbles.forEach(bubble => {
-          const speed = parseFloat(bubble.dataset.speed) || 0.1;
-          bubble.style.transform = 'translate3d(0,' + (y * speed).toFixed(1) + 'px,0)';
-        });
-        ticking = false;
-      };
-      const tick = () => { if (!ticking) { requestAnimationFrame(apply); ticking = true; } };
-
-      apply();
-      window.addEventListener('scroll', tick, { passive: true });
+      // ---------------------------------------------------------- boot
+      (async () => {
+        const boot = [
+          'BENIAH.GAMES SYSTEM v5.0 — booting',
+          'loading cartridges ......... OK',
+          'mounting devlog feed ....... OK',
+          'calibrating phosphor ....... OK',
+        ];
+        for (const b of boot) { await type(b, 'l faint', 6); }
+        await new Promise(r => setTimeout(r, reduced ? 0 : 260));
+        await home();
+        input.focus();
+      })();
     })();
 
   </script>
-
-  <!-- User Authentication Modal -->
-  <div id="signup-modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      
-      <!-- Tab Navigation -->
-      <div class="auth-tabs">
-        <button class="tab-btn active" id="login-tab" data-translate="login.title">Login</button>
-        <button class="tab-btn" id="signup-tab" data-translate="signup.title">Sign Up</button>
-      </div>
-      
-      <!-- Login Form -->
-      <div id="login-form-container" class="form-container active">
-        <form id="login-form">
-          <div class="form-group">
-            <label for="login-email" data-translate="login.email">Email:</label>
-            <input type="email" id="login-email" name="email" required>
-          </div>
-          <div class="form-group">
-            <label for="login-password" data-translate="login.password">Password:</label>
-            <input type="password" id="login-password" name="password" required>
-          </div>
-          <button type="submit" data-translate="login.submit">Login</button>
-          <div id="login-message" class="message"></div>
-        </form>
-      </div>
-      
-      <!-- Signup Form -->
-      <div id="signup-form-container" class="form-container">
-        <form id="signup-form">
-          <div class="form-group">
-            <label for="email" data-translate="signup.email">Email:</label>
-            <input type="email" id="email" name="email" required>
-          </div>
-          <div class="form-group">
-            <label for="password" data-translate="signup.password">Password:</label>
-            <input type="password" id="password" name="password" required>
-          </div>
-          <div class="form-group">
-            <label for="confirm-password" data-translate="signup.confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm-password" name="confirm-password" required>
-          </div>
-          <div class="captcha-container">
-            <div class="h-captcha" data-sitekey="046c6cd4-135a-4bba-8fa6-30403bc05c96"></div>
-          </div>
-          <button type="submit" data-translate="signup.submit">Sign Up</button>
-          <div id="signup-message" class="message"></div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-
-
 </body>
 </html>
