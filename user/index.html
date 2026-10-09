@@ -259,8 +259,8 @@
                     // Try to fetch role and progress data (optional)
                     try {
                         const [roleResult, progressResult] = await Promise.all([
-                            supabase.from('user_current_role').select('role_id, role_tiers:role_id(code,name,color)').eq('user_id', targetUserId).single(),
-                            supabase.from('user_progress').select('xp, level').eq('user_id', targetUserId).single()
+                            supabase.from('user_current_role').select('role_id, role_tiers:role_id(code,name,color)').eq('user_id', targetUserId).maybeSingle(),
+                            supabase.from('user_progress').select('xp, level').eq('user_id', targetUserId).maybeSingle()
                         ]);
                         
                         currentRole = roleResult.data;
@@ -321,7 +321,8 @@
             document.getElementById('info-games-played').textContent = profile.games_played || '0';
             document.getElementById('info-high-score').textContent = profile.high_score || '0';
             document.getElementById('info-playtime').textContent = (profile.total_playtime || 0) + ' minutes';
-            document.getElementById('info-achievements').textContent = profile.achievements || '0';
+            document.getElementById('info-achievements').textContent =
+                Array.isArray(profile.achievements) ? String(profile.achievements.length) : '0';
             
             // Display role information if available
             if (currentRole && currentRole.role_tiers) {

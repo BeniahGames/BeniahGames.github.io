@@ -1363,6 +1363,13 @@
 
     // Initialize Supabase and modal functionality when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
+      // If the supabase bundle did not load (blocked CDN, offline, adblocker),
+      // bail out quietly: the terminal and the rest of the page still work.
+      if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+        console.warn('supabase unavailable; account features are disabled');
+        return;
+      }
+
       // Initialize Supabase
       const supabaseUrl = 'https://nqhejsnfwfcilktnyqbi.supabase.co';
       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xaGVqc25md2ZjaWxrdG55cWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzODQ3NzAsImV4cCI6MjA3Mzk2MDc3MH0.8ngjb28rPVPCj4SnLtLSeUFbeAoFsrcQlZXpq2D19Ag';
@@ -1370,7 +1377,7 @@
 
       // Username and Profile Functions
       async function checkUsername(name) { 
-        const { data, error } = await supabase.rpc('is_username_available', { p_username: name }); 
+        const { data, error } = await supabase.rpc('is_username_available', { username_to_check: name }); 
         if (error) { console.error(error); return false; } 
         return data === true; 
       }
@@ -1835,11 +1842,41 @@
         }
       });
 
+      // --- bridge the terminal's achievement system to the account -----------
+      // The server validates every code against its own catalog and awards the
+      // XP, so nothing here is trusted; a tampered client gains nothing.
+      window.bgCloud = {
+        async syncAchievements(codes) {
+          try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return null;
+            const { data, error } = await supabase.rpc('sync_terminal_achievements', {
+              p_codes: Array.isArray(codes) ? codes : []
+            });
+            if (error) { console.warn('achievement sync failed:', error.message); return null; }
+            const row = Array.isArray(data) ? data[0] : data;
+            if (!row) return null;
+            return {
+              codes: row.codes || [],
+              newly: row.newly_added || [],
+              xp: row.total_xp,
+              level: row.user_level,
+              role: row.role_name
+            };
+          } catch (e) {
+            console.warn('achievement sync failed:', e);
+            return null;
+          }
+        }
+      };
+      window.dispatchEvent(new CustomEvent('bg-cloud-ready'));
+
       // Check auth state on page load
       checkAuthState();
 
       // Listen for auth state changes
       supabase.auth.onAuthStateChange((event, session) => {
+        window.dispatchEvent(new CustomEvent('bg-auth-changed', { detail: { event } }));
         if (event === 'SIGNED_IN') {
           checkAuthState();
         } else if (event === 'SIGNED_OUT') {
@@ -1910,6 +1947,7 @@
         line('*** ACHIEVEMENT UNLOCKED — ' + a.name + ' ***', 'l ok');
         if (window.audioManager) window.audioManager.playSound('alienOpen');
         if (!has('all') && P.got.length === ACHIEVEMENTS.length - 1) unlock('all');
+        queueSync();
       }
 
       function meter() {
@@ -1928,6 +1966,38 @@
       function secret(name) {
         if (P.secrets.indexOf(name) === -1) { P.secrets.push(name); save(); }
         if (P.secrets.length >= 3) unlock('digger');
+      }
+
+      // ---------------------------------------------------------- account sync
+      // Local play always works. When signed in, the account is the union of
+      // what this browser found and what the account already had, so a second
+      // device adds to the set rather than overwriting it.
+      const cloud = { on: false, xp: null, level: null, role: null };
+      let syncTimer = null;
+
+      async function pushCloud() {
+        if (!window.bgCloud) return null;
+        const r = await window.bgCloud.syncAchievements(P.got);
+        if (!r) { cloud.on = false; return null; }
+        cloud.on = true;
+        cloud.xp = r.xp; cloud.level = r.level; cloud.role = r.role;
+
+        // adopt anything the account knows that this browser does not
+        let adopted = 0;
+        r.codes.forEach(code => {
+          if (P.got.indexOf(code) === -1 && ACHIEVEMENTS.some(a => a.id === code)) {
+            P.got.push(code); adopted++;
+          }
+        });
+        if (adopted) save();
+        return { adopted: adopted, result: r };
+      }
+
+      // unlocks arrive in bursts, so settle before talking to the server
+      function queueSync() {
+        if (!window.bgCloud) return;
+        clearTimeout(syncTimer);
+        syncTimer = setTimeout(() => { pushCloud(); }, 1200);
       }
 
       // type a line out one character at a time; resolves when done
@@ -2124,8 +2194,15 @@
           else line('[ ] ???  — ' + a.hint, 'l faint');
         });
         gap();
-        line('progress is kept in this browser only; nothing is sent anywhere', 'l faint');
-        line('RESET wipes it', 'l faint');
+        if (cloud.on) {
+          const rank = cloud.role ? ' \u00b7 ' + String(cloud.role).toUpperCase() : '';
+          line('SYNC: account \u2014 LEVEL ' + cloud.level + ' \u00b7 ' + cloud.xp + ' XP' + rank, 'l ok');
+          line('these travel with your account, on any device you sign in from', 'l faint');
+        } else {
+          line('SYNC: this browser only', 'l faint');
+          line('sign in with LOGIN and they follow your account instead', 'l faint');
+        }
+        line('RESET clears this browser; anything already on your account stays', 'l faint');
         gap();
         commandRow(['PROJECTS', 'HOME']);
       }
@@ -2161,6 +2238,7 @@
         RESET: async () => {
           P = { got: [], screens: [], carts: [], secrets: [] }; save();
           line('> progress wiped. the rack forgets you.', 'l ok');
+          if (cloud.on) line('  (your account keeps what it already had)', 'l faint');
         },
 
         // --- not listed in HELP ---
@@ -2261,6 +2339,17 @@
           if (window.audioManager) window.audioManager.playSound('alienOpen');
         }
         input.focus();
+
+        // pull the account's achievements in without holding up the boot
+        const announce = r => {
+          if (r && r.adopted) {
+            line('> ' + r.adopted + ' achievement' + (r.adopted === 1 ? '' : 's') +
+                 ' restored from your account', 'l ok');
+          }
+        };
+        if (window.bgCloud) pushCloud().then(announce);
+        else window.addEventListener('bg-cloud-ready', () => pushCloud().then(announce), { once: true });
+        window.addEventListener('bg-auth-changed', () => { pushCloud().then(announce); });
       })();
 
       // up up down down left right left right B A
