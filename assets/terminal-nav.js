@@ -27,9 +27,11 @@
     DEVLOG: () => go(root + 'devlogs/'),
     DEVLOGS: () => go(root + 'devlogs/'),
     PRIVACY: () => go(root + 'privacy/'),
+    SUNKEEPER: () => go(root + 'sunkeeper/'),
+    STEAM: () => { say('> opening steam ...', 'l ok'); window.open('https://store.steampowered.com/app/5410670/Sunkeeper/', '_blank', 'noopener'); },
     DISCORD: () => { say('> opening discord ...', 'l ok'); window.open('https://discord.gg/PW6UZWtZ7C', '_blank', 'noopener'); },
     BACK: () => history.back(),
-    HELP: () => say('HOME  ABOUT  PROJECTS  DEVLOG  FAQ  CONTACT  PRIVACY  DISCORD  BACK', 'l dim'),
+    HELP: () => say('HOME  ABOUT  PROJECTS  DEVLOG  FAQ  CONTACT  PRIVACY  SUNKEEPER  DISCORD  BACK', 'l dim'),
   };
 
   function run(raw) {

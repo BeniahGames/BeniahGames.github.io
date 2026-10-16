@@ -126,6 +126,8 @@ p{margin:0}
   gap:clamp(1.25rem,3vw,2.25rem);padding:1.5rem .25rem 1rem;perspective:1100px;
 }
 .slot{display:grid;justify-items:center;gap:.8rem}
+/* a rack holding a single cartridge should not stretch across the screen */
+.rack-one{grid-template-columns:minmax(150px,220px);justify-content:center}
 .cart{
   width:124px;height:164px;position:relative;transform-style:preserve-3d;
   transform:rotateX(-10deg) rotateY(-24deg);
@@ -170,6 +172,8 @@ p{margin:0}
   filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));pointer-events:none;
 }
 .slot .name{font-size:.78rem;color:var(--text);text-align:center;letter-spacing:.08em}
+.slot .name a{color:var(--amber);text-decoration:none}
+.slot .name a:hover{text-decoration:underline}
 .slot .meta{font-size:.68rem;color:var(--faint);text-align:center}
 
 /* ============================================================ panels */

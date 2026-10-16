@@ -178,11 +178,13 @@
             "short": "SUN\nKEEPER",
             "genre": "Idle incremental · Galaxy",
             "platform": "STEAM",
-            "status": "Release Q1 2027",
+            "status": "Release Q1 2027 · on Steam now",
             "key": "games.sunkeeper.desc",
             "desc": "Tend a newborn star in the corner of your desktop. Gather light, raise worlds and guide their people from the first fire to the stars. Collapse your sun in a supernova, decipher a lost alien alphabet, and, at the very end, tear open a black hole into the multiverse.",
-            "link": "",
-            "linkLabel": "",
+            "link": "./sunkeeper/",
+            "linkLabel": "FULL GAME PAGE →",
+            "link2": "https://store.steampowered.com/app/5410670/Sunkeeper/",
+            "link2Label": "WISHLIST ON STEAM →",
             "sticker": "",
             "lead": ""
       }
@@ -2119,7 +2121,12 @@
         put(dl);
         html('<p class="l dim">' + (g.lead ? '<span class="hl">' + esc(g.lead) + '</span>' : '') +
              '<span data-translate="' + g.key + '">' + g.desc + '</span></p>');
-        if (g.link) html('<p class="link-row"><a href="' + g.link + '">' + g.linkLabel + '</a></p>');
+        if (g.link || g.link2) {
+          let row = '<p class="link-row">';
+          if (g.link) row += '<a href="' + g.link + '">' + g.linkLabel + '</a>';
+          if (g.link2) row += '<a href="' + g.link2 + '" target="_blank" rel="noopener">' + g.link2Label + '</a>';
+          html(row + '</p>');
+        }
         if (window.applyI18n) window.applyI18n();
         collect(i);
         out.scrollTop = out.scrollHeight;
@@ -2214,7 +2221,8 @@
         const dl = el('dl', 'kv');
         [['ABOUT', 'who is behind this'], ['PROJECTS', 'the cartridge rack'], ['DEVLOG', 'latest development logs'],
          ['FAQ', 'questions people ask'], ['CONTACT', 'send a message'], ['ALL GAMES', 'the full games page'],
-         ['PRIVACY', 'privacy policies'], ['DISCORD', 'open the server'], ['LOGIN', 'account access'],
+         ['PRIVACY', 'privacy policies'], ['SUNKEEPER', 'the Steam title, in detail'],
+         ['DISCORD', 'open the server'], ['LOGIN', 'account access'],
          ['ACHIEVEMENTS', 'what you have found so far'],
          ['CLEAR', 'wipe the screen'], ['HOME', 'back to the start']]
           .forEach(([k, v]) => { dl.appendChild(el('dt', null, k)); dl.appendChild(el('dd', 'dim', v)); });
@@ -2232,6 +2240,8 @@
         CLEAR: async () => { clear(); },
         'ALL GAMES': async () => { line('> opening games/ ...', 'l ok'); location.href = './games/'; },
         PRIVACY: async () => { line('> opening privacy/ ...', 'l ok'); location.href = './privacy/'; },
+        SUNKEEPER: async () => { line('> opening sunkeeper/ ...', 'l ok'); location.href = './sunkeeper/'; },
+        STEAM: async () => { line('> opening steam ...', 'l ok'); window.open('https://store.steampowered.com/app/5410670/Sunkeeper/', '_blank', 'noopener'); },
         DISCORD: async () => { line('> opening discord ...', 'l ok'); window.open('https://discord.gg/PW6UZWtZ7C', '_blank', 'noopener'); },
         LOGIN: async () => { const m = document.getElementById('signup-modal'); if (m) m.classList.add('show'); line('> auth panel open', 'l ok'); },
         ACHIEVEMENTS: achievements, ACH: achievements,
