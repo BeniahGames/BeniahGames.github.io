@@ -185,7 +185,8 @@
             "linkLabel": "FULL GAME PAGE →",
             "link2": "https://store.steampowered.com/app/5410670/Sunkeeper/",
             "link2Label": "WISHLIST ON STEAM →",
-            "sticker": "./assets/games/sunkeeper-sticker.webp",
+            "sticker": "",
+            "labelArt": "./assets/games/sunkeeper-label.webp",
             "lead": ""
       }
 ];
@@ -2092,7 +2093,11 @@
           cart.setAttribute('aria-label', g.name + ' — open dossier');
           cart.innerHTML =
             '<span class="face front"><span class="notch"></span>' +
-              '<span class="label">' + esc(g.short) + '<small>' + esc(g.platform) + '</small></span>' +
+              (g.labelArt
+                ? '<span class="label art" style="background-image:url(' + g.labelArt + ')">' +
+                    '<span class="sr-only">' + esc(g.name) + '</span>' +
+                    '<small>' + esc(g.platform) + '</small></span>'
+                : '<span class="label">' + esc(g.short) + '<small>' + esc(g.platform) + '</small></span>') +
               '<span class="ridges"></span>' +
               (g.sticker ? '<span class="sticker" style="background-image:url(' + g.sticker + ')"></span>' : '') +
             '</span>' +

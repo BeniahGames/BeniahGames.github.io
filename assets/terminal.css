@@ -159,6 +159,19 @@ p{margin:0}
   display:grid;place-items:center;min-height:52px;
 }
 .face.front .label small{display:block;font-weight:400;font-size:.52rem;opacity:.75;letter-spacing:.08em}
+/* a cartridge whose label is cover art instead of a printed name.
+   The art is portrait and the label box is slightly more so, hence contain:
+   cover would crop the edges off the wordmark. The letterbox is invisible
+   because the art meets it in near-black space. */
+.face.front .label.art{
+  background:#05060a center/contain no-repeat;
+  padding:0;display:block;position:relative;overflow:hidden;
+}
+.face.front .label.art small{
+  position:absolute;left:0;right:0;bottom:0;opacity:1;
+  background:rgba(4,5,9,.72);color:var(--amber);
+  font-size:.5rem;letter-spacing:.12em;padding:.1rem 0;text-align:center;
+}
 .face.front .ridges{
   background:repeating-linear-gradient(90deg,rgba(255,204,0,.16) 0 4px,transparent 4px 9px);
   border-radius:2px;
@@ -167,10 +180,9 @@ p{margin:0}
 .face.back{background-image:repeating-linear-gradient(0deg,rgba(255,204,0,.06) 0 2px,transparent 2px 7px)}
 /* sticker slot: drop an image in later and it lands on the cartridge face */
 .face.front .sticker{
-  position:absolute;right:-7px;bottom:4px;width:48px;height:58px;transform:rotate(-11deg);
+  position:absolute;right:-6px;top:30px;width:44px;height:44px;transform:rotate(-11deg);
   background-size:contain;background-repeat:no-repeat;background-position:center;
-  border-radius:3px;
-  filter:drop-shadow(0 3px 7px rgba(0,0,0,.7));pointer-events:none;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));pointer-events:none;
 }
 .slot .name{font-size:.78rem;color:var(--text);text-align:center;letter-spacing:.08em}
 .slot .name a{color:var(--amber);text-decoration:none}
