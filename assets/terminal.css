@@ -371,3 +371,52 @@ body.konami{animation:konami 4s ease-in-out}
   88%{filter:hue-rotate(120deg) saturate(1.4)}
   100%{filter:none}
 }
+
+/* ============================================================ screenshots */
+.shots{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:.6rem;margin:.5rem 0 1.3rem;max-width:84ch;
+}
+/* five 16:9 shots tile badly in equal columns, so the first one leads
+   full width and the remaining four pair off beneath it */
+.shots > .shot:first-child{grid-column:1/-1}
+@media(max-width:560px){.shots{grid-template-columns:1fr}}
+
+/* compact row, for listing a game among others rather than on its own page */
+.shots.strip{grid-template-columns:repeat(auto-fit,minmax(104px,1fr));max-width:none;gap:.45rem}
+.shots.strip > .shot:first-child{grid-column:auto}
+.shot{
+  display:block;line-height:0;border:1px solid var(--line);border-radius:6px;
+  overflow:hidden;transition:.2s var(--ease);background:#05060a;
+}
+.shot:hover,.shot:focus-visible{
+  border-color:var(--amber);outline:none;box-shadow:0 0 0 3px rgba(255,204,0,.12);
+}
+.shot img{width:100%;height:auto;display:block}
+
+/* lightbox: sits above the bar (40) and below the auth modal (200) */
+.lb{
+  position:fixed;inset:0;z-index:150;display:grid;place-items:center;
+  background:rgba(3,4,7,.97);padding:clamp(1rem,4vmin,3rem);
+}
+.lb figure{margin:0;display:grid;justify-items:center;gap:.6rem;max-width:100%}
+.lb img{
+  max-width:100%;max-height:82vh;width:auto;height:auto;display:block;
+  border:1px solid var(--line);border-radius:6px;
+}
+.lb figcaption{color:var(--faint);font-size:.78rem;letter-spacing:.08em;text-align:center}
+.lb button{
+  font:inherit;cursor:pointer;color:var(--amber);background:rgba(7,8,10,.85);
+  border:1px solid var(--line);border-radius:6px;transition:.2s var(--ease);
+}
+.lb button:hover{background:var(--amber);color:#14130d}
+.lb-close{position:absolute;top:1rem;right:1rem;padding:.3rem .65rem;font-size:1rem;line-height:1}
+.lb-prev,.lb-next{
+  position:absolute;top:50%;transform:translateY(-50%);
+  padding:.5rem .7rem;font-size:1.1rem;line-height:1;
+}
+.lb-prev{left:.6rem}
+.lb-next{right:.6rem}
+@media(max-width:620px){
+  .lb-prev,.lb-next{top:auto;bottom:1rem;transform:none}
+}
